@@ -1,0 +1,206 @@
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;700&display=swap');
+@import "tailwindcss";
+@import "tw-animate-css";
+
+
+
+/* ✨ Tell Tailwind where to inject layers */
+@layer base {
+  :root {
+    /* 2. Define colors and fonts as CSS variables for easy theming */
+    --font-primary: 'Sora', system-ui, Avenir, Helvetica, Arial, sans-serif;
+
+    /* Dark Theme Colors (default) */
+    --color-text: #D4D4D4; /* A softer white for better readability */
+    --color-heading: #FFD700; /* Gold for main headings */
+    --color-background: #08080E; /* Dark Charcoal */
+    --color-accent: #A855F7; /* Violet */
+    --color-button-bg: #2C2C3A;
+  }
+
+  @media (prefers-color-scheme: light) {
+    :root {
+      /* 3. Redefine variables for Light Theme */
+      --color-text: #213547;
+      --color-heading: #1a1a1a;
+      --color-background: #08080E;;
+      --color-accent: #535bf2;
+      --color-button-bg: #f9f9f9;
+    }
+  }
+
+  /* Apply the base styles using variables */
+  body {
+    font-family: var(--font-primary);
+    line-height: 1.5;
+    font-weight: 400;
+
+    color: var(--color-text);
+    background-color: var(--color-background);
+
+    margin: 0;
+    min-width: 320px;
+    min-height: 100vh;
+
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3 {
+    color: var(--color-heading);
+  }
+
+  h1 {
+    font-size: 3.2em;
+    line-height: 1.1;
+  }
+
+  a {
+    font-weight: 500;
+    color: var(--color-accent);
+    text-decoration: inherit;
+    transition: color 0.2s ease-in-out; /* 4. Smoother transition */
+  }
+  a:hover {
+    color: var(--color-heading);
+  }
+
+  button {
+    border-radius: 8px;
+    border: 1px solid transparent;
+    padding: 0.6em 1.2em;
+    font-size: 1em;
+    font-weight: 500;
+    font-family: inherit;
+    color: var(--color-text); /* Ensure button text is readable */
+    background-color: var(--color-button-bg);
+    cursor: pointer;
+    transition: border-color 0.25s;
+  }
+  button:hover {
+    border-color: var(--color-accent);
+  }
+  button:focus,
+  button:focus-visible {
+    outline: 4px auto -webkit-focus-ring-color;
+  }
+
+  .shine-text {
+    /* Define the gradient that will act as the "shine" */
+    background-image: linear-gradient(
+      90deg,
+      var(--color-heading) 0%, /* Start with the base gold color */
+      #FFF6A3 50%,        /* A brighter, lighter gold for the "shine" highlight */
+      var(--color-heading) 100% /* End with the base gold color */
+    );
+
+    /* Set the background size and position. The width is important for the animation. */
+    background-size: 200% auto;
+    background-position: 0% 50%;
+
+    /* Clip the background to the text and make the text transparent */
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+
+    /* Apply the animation */
+    animation: shine 3s linear infinite;
+  }
+
+  /* Define the animation keyframes */
+  @keyframes shine {
+    to {
+      background-position: -200% 50%;
+    }
+  }
+
+  /* You can apply this class to any heading you want to animate */
+  h1 {
+    font-size: 3.2em;
+    line-height: 1.1;
+    /* Remove the color variable here since we're using a gradient */
+    color: initial; 
+  }
+  
+  /* ADDED: Style for the encrypted text from DecryptedText component */
+  .text-encrypted {
+    color: #A855F7; /* Using your existing accent color */
+    opacity: 0.8;
+    transition: color 0.3s ease-in-out, opacity 0.3s ease-in-out;
+  }
+}
+
+
+
+:root {
+  --radius: 0.625rem;
+  --background: #08080E;
+  --foreground: #ffffff;
+  --card: #1e1e2f;
+  --card-foreground: #ffffff;
+  --popover: #1e1e2f;
+  --popover-foreground: #ffffff;
+  --primary: #08080E;
+  --primary-foreground: #ffffff;
+  --secondary: #08080E;
+  --secondary-foreground: #ffffff;
+  --muted: #08080E;
+  --muted-foreground: #ffffff;
+  --accent: #08080E;
+  --accent-foreground: #ffffff;
+  --destructive: #08080E;
+  --border: #08080E;
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}
+
+  
