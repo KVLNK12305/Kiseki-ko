@@ -1,6 +1,5 @@
 import React from 'react';
-import DecryptedText from './DecryptedText'; // Make sure to import the component
-
+import DecryptedText from './sokulu/DecryptedText'; // Make sure to import the component
 const Main_story = () => (
     <section id="home" className="min-h-screen flex items-center justify-start px-6">
         <div className="max-w-4xl container mx-auto">
