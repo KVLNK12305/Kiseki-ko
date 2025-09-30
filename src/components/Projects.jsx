@@ -1,4 +1,5 @@
 import React from 'react';
+import ElectricBorder from './sokulu/ElectricBorder';
 
 const GitHubIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" role="img" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 transition-colors duration-300">
@@ -44,20 +45,29 @@ const Projects = () => {
                 </h2>
                 <div className="grid md:grid-cols-2 gap-6">
                     {projects.map((project, index) => (
-                        <div key={index} className="bg-navy-light p-6 rounded-md border border-slate/20 hover:border-gold/50 transition-all duration-300 transform hover:-translate-y-2 hover:shadow-glow group flex flex-col">
-                            <div className="flex justify-between items-center mb-4">
-                                <h3 className="text-xl font-bold text-light-slate group-hover:text-gold transition-colors duration-300">{project.title}</h3>
-                                <a href={project.link} target="_blank" rel="noopener noreferrer" className="text-slate hover:text-gold">
-                                    <GitHubIcon />
-                                </a>
+                        <ElectricBorder
+                            key={index}
+                            color="#FFD700" 
+                            thickness={1}
+                            speed={1.2}
+                            className="rounded-md transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl group flex flex-col"
+                            style={{borderRadius: '0.375rem'}}
+                        >
+                            <div className="bg-navy-light p-6 rounded-md h-full flex flex-col">
+                                <div className="flex justify-between items-center mb-4">
+                                    <h3 className="text-xl font-bold text-light-slate group-hover:text-gold transition-colors duration-300">{project.title}</h3>
+                                    <a href={project.link} target="_blank" rel="noopener noreferrer" className="text-slate hover:text-gold">
+                                        <GitHubIcon />
+                                    </a>
+                                </div>
+                                <p className="text-slate mb-4 flex-grow">{project.description}</p>
+                                <div className="flex flex-wrap gap-2 mt-auto">
+                                    {project.tags.map(tag => (
+                                        <span key={tag} className="text-xs font-mono text-gold bg-gold/10 px-2 py-1 rounded-full">{tag}</span>
+                                    ))}
+                                </div>
                             </div>
-                            <p className="text-slate mb-4 flex-grow">{project.description}</p>
-                            <div className="flex flex-wrap gap-2 mt-auto">
-                                {project.tags.map(tag => (
-                                    <span key={tag} className="text-xs font-mono text-gold bg-gold/10 px-2 py-1 rounded-full">{tag}</span>
-                                ))}
-                            </div>
-                        </div>
+                        </ElectricBorder>
                     ))}
                 </div>
             </div>
