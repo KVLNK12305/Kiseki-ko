@@ -1,6 +1,6 @@
 import React from 'react';
 import DecryptedText from './sokulu/DecryptedText';
-import CyberFrame from './CyberFrame'; // Import the new component
+import CyberFrame from './sokulu/CyberFrame'; // Import the new component
 
 // Optional: Replace with your actual image path
 import profileImg from './images/me.png'; 
