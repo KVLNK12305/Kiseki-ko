@@ -29,6 +29,47 @@
     }
   }
 
+  /* Add to index.css */
+@layer utilities {
+  /* A cleaner, more technical grid background */
+  .bg-tech-grid {
+    background-size: 30px 30px;
+    background-image: 
+      linear-gradient(to right, rgba(6, 182, 212, 0.1) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(6, 182, 212, 0.1) 1px, transparent 1px);
+  }
+  
+  /* Scrolling data stream effect */
+  .bg-data-stream {
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(6, 182, 212, 0.15) 0px,
+      rgba(6, 182, 212, 0.15) 1px,
+      transparent 1px,
+      transparent 4px
+    );
+    background-size: 100% 100%;
+  }
+}
+
+@keyframes data-scroll {
+  from { background-position: 0 0; }
+  to { background-position: 0 100%; }
+}
+
+.animate-data-scroll {
+  animation: data-scroll 20s linear infinite;
+}
+
+/* A subtle pulse for 'live' status indicators */
+@keyframes quick-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .5; }
+}
+.animate-quick-pulse {
+  animation: quick-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
   /* Apply the base styles using variables */
   body {
     font-family: var(--font-primary);
