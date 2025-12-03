@@ -3,7 +3,7 @@ name: Deploy Portfolio
 on:
   push:
     branches:
-      - main   # run workflow on pushes to main
+      - main
 
 jobs:
   build-and-deploy:
@@ -28,8 +28,11 @@ jobs:
       - name: Build project
         run: pnpm build
 
+      - name: Fix SPA routing
+        run: cp dist/index.html dist/404.html
+
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v6
+        uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
