@@ -14,7 +14,7 @@ const Honors_n_certs = () => (
                     </div>
                      <div>
                          <h3 className="text-lg font-bold text-light-slate mb-1">Journal Manuscript (In Preparation)</h3>
-                         <p className="text-slate italic">"A Participatory Case Study on Children’s Mental Health in a Rural Community of Rameswaram, Tamil Nadu."</p>
+                         <p className="text-slate italic">"A Participatory Case Study on Children's Mental Health in a Rural Community of Rameswaram, Tamil Nadu."</p>
                     </div>
                 </div>
             </div>

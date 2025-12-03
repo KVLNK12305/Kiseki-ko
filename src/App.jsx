@@ -4,7 +4,7 @@ import Projects from "./components/Projects";
 import CertsExperience from "./components/Experiences";
 import Climax from "./components/climax";
 import Ed_Timeline from "./components/Edtimeline";
-import Main_story from "./components/Land_page";
+import Main_story from "./components/Basic_intro";
 import Honors_n_certs from "./components/Honors_n_certs";
 
 
