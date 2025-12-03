@@ -1,76 +1,132 @@
-import React from 'react';
+import React, { useRef } from 'react';
+import { motion, useScroll, useTransform } from 'motion/react';
 import ElectricBorder from './sokulu/ElectricBorder';
 
-const GitHubIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" role="img" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 transition-colors duration-300">
-        <title>GitHub</title>
-        <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
-    </svg>
-);
+const projects = [
+    {
+        title: "Quickdesk",
+        description: "A responsive task management dashboard with real-time updates, improving collaboration and productivity. Integrated backend APIs for task creation, assignment, and tracking with MongoDB persistence.",
+        tags: ["Next.js", "Tailwind CSS", "MongoDB", "Express.js"],
+        link: "https://github.com/Aashiq-Edavalapati/QuickDesk",
+        color: "#1a1a2e" // Custom card color for stacking contrast
+    },
+    {
+        title: "SwapCache",
+        description: "Implemented a hybrid LRU/LFU cache system with adaptive eviction policies. Achieved 15% higher hit rates compared to static cache policies via benchmarking and testing.",
+        tags: ["Python", "Streamlit", "Matplotlib"],
+        link: "https://github.com/KVLNK12305/SwapCache",
+        color: "#16213e"
+    },
+    {
+        title: "Everust",
+        description: "Documented solutions, exercises, and mini-projects exploring Rust ownership, concurrency, and systems programming. Serves as a foundation for future Rust-based performance-critical projects.",
+        tags: ["Rust", "Cargo"],
+        link: "https://github.com/KVLNK12305/Everust",
+        color: "#0f3460"
+    },
+    {
+        title: "The Evolution of F1",
+        description: "Analyzed impact of regulatory changes and technology on Formula 1 team strategies and performance. Delivered interactive dashboards and statistical visualizations to communicate insights.",
+        tags: ["Pandas", "NumPy", "Seaborn", "FastF1", "Plotly"],
+        link: "https://github.com/KVLNK12305/F1_Case_Study",
+        color: "#1f4068"
+    }
+];
 
-const Projects = () => {
-    const projects = [
-        {
-            title: "Quickdesk",
-            description: "A responsive task management dashboard with real-time updates, improving collaboration and productivity. Integrated backend APIs for task creation, assignment, and tracking with MongoDB persistence.",
-            tags: ["Next.js", "Tailwind CSS", "MongoDB", "Express.js"],
-            link: "https://github.com/Aashiq-Edavalapati/QuickDesk"
-        },
-        {
-            title: "SwapCache",
-            description: "Implemented a hybrid LRU/LFU cache system with adaptive eviction policies. Achieved 15% higher hit rates compared to static cache policies via benchmarking and testing.",
-            tags: ["Python", "Streamlit", "Matplotlib"],
-            link: "https://github.com/KVLNK12305/SwapCache"
-        },
-        {
-            title: "Everust",
-            description: "Documented solutions, exercises, and mini-projects exploring Rust ownership, concurrency, and systems programming. Serves as a foundation for future Rust-based performance-critical projects.",
-            tags: ["Rust", "Cargo"],
-            link: "https://github.com/KVLNK12305/Everust"
-        },
-        {
-            title: "The Evolution of F1",
-            description: "Analyzed impact of regulatory changes and technology on Formula 1 team strategies and performance. Delivered interactive dashboards and statistical visualizations to communicate insights.",
-            tags: ["Pandas", "NumPy", "Seaborn", "FastF1", "Plotly"],
-            link: "https://github.com/KVLNK12305/F1_Case_Study"
-        }
-    ];
+const Card = ({ i, project, progress, range, targetScale }) => {
+    const container = useRef(null);
+    const { scrollYProgress } = useScroll({
+        target: container,
+        offset: ['start end', 'start start']
+    })
+
+    const imageScale = useTransform(scrollYProgress, [0, 1], [2, 1])
+    const scale = useTransform(progress, range, [1, targetScale]);
 
     return (
-        <section id="projects" className="py-24 px-6">
-            <div className="container mx-auto max-w-4xl">
-                <h2 className="section-title text-3xl font-bold text-light-slate mb-12">
-                     <span className="text-gold font-mono mr-2">04.</span>
-                     Key Projects
-                </h2>
-                <div className="grid md:grid-cols-2 gap-6">
-                    {projects.map((project, index) => (
-                        <ElectricBorder
-                            key={index}
-                            color="#FFD700" 
-                            thickness={1}
-                            speed={1.2}
-                            className="rounded-md transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl group flex flex-col"
-                            style={{borderRadius: '0.375rem'}}
-                        >
-                            <div className="bg-navy-light p-6 rounded-md h-full flex flex-col">
-                                <div className="flex justify-between items-center mb-4">
-                                    <h3 className="text-xl font-bold text-light-slate group-hover:text-gold transition-colors duration-300">{project.title}</h3>
-                                    <a href={project.link} target="_blank" rel="noopener noreferrer" className="text-slate hover:text-gold">
-                                        <GitHubIcon />
-                                    </a>
-                                </div>
-                                <p className="text-slate mb-4 flex-grow">{project.description}</p>
-                                <div className="flex flex-wrap gap-2 mt-auto">
-                                    {project.tags.map(tag => (
-                                        <span key={tag} className="text-xs font-mono text-gold bg-gold/10 px-2 py-1 rounded-full">{tag}</span>
-                                    ))}
-                                </div>
+        <div ref={container} className="h-screen flex items-center justify-center sticky top-0">
+            <motion.div 
+                style={{ scale, top: `calc(-5vh + ${i * 25}px)` }} 
+                className="relative flex flex-col w-[1000px] h-[500px] rounded-3xl origin-top"
+            >
+                <ElectricBorder 
+                    color="#FFD700" 
+                    thickness={2} 
+                    className="h-full w-full rounded-3xl overflow-hidden bg-[#0F0F16] border border-white/10 shadow-2xl"
+                >
+                    <div className="flex h-full gap-10 p-12">
+                        {/* Content Side */}
+                        <div className="flex flex-col justify-center w-3/5">
+                            <h2 className="text-4xl font-bold text-light-slate mb-6 font-mono">{project.title}</h2>
+                            <p className="text-lg text-slate/80 leading-relaxed mb-8">
+                                {project.description}
+                            </p>
+                            <div className="flex flex-wrap gap-3 mt-auto">
+                                {project.tags.map(tag => (
+                                    <span key={tag} className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-gold text-sm font-mono">
+                                        {tag}
+                                    </span>
+                                ))}
                             </div>
-                        </ElectricBorder>
-                    ))}
-                </div>
+                            <div className="mt-8">
+                                <a 
+                                    href={project.link} 
+                                    target="_blank" 
+                                    rel="noreferrer"
+                                    className="inline-flex items-center gap-2 text-gold hover:underline underline-offset-4 font-mono"
+                                >
+                                    View Repository 
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg>
+                                </a>
+                            </div>
+                        </div>
+
+                        {/* Visual Side (Placeholder for project image) */}
+                        <div className="w-2/5 relative rounded-2xl overflow-hidden bg-black/20">
+                            <div className="absolute inset-0 flex items-center justify-center text-slate/20 font-mono text-6xl font-bold">
+                                {String(i + 1).padStart(2, '0')}
+                            </div>
+                            <motion.div 
+                                style={{ scale: imageScale }}
+                                className="w-full h-full bg-gradient-to-br from-gold/10 to-purple-500/10 opacity-50"
+                            />
+                        </div>
+                    </div>
+                </ElectricBorder>
+            </motion.div>
+        </div>
+    )
+}
+
+const Projects = () => {
+    const container = useRef(null);
+    const { scrollYProgress } = useScroll({
+        target: container,
+        offset: ['start start', 'end end']
+    })
+
+    return (
+        <section ref={container} id="projects" className="relative mt-[20vh] mb-[20vh]">
+            <div className="sticky top-10 mb-20 text-center">
+                <h2 className="section-title text-3xl md:text-5xl font-bold text-light-slate">
+                    <span className="text-gold font-mono mr-4">04.</span>
+                    Key Projects
+                </h2>
             </div>
+            
+            {projects.map((project, i) => {
+                const targetScale = 1 - ((projects.length - i) * 0.05);
+                return (
+                    <Card 
+                        key={i} 
+                        i={i} 
+                        project={project} 
+                        progress={scrollYProgress} 
+                        range={[i * 0.5, 1]} 
+                        targetScale={targetScale} 
+                    />
+                )
+            })}
         </section>
     );
 };
