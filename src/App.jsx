@@ -7,10 +7,8 @@ import Main_story from "./components/Basic_intro";
 import Hero from "./components/hero";
 import Honors_n_certs from "./components/Honors_n_certs";
 
-import useLenis from "./hooks/useLenis";
 
-function App() {
-  useLenis(); // initialize Lenis globally
+function App() { // initialize Lenis globally
 
   return (
     <>
