@@ -34,12 +34,29 @@ const Main_story = () => (
                 </p>
                 
                 <a
-                    href="#contact"
+                    href="https://www.linkedin.com/in/venkata-lakshmi-narasimha-kushal-kurapati-729ab4289/"  target='_blank' rel='noopener noreferrer'
                     className="inline-block text-gold border-2 border-gold rounded-md px-8 py-3 font-bold text-lg
                                hover:bg-gold/10 hover:shadow-[0_0_15px_rgba(255,215,0,0.3)] transition-all duration-300"
                 >
                     Connect With Me
                 </a>
+
+                {
+                /* rel="noopener noreferrer" is a security best practice when opening external links 
+                noopener
+
+Prevents the new tab from accessing window.opener
+Protects your site from tab-nabbing attacks
+Improves performance by cutting the JS connection between tabs
+
+noreferrer
+Prevents sending your page’s URL as the referrer to the new site
+Adds an extra layer of privacy.
+Automatically implies noopener in most modern browsers
+
+                */
+                }
+
             </div>
 
             {/* Image Content - Right Side */}
