@@ -19,20 +19,25 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 18
-          cache: "pnpm"   # 🔑 enables pnpm cache automatically
-
+      # 1️⃣ Install pnpm FIRST
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
         with:
           version: 8
           run_install: false
 
+      # 2️⃣ Setup Node + enable pnpm cache
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: "pnpm"
+
+      # 3️⃣ Install deps (now cached)
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # 4️⃣ Build
       - name: Build
         run: pnpm run build
 
