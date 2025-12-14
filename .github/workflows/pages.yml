@@ -23,6 +23,12 @@ jobs:
         with:
           node-version: 18
 
+      # 🔑 THIS IS WHAT YOU WERE MISSING
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
       - name: Install dependencies
         run: pnpm install
 
