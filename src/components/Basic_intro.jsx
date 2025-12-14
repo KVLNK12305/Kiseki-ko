@@ -26,7 +26,7 @@ const Main_story = () => (
                 />
 
                 <h3 className="text-2xl sm:text-4xl md:text-5xl font-bold text-slate mb-6 mt-2 tracking-wide">
-                    I am a god.
+                    Shinra tensei.
                 </h3>
                 
                 <p className="text-slate mb-10 text-base sm:text-lg leading-relaxed max-w-xl">
