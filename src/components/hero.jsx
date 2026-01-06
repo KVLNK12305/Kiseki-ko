@@ -1,101 +1,64 @@
-import React, { useState, useEffect } from "react";
-import { motion } from "motion/react";
+import React, { useRef } from 'react';
+import { motion } from 'motion/react';
+import DecryptedText from './sokulu/DecryptedText';
+import Lanyard from './sokulu/Lanyard.jsx'; // Ensure path is correct
 
-import useLenis from "../hooks/useLenis"; 
-import DecryptedText from "./sokulu/DecryptedText"; 
+const Hero = () => {
+    return (
+        <section className="relative h-screen w-full overflow-hidden flex flex-col lg:flex-row items-center justify-center bg-[#030305]">
+            
+            {/* Background Gradients */}
+            <div className="absolute top-[-20%] left-[-10%] w-[50vw] h-[50vw] bg-purple-900/20 rounded-full blur-[120px]" />
+            <div className="absolute bottom-[-20%] right-[-10%] w-[40vw] h-[40vw] bg-blue-900/10 rounded-full blur-[100px]" />
 
-const QUOTE_TEXT = "SHARPEN WHAT YOU CHOOSE TO MASTER.";
-const SCROLL_DESTINATION_ID = "#arsenal-intro";
+            {/* Left Content - Typography */}
+            <div className="relative z-10 flex-1 px-6 lg:pl-24 pt-20 lg:pt-0 text-center lg:text-left pointer-events-none">
+                <motion.div
+                    initial={{ opacity: 0, y: 50 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 1, delay: 2.2 }} // Wait for preloader
+                >
+                    <h2 className="font-mono text-[#FFD700] mb-4 text-sm tracking-widest">
+                        // ARCHITECT OF THE WEB
+                    </h2>
+                    
+                    <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-slate-100 leading-tight tracking-tighter mix-blend-difference">
+                        KUSHAL <br />
+                        <span className="text-slate-500">KURAPATI</span>
+                    </h1>
 
-export default function Hero({ onScrollToContent }) {
-  const [startAnimation, setStartAnimation] = useState(false);
-  const lenis = useLenis(); // ✔ Now properly imported
+                    <div className="mt-8 max-w-lg text-slate-400 font-mono text-sm leading-relaxed">
+                        <DecryptedText 
+                            text="Building robust systems and translating complex data into actionable digital experiences."
+                            speed={30}
+                            animateOn="view"
+                            revealDirection="start"
+                        />
+                    </div>
+                </motion.div>
+            </div>
 
-  useEffect(() => {
-    const animationStartTimer = setTimeout(() => {
-      setStartAnimation(true);
-    }, 1000);
+            {/* Right Content - Physics Lanyard (Interactive) */}
+            <div className="absolute inset-0 lg:relative lg:flex-1 w-full h-full z-20 cursor-grab active:cursor-grabbing">
+                {/* IMPORTANT: Ensure you have 'card.glb' and 'lanyard.png' in the correct folder 
+                   referenced inside Lanyard.jsx, otherwise this will crash. 
+                   If assets are missing, comment out <Lanyard /> 
+                */}
+                <Lanyard position={[0, 0, 15]} gravity={[0, -40, 0]} />
+            </div>
 
-    const scrollTimer = setTimeout(() => {
-      if (lenis && onScrollToContent) {
-        lenis.scrollTo(SCROLL_DESTINATION_ID, {
-          duration: 1.5,
-          easing: (t) => 1 - Math.pow(1 - t, 3),
-        });
-        onScrollToContent();
-      }
-    }, 3500);
-
-    return () => {
-      clearTimeout(animationStartTimer);
-      clearTimeout(scrollTimer);
-    };
-  }, [lenis, onScrollToContent]);
-
-  return (
-    <div className="relative h-screen w-full overflow-hidden bg-background text-foreground">
-      {/* Background Layers */}
-      <div className="absolute inset-0 bg-tech-grid opacity-10" />
-      <div className="absolute inset-0 bg-data-stream animate-data-scroll opacity-10" />
-
-      {/* Pulsating Glow */}
-      <div
-        className="
-          absolute inset-0 
-          bg-gradient-to-br from-purple-700/20 via-fuchsia-500/10 to-cyan-300/10 
-          blur-3xl animate-pulse
-        "
-      />
-
-      {/* Content Container */}
-      <div className="relative z-10 flex h-full flex-col items-center justify-center text-center">
-        <motion.h1
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 1, type: "spring", stiffness: 50 }}
-          className="text-6xl md:text-8xl font-bold shine-text tracking-tighter drop-shadow-lg"
-        >
-          KLS2
-        </motion.h1>
-
-        {/* Quote */}
-        <div className="mt-8 md:mt-10 max-w-xl px-4">
-          <DecryptedText
-            text={QUOTE_TEXT}
-            parentClassName="text-lg md:text-xl font-mono tracking-wider"
-            className="text-[#FFD700] text-balance"
-            encryptedClassName="text-[#A855F7] opacity-80"
-            animateOn={startAnimation ? "view" : "none"}
-            speed={35}
-            sequential={true}
-            revealDirection="center"
-          />
-        </div>
-
-        {/* Scroll Indicator */}
-        {startAnimation && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 2, duration: 1 }}
-            className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center cursor-pointer"
-            onClick={() =>
-              lenis?.scrollTo(SCROLL_DESTINATION_ID, { duration: 1.5 })
-            }
-          >
-            <span className="text-gold text-xs font-mono tracking-widest animate-pulse">
-              VIEW ARSENAL
-            </span>
-            <motion.div
-              animate={{ y: [0, 10, 0] }}
-              transition={{ repeat: Infinity, duration: 1.5 }}
-              className="mt-2 text-[#A855F7] text-2xl"
+            {/* Scroll Indicator */}
+            <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 3, duration: 1 }}
+                className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-10 pointer-events-auto"
             >
-              &darr;
+                <span className="text-[10px] font-mono text-slate-500 uppercase tracking-widest">Scroll to Explore</span>
+                <div className="w-[1px] h-12 bg-gradient-to-b from-[#FFD700] to-transparent"></div>
             </motion.div>
-          </motion.div>
-        )}
-      </div>
-    </div>
-  );
-}
+        </section>
+    );
+};
+
+export default Hero;
