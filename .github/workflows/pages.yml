@@ -19,21 +19,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 22
+          cache: 'pnpm'
 
-      # 🔑 THIS IS WHAT YOU WERE MISSING
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8
+      - name: Enable Corepack
+        run: corepack enable
 
       - name: Install dependencies
         run: pnpm install
 
       - name: Build
-        run: pnpm run build
+        run: pnpm build
 
       - uses: actions/configure-pages@v5
 
