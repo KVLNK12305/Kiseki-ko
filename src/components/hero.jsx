@@ -204,9 +204,12 @@ const Hero = () => {
     return (
         <section 
             ref={containerRef} 
-            className="relative h-screen w-full bg-[#030303] overflow-hidden flex flex-col items-center justify-center invisible"
+            // BUG FIX #4: Changed bg-[#030303] to bg-[#030305] to match main app theme
+            // ISSUE: Hero section had inconsistent background color (#030303) that didn't match App.jsx (#030305)
+            // SOLUTION: Updated to use consistent theme color #030305 for seamless transition
+            className="relative h-screen w-full bg-[#030305] overflow-hidden flex flex-col items-center justify-center invisible"
         >
-            <div ref={slashRef} className="relative w-full h-full flex flex-col items-center justify-center bg-[#050505]">
+            <div ref={slashRef} className="relative w-full h-full flex flex-col items-center justify-center bg-[#030305]">
                 
                 {/* Background: Digital Void */}
                 <DigitalVoid />

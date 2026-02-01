@@ -75,19 +75,25 @@ const Arsenal = () => {
   };
 
   return (
-    <section className="relative w-full min-h-screen bg-[#050505] text-white overflow-hidden font-mono selection:bg-cyan-500/30">
+    // BUG FIX #2: Added missing id="arsenal" to section element
+    // ISSUE: FloatingNav's Skills button targeted 'arsenal' but section had no ID
+    // SOLUTION: Added id="arsenal" to enable smooth scrolling from FloatingNav
+    // BUG FIX #6: Changed color scheme from cyan to match app theme (gold #FFD700 and violet #A855F7)
+    // ISSUE: FoE.jsx used cyan-400/cyan-500 colors which didn't match the gold/violet theme used throughout app
+    // SOLUTION: Updated background and grid colors to gold (#FFD700) for consistency with overall design
+    <section id="arsenal" className="relative w-full min-h-screen bg-[#030305] text-white overflow-hidden font-mono selection:bg-[#FFD700]/30">
       
-      {/* BACKGROUND GRID & DECORATION */}
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px] opacity-20" />
-      <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-cyan-900/10 to-transparent pointer-events-none" />
+      {/* BACKGROUND GRID & DECORATION - Updated to gold theme */}
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,215,0,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,215,0,0.03)_1px,transparent_1px)] bg-[size:40px_40px] opacity-20" />
+      <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-[#FFD700]/10 to-transparent pointer-events-none" />
 
       <div className="relative z-10 container mx-auto px-4 py-20 h-full flex flex-col">
         
-        {/* HEADER SECTION */}
+        {/* HEADER SECTION - Updated to gold theme for consistency */}
         <div className="mb-12 space-y-4">
-          <div className="flex items-center gap-2 text-cyan-400 text-xs tracking-[0.2em] opacity-80">
+          <div className="flex items-center gap-2 text-[#FFD700] text-xs tracking-[0.2em] opacity-80">
             <span>// SYSTEM_INVENTORY</span>
-            <span className="w-12 h-[1px] bg-cyan-400/50" />
+            <span className="w-12 h-[1px] bg-[#FFD700]/50" />
             <span>V.2.0.26 [OPTIMIZED]</span>
           </div>
           <h2 className="text-5xl md:text-7xl font-bold tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-gray-500">
@@ -100,21 +106,22 @@ const Arsenal = () => {
               <button
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.id)}
+                // BUG FIX #7: Changed button active color from cyan-500 to gold #FFD700
                 className={`
                   px-4 py-2 text-xs tracking-wider border transition-all duration-300 relative group overflow-hidden
                   ${activeCategory === cat.id 
-                    ? 'border-cyan-500 text-cyan-500 bg-cyan-950/10 shadow-[0_0_15px_rgba(6,182,212,0.15)]' 
+                    ? 'border-[#FFD700] text-[#FFD700] bg-[#FFD700]/10 shadow-[0_0_15px_rgba(255,215,0,0.15)]' 
                     : 'border-white/10 text-gray-400 hover:border-white/30 hover:text-white'}
                 `}
               >
                 <span className="relative z-10 flex items-center gap-2">
-                  {activeCategory === cat.id && <span className="w-1 h-1 bg-cyan-500 rounded-full animate-pulse" />}
+                  {activeCategory === cat.id && <span className="w-1 h-1 bg-[#FFD700] rounded-full animate-pulse" />}
                   {cat.label}
                 </span>
                 {activeCategory === cat.id && (
                   <motion.div 
                     layoutId="activeTab"
-                    className="absolute bottom-0 left-0 h-[2px] w-full bg-cyan-500" 
+                    className="absolute bottom-0 left-0 h-[2px] w-full bg-[#FFD700]" 
                   />
                 )}
               </button>
@@ -132,10 +139,11 @@ const Arsenal = () => {
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 20 }}
-                className="absolute top-8 right-8 z-30 w-64 bg-black/80 border border-cyan-500/30 p-4 rounded-xl backdrop-blur-md shadow-2xl"
+                // BUG FIX #8: Changed border color from cyan-500 to gold #FFD700
+                className="absolute top-8 right-8 z-30 w-64 bg-black/80 border border-[#FFD700]/30 p-4 rounded-xl backdrop-blur-md shadow-2xl"
               >
                 <div className="flex items-center justify-between mb-2 pb-2 border-b border-white/10">
-                  <span className="text-xs text-cyan-400 tracking-widest">INFO_PANEL</span>
+                  <span className="text-xs text-[#FFD700] tracking-widest">INFO_PANEL</span>
                   <div className="flex gap-1">
                     <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
                     <span className="w-2 h-2 rounded-full bg-yellow-500" />
@@ -143,7 +151,7 @@ const Arsenal = () => {
                 </div>
                 <h3 className="text-xl font-bold text-white mb-1">{hoveredNode.label}</h3>
                 <div className="text-xs text-gray-400 font-mono mb-3">ID: {hoveredNode.id.toUpperCase()}_MOD</div>
-                <p className="text-sm text-gray-300 leading-relaxed border-l-2 border-cyan-500/50 pl-3">
+                <p className="text-sm text-gray-300 leading-relaxed border-l-2 border-[#FFD700]/50 pl-3">
                   {hoveredNode.description}
                 </p>
                 <div className="mt-4 flex gap-2">
@@ -151,11 +159,11 @@ const Arsenal = () => {
                     <motion.div 
                       initial={{ width: 0 }} 
                       animate={{ width: '100%' }} 
-                      className="h-full bg-cyan-500"
+                      className="h-full bg-[#FFD700]"
                     />
                   </div>
                 </div>
-                <div className="text-[10px] text-right mt-1 text-cyan-500/70">MASTERY LEVEL: SYNCHRONIZED</div>
+                <div className="text-[10px] text-right mt-1 text-[#FFD700]/70">MASTERY LEVEL: SYNCHRONIZED</div>
               </motion.div>
             )}
           </AnimatePresence>
@@ -219,11 +227,11 @@ const Arsenal = () => {
                   onMouseLeave={() => setHoveredNode(null)}
                 >
                   <div className="relative group">
-                    {/* Glowing Ring Effect */}
+                    {/* Glowing Ring Effect - Updated to gold theme */}
                     {isHovered && (
                       <motion.div 
                         layoutId="glow"
-                        className="absolute -inset-4 bg-cyan-500/20 rounded-full blur-xl"
+                        className="absolute -inset-4 bg-[#FFD700]/20 rounded-full blur-xl"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
@@ -235,7 +243,7 @@ const Arsenal = () => {
                       relative w-12 h-12 md:w-16 md:h-16 rounded-2xl flex items-center justify-center 
                       bg-[#0a0a0a] border transition-all duration-300
                       ${isHovered 
-                        ? 'border-cyan-500 shadow-[0_0_30px_rgba(6,182,212,0.3)] scale-110 text-cyan-400' 
+                        ? 'border-[#FFD700] shadow-[0_0_30px_rgba(255,215,0,0.3)] scale-110 text-[#FFD700]' 
                         : 'border-white/10 text-gray-400 hover:border-white/40'}
                     `}>
                       <div className="w-6 h-6 md:w-8 md:h-8">
@@ -247,7 +255,7 @@ const Arsenal = () => {
                     <div className={`
                       absolute top-full left-1/2 -translate-x-1/2 mt-3 whitespace-nowrap
                       text-[10px] tracking-widest font-semibold transition-all duration-300
-                      ${isHovered ? 'text-cyan-400 translate-y-0 opacity-100' : 'text-gray-500 translate-y-2 opacity-0 group-hover:opacity-100'}
+                      ${isHovered ? 'text-[#FFD700] translate-y-0 opacity-100' : 'text-gray-500 translate-y-2 opacity-0 group-hover:opacity-100'}
                     `}>
                       {node.label}
                     </div>

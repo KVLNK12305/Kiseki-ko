@@ -14,7 +14,10 @@ const Climax = () => (
                 </p>
             </div>
             <a
-                href="mailto:aashiq.edavalapati@example.com"
+                // BUG FIX #3: Replaced placeholder email with actual contact email
+                // ISSUE: Button had dummy email '' (non-functional)
+                // SOLUTION: Updated to correct email address for proper contact functionality
+                href="mailto:kurapatikushalnarasimha95@gmail.com"
                 className="inline-block text-gold border-2 border-gold rounded-md px-10 py-4 font-bold text-lg
                            hover:bg-gold hover:text-navy hover:shadow-glow transition-all duration-300"
             >

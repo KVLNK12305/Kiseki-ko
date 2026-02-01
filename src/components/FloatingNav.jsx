@@ -1,41 +1,90 @@
-import React from 'react';
-import { motion } from 'motion/react';
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 
-const navItems = [
-    { id: 'home', icon: 'H' },
-    { id: 'skills', icon: 'S' },
-    { id: 'experience', icon: 'E' },
-    { id: 'projects', icon: 'P' },
-    { id: 'contact', icon: '@' },
+// Configuration: Map the label to the ACTUAL ID in your DOM
+// BUG FIX #1: Updated 'Skills' targetId from empty string to 'arsenal'
+// ISSUE: The Skills button had targetId: '' (empty) which prevented navigation
+// SOLUTION: Connected it to the FoE.jsx (Arsenal) section with id="arsenal"
+const NAV_CONFIG = [
+    { label: 'Home', targetId: 'home', icon: 'H' },
+    { label: 'Skills', targetId: 'arsenal', icon: 'S' }, // FIXED: Now correctly maps to FoE.jsx section
+    { label: 'Experience', targetId: 'experience', icon: 'E' },
+    { label: 'Projects', targetId: 'projects', icon: 'P' },
+    { label: 'Contact', targetId: 'contact', icon: '@' },
 ];
 
 const FloatingNav = ({ lenis }) => {
+    // BUG FIX #10: Added scroll status tracking to FloatingNav
+    // ISSUE: FloatingNav was not updating which section is currently active
+    // SOLUTION: Added activeSection state and scroll listener to detect current section
+    const [activeSection, setActiveSection] = useState('home');
     
-    const scrollToSection = (id) => {
+    useEffect(() => {
+        const handleScroll = () => {
+            // Find which section is currently in view
+            let currentSection = 'home';
+            
+            NAV_CONFIG.forEach((item) => {
+                const element = document.getElementById(item.targetId);
+                if (element) {
+                    const rect = element.getBoundingClientRect();
+                    // If section is in viewport (top < 400px from top), mark it as active
+                    if (rect.top < 400) {
+                        currentSection = item.targetId;
+                    }
+                }
+            });
+            
+            setActiveSection(currentSection);
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+    
+    const scrollToSection = (targetId) => {
+        const element = document.getElementById(targetId);
+        
+        if (!element) {
+            console.warn(`[FloatingNav] Warning: Section with id="#${targetId}" not found.`);
+            return;
+        }
+
         if (lenis) {
-            lenis.scrollTo(`#${id}`, { duration: 1.5, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
+            lenis.scrollTo(`#${targetId}`, { 
+                duration: 1.5, 
+                easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) 
+            });
+        } else {
+            element.scrollIntoView({ behavior: 'smooth' });
         }
     };
 
     return (
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50">
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] pointer-events-none">
             <motion.div 
-                className="flex items-center gap-2 px-3 py-3 bg-[#0f0f12]/80 backdrop-blur-md border border-white/10 rounded-full shadow-2xl"
+                className="flex items-center gap-2 px-3 py-3 bg-[#0f0f12]/80 backdrop-blur-xl border border-white/10 rounded-full shadow-2xl pointer-events-auto"
                 initial={{ y: 100, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 2.5, type: 'spring' }}
+                transition={{ delay: 2.5, type: 'spring', stiffness: 260, damping: 20 }}
             >
-                {navItems.map((item) => (
+                {NAV_CONFIG.map((item) => (
                     <button
-                        key={item.id}
-                        onClick={() => scrollToSection(item.id)}
-                        className="relative group w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-[#FFD700] hover:text-black transition-all duration-300"
+                        key={item.label}
+                        onClick={() => scrollToSection(item.targetId)}
+                        // BUG FIX #10 CONTINUED: Added active state styling to show current section
+                        // Shows gold background and glow when button corresponds to active section
+                        className={`relative group w-10 h-10 flex items-center justify-center rounded-full transition-all duration-300 ${
+                            activeSection === item.targetId
+                                ? 'bg-[#FFD700] text-black shadow-[0_0_20px_rgba(255,215,0,0.5)]'
+                                : 'bg-white/5 hover:bg-[#FFD700] hover:text-black'
+                        }`}
                     >
                         <span className="font-mono font-bold text-xs group-hover:scale-110 transition-transform">{item.icon}</span>
                         
                         {/* Tooltip */}
-                        <span className="absolute -top-10 left-1/2 -translate-x-1/2 px-2 py-1 bg-[#FFD700] text-black text-[10px] font-bold rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-                            {item.id.toUpperCase()}
+                        <span className="absolute -top-12 left-1/2 -translate-x-1/2 px-2 py-1 bg-[#FFD700] text-black text-[10px] font-bold rounded opacity-0 group-hover:opacity-100 transition-all duration-200 whitespace-nowrap pointer-events-none translate-y-2 group-hover:translate-y-0 shadow-[0_0_10px_rgba(255,215,0,0.5)]">
+                            {item.label.toUpperCase()}
                         </span>
                     </button>
                 ))}
