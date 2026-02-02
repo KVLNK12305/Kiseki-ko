@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useMemo } from 'react';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -8,16 +8,18 @@ import Lanyard from './sokulu/Lanyard';
 gsap.registerPlugin(ScrollTrigger);
 
 // --- Fixed Sub-Component: "Digital Void" Engine ---
-const DigitalVoid = () => {
+// Wrapped in React.memo to prevent canvas re-initialization when Hero state changes
+const DigitalVoid = React.memo(() => {
     const canvasRef = useRef(null);
 
     useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
-        const ctx = canvas.getContext('2d');
-        let w, h, animationFrame;
         
-        // Configuration
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return; // Safety check
+
+        let w, h, animationFrame;
         const scanlines = [];
         const MAX_LINES = 15;
 
@@ -28,6 +30,7 @@ const DigitalVoid = () => {
             canvas.height = h;
         };
 
+        // Class definition inside effect to access local w/h scope
         class Scanline {
             constructor() {
                 this.init();
@@ -35,11 +38,11 @@ const DigitalVoid = () => {
 
             init() {
                 this.y = Math.random() * h;
-                this.height = Math.random() * 2 + 1; // Thin lines
+                this.height = Math.random() * 2 + 1;
                 this.speed = Math.random() * 2 + 0.5;
-                this.width = Math.random() * w * 0.5 + w * 0.1; // Random widths
+                this.width = Math.random() * w * 0.5 + w * 0.1;
                 this.x = Math.random() * (w - this.width);
-                this.color = `rgba(168, 85, 247, ${Math.random() * 0.1 + 0.02})`; // Very faint violet
+                this.color = `rgba(168, 85, 247, ${Math.random() * 0.1 + 0.02})`;
             }
 
             update() {
@@ -59,9 +62,10 @@ const DigitalVoid = () => {
         };
 
         const animate = () => {
+            if (!ctx) return;
             ctx.clearRect(0, 0, w, h);
             
-            // 1. Base "Stealth" Texture (Grid dots)
+            // 1. Base "Stealth" Texture
             ctx.fillStyle = 'rgba(255, 255, 255, 0.02)';
             for(let i=0; i<20; i++) {
                 ctx.fillRect(Math.random() * w, Math.random() * h, 1, 1);
@@ -73,14 +77,12 @@ const DigitalVoid = () => {
                 line.draw();
             });
 
-            // 3. Occasional Glitch Bar (The "Signal Lost" feel)
+            // 3. Occasional Glitch Bar
             if(Math.random() > 0.98) {
                 const barH = Math.random() * 50 + 10;
                 const barY = Math.random() * h;
-                ctx.fillStyle = 'rgba(20, 20, 20, 0.8)'; // Dark band
+                ctx.fillStyle = 'rgba(20, 20, 20, 0.8)';
                 ctx.fillRect(0, barY, w, barH);
-                
-                // Red/Gold chromatic aberration hint
                 ctx.fillStyle = 'rgba(255, 215, 0, 0.1)';
                 ctx.fillRect(5, barY, w, 2);
             }
@@ -88,6 +90,7 @@ const DigitalVoid = () => {
             animationFrame = requestAnimationFrame(animate);
         };
 
+        // Initialize
         window.addEventListener('resize', resize);
         resize();
         initLines();
@@ -100,7 +103,7 @@ const DigitalVoid = () => {
     }, []);
 
     return <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none z-0" />;
-};
+});
 
 // --- Main Hero Component ---
 const Hero = () => {
@@ -109,13 +112,17 @@ const Hero = () => {
     const slashRef = useRef(null);
     const [mountLanyard, setMountLanyard] = useState(false);
 
+    // Memoize the name arrays to prevent unnecessary re-renders
+    const firstName = useMemo(() => "KUSHAL".split(""), []);
+    const lastName = useMemo(() => "KURAPATI".split(""), []);
+
     useGSAP(() => {
         const tl = gsap.timeline({
             defaults: { ease: "power3.out" },
             onComplete: () => setMountLanyard(true)
         });
 
-        // Ensure visibility immediately
+        // Ensure visibility immediately (prevents FOUC)
         gsap.set(containerRef.current, { visibility: 'visible' });
 
         // 1. The "Signal Restoration" Wipe
@@ -129,16 +136,26 @@ const Hero = () => {
         );
 
         // 2. POPPING Text Animation
-        // Scale from 0 to 1 with a strong elastic bounce
         tl.from(".hero-text-char", {
             scale: 0,
             opacity: 0,
             y: 50,
-            rotation: () => Math.random() * 40 - 20, // Slight random tilt
-            duration: 1.5,
-            stagger: { amount: 0.6, from: "center" }, // Ripple from center
-            ease: "elastic.out(1.5, 0.3)" // High elasticity for "pop" effect
-        }, "-=0.8");
+            // FIX: Using GSAP's `targets` param instead of document.querySelectorAll
+            // This ensures proper scoping and prevents errors if elements aren't ready
+            rotation: (i, target, targets) => {
+                const totalChars = targets.length;
+                const center = totalChars / 2;
+                const distance = Math.abs(i - center);
+                return (Math.random() - 0.5) * 40 * (1 - distance / center * 0.3);
+            },
+            duration: 1.2,
+            stagger: {
+                amount: 0.5,
+                from: "center",
+                ease: "power2.inOut"
+            },
+            ease: "elastic.out(1.2, 0.5)"
+        }, "-=0.6");
 
         // 3. Paint Reveal (Violet)
         tl.from(".paint-reveal", {
@@ -190,9 +207,9 @@ const Hero = () => {
 
     }, { scope: containerRef });
 
-    // Failsafe mount
+    // Failsafe mount for Lanyard
     useEffect(() => {
-        const timer = setTimeout(() => setMountLanyard(true), 1500);
+        const timer = setTimeout(() => setMountLanyard(true), 2500); // Increased slightly to match animation + buffer
         return () => clearTimeout(timer);
     }, []);
 
@@ -204,10 +221,8 @@ const Hero = () => {
     return (
         <section 
             ref={containerRef} 
-            // BUG FIX #4: Changed bg-[#030303] to bg-[#030305] to match main app theme
-            // ISSUE: Hero section had inconsistent background color (#030303) that didn't match App.jsx (#030305)
-            // SOLUTION: Updated to use consistent theme color #030305 for seamless transition
-            className="relative h-screen w-full bg-[#030305] overflow-hidden flex flex-col items-center justify-center invisible"
+            // FIX: h-[100dvh] handles mobile browsers better than h-screen
+            className="relative h-[100dvh] w-full bg-[#030305] overflow-hidden flex flex-col items-center justify-center invisible"
         >
             <div ref={slashRef} className="relative w-full h-full flex flex-col items-center justify-center bg-[#030305]">
                 
@@ -236,13 +251,13 @@ const Hero = () => {
                         <div className="h-[1px] w-12 bg-[#A855F7]/50"></div>
                     </div>
                     
-                    <div className="relative z-10 mb-8 pointer-events-none">
+                    <div className="relative z-10 mb-8 pointer-events-none" aria-label="Kushal Kurapati">
                         {/* FIRST NAME */}
                         <div className="overflow-visible leading-none mb-2">
                             <h1 className="flex justify-center flex-wrap text-6xl md:text-8xl lg:text-[7.5rem] font-black text-transparent leading-[0.85] tracking-tighter"
                                 style={{ WebkitTextStroke: '2px #ffffff' }}>
-                                {"KUSHAL".split("").map((char, i) => (
-                                    <span key={i} className="hero-text-char inline-block will-change-transform">{char}</span>
+                                {firstName.map((char, i) => (
+                                    <span key={`first-${i}`} className="hero-text-char inline-block will-change-transform" aria-hidden="true">{char}</span>
                                 ))}
                             </h1>
                         </div>
@@ -253,8 +268,8 @@ const Hero = () => {
                                  style={{ clipPath: 'polygon(5% 0%, 100% 0%, 95% 100%, 0% 100%)' }}></div>
                             
                             <h1 className="relative z-10 flex justify-center flex-wrap text-6xl md:text-8xl lg:text-[7.5rem] font-black text-white leading-[0.85] tracking-tighter mix-blend-hard-light drop-shadow-[0_5px_15px_rgba(168,85,247,0.5)]">
-                                {"KURAPATI".split("").map((char, i) => (
-                                    <span key={i + 10} className="hero-text-char inline-block will-change-transform">{char}</span>
+                                {lastName.map((char, i) => (
+                                    <span key={`last-${i}`} className="hero-text-char inline-block will-change-transform" aria-hidden="true">{char}</span>
                                 ))}
                             </h1>
                         </div>
@@ -283,9 +298,9 @@ const Hero = () => {
                 </div>
 
                 {/* --- Lanyard Layer --- */}
-                <div className="absolute inset-0 w-full h-full z-10">
+                <div className="absolute inset-0 w-full h-full z-10 pointer-events-none">
                     {mountLanyard && (
-                        <div className="w-full h-full opacity-60 mix-blend-screen">
+                        <div className="w-full h-full opacity-60 mix-blend-screen pointer-events-auto">
                             <Lanyard 
                                 position={[0, 0, 20]} 
                                 gravity={[0, -40, 0]} 

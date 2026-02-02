@@ -1,68 +1,89 @@
 import React from 'react';
+import { ArrowUpRight, Terminal, Activity } from 'lucide-react';
 import DecryptedText from './sokulu/DecryptedText';
-import CyberFrame from './sokulu/CyberFrame'; // Import the new component
-
-// Optional: Replace with your actual image path
+import CyberFrame from './sokulu/CyberFrame';
 import profileImg from './images/me.png'; 
 
 const Main_story = () => (
-    <section id="home" className="min-h-screen flex items-center justify-center px-6 py-20">
-        <div className="container mx-auto flex flex-col-reverse lg:flex-row items-center justify-between gap-12">
+    <section id="home" className="min-h-screen flex items-center justify-center px-6 py-20 relative overflow-hidden">
+        
+        {/* Optional: Subtle Background Accent (keeps focus on content) */}
+        <div className="absolute top-1/2 right-0 w-[500px] h-[500px] bg-gold/5 rounded-full blur-[120px] -translate-y-1/2 pointer-events-none"></div>
+
+        <div className="container mx-auto flex flex-col-reverse lg:flex-row items-center justify-between gap-16 relative z-10">
             
-            {/* Text Content - Left Side */}
+            {/* LEFT: Text Content */}
             <div className="flex-1 text-left max-w-2xl">
-                <h2 className="text-lg md:text-xl text-gold font-mono mb-4">
-                    Greetings, I am
+                
+                {/* Status Badge */}
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-gold/20 bg-gold/5 mb-6">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                    </span>
+                    <span className="font-mono text-xs text-gold tracking-widest uppercase">System Online</span>
+                </div>
+
+                <h2 className="text-lg md:text-xl text-slate font-mono mb-2 flex items-center gap-2">
+                    <Terminal size={16} className="text-gold" />
+                    <span>Initiating sequence...</span>
                 </h2>
                 
-                <DecryptedText 
-                    text="KURAPATI VENKATA LAKSHMI NARASIMHA KUSHAL."
-                    parentClassName="text-3xl sm:text-4xl md:text-5xl font-bold text-light-slate mb-4 tracking-wider leading-tight"
-                    encryptedClassName="text-encrypted"
-                    animateOn="hover"
-                    speed={50}
-                    sequential={true}
-                    revealDirection="start"
-                />
+                <div className="min-h-[80px] sm:min-h-[100px]">
+                    <DecryptedText 
+                        text="KURAPATI VENKATA LAKSHMI NARASIMHA KUSHAL"
+                        parentClassName="text-4xl sm:text-5xl md:text-6xl font-black text-white mb-2 tracking-tighter leading-[0.9]"
+                        encryptedClassName="text-gold/50"
+                        animateOn="hover"
+                        speed={40}
+                        sequential={true}
+                        revealDirection="center"
+                    />
+                </div>
 
-                <h3 className="text-2xl sm:text-4xl md:text-5xl font-bold text-slate mb-6 mt-2 tracking-wide">
-                    Shinra tensei.
+                <h3 className="text-2xl sm:text-3xl font-bold text-slate-400 mb-6 tracking-wide flex items-center gap-3">
+                    <span className="text-gold">Shinra Tensei.</span>
+                    <span className="h-px w-12 bg-slate-700"></span>
+                    <span className="text-slate-600 font-mono text-base font-normal">Building High-Perf Systems</span>
                 </h3>
                 
-                <p className="text-slate mb-10 text-base sm:text-lg leading-relaxed max-w-xl">
-                    I'm a software engineer specializing in building high-performance digital experiences. Currently, I'm focused on developing robust systems and translating complex data into actionable insights.
+                <p className="text-slate-300 mb-10 text-base sm:text-lg leading-relaxed max-w-xl border-l-2 border-gold/20 pl-6">
+                    I engineer robust digital architectures and translate complex data streams into actionable intelligence. 
+                    Specializing in <span className="text-white font-semibold">Rust</span>, <span className="text-white font-semibold">Distributed Systems</span>, and <span className="text-white font-semibold">Active Defense</span>.
                 </p>
                 
-                <a
-                    href="https://www.linkedin.com/in/venkata-lakshmi-narasimha-kushal-kurapati-729ab4289/"  target='_blank' rel='noopener noreferrer'
-                    className="inline-block text-gold border-2 border-gold rounded-md px-8 py-3 font-bold text-lg
-                               hover:bg-gold/10 hover:shadow-[0_0_15px_rgba(255,215,0,0.3)] transition-all duration-300"
-                >
-                    Connect With Me
-                </a>
+                <div className="flex flex-wrap gap-4">
+                    <a
+                        href="https://www.linkedin.com/in/venkata-lakshmi-narasimha-kushal-kurapati-729ab4289/" 
+                        target='_blank' 
+                        rel='noopener noreferrer'
+                        className="group relative inline-flex items-center gap-3 px-8 py-3 bg-transparent overflow-hidden border border-gold/50 rounded-none hover:border-gold transition-colors duration-300"
+                    >
+                        {/* Hover Fill Effect */}
+                        <div className="absolute inset-0 w-0 bg-gold transition-all duration-[250ms] ease-out group-hover:w-full opacity-10"></div>
+                        
+                        <span className="font-mono text-gold font-bold tracking-wider uppercase group-hover:translate-x-1 transition-transform">
+                            Connect Signal
+                        </span>
+                        <ArrowUpRight size={18} className="text-gold group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                    </a>
 
-                {
-                /* rel="noopener noreferrer" is a security best practice when opening external links 
-                noopener
-
-Prevents the new tab from accessing window.opener
-Protects your site from tab-nabbing attacks
-Improves performance by cutting the JS connection between tabs
-
-noreferrer
-Prevents sending your page’s URL as the referrer to the new site
-Adds an extra layer of privacy.
-Automatically implies noopener in most modern browsers
-
-                */
-                }
-
+                    <div className="flex items-center gap-4 px-6 py-3 border border-white/10 bg-white/5 rounded-none">
+                        <Activity size={18} className="text-green-500" />
+                        <span className="font-mono text-xs text-slate-400">AVAILABLE FOR DEPLOYMENT</span>
+                    </div>
+                </div>
             </div>
 
-            {/* Image Content - Right Side */}
-            <div className="flex-1 w-full max-w-md lg:max-w-lg justify-center">
-                 {/* Pass your image URL here. If you don't have one yet, it uses a placeholder. */}
-                <CyberFrame imageUrl={profileImg} />
+            {/* RIGHT: Image Content */}
+            <div className="flex-1 w-full max-w-md lg:max-w-lg flex justify-center lg:justify-end relative">
+                {/* Decorative background element for image */}
+                <div className="absolute -inset-4 border border-gold/20 z-0 opacity-50"></div>
+                <div className="absolute -inset-4 rotate-3 border border-gold/10 z-0 opacity-30"></div>
+                
+                <div className="relative z-10">
+                    <CyberFrame imageUrl={profileImg} />
+                </div>
             </div>
         </div>
     </section>

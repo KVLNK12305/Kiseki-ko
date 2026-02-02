@@ -1,108 +1,111 @@
 /* eslint-disable react/no-unknown-property */
 import { useEffect, useRef, useState } from 'react';
-import { Canvas, extend, useThree, useFrame } from '@react-three/fiber';
-import { Environment, Lightformer } from '@react-three/drei';
+import { Canvas, useThree, useFrame } from '@react-three/fiber';
+import { Environment, Lightformer, Text, useTexture, Line } from '@react-three/drei';
+import { easing } from 'maath';
 import * as THREE from 'three';
 
-export default function Lanyard({ position = [0, 0, 30], fov = 20, transparent = true }) {
+export default function Lanyard({ position = [0, 0, 30], gravity = [0, -40, 0], fov = 20, transparent = true }) {
   return (
-    <div className="relative z-0 w-full h-full flex justify-center items-center bg-[#050505] overflow-hidden">
+    <div className="relative z-0 w-full h-full flex justify-center items-center overflow-hidden pointer-events-none">
       <Canvas
         camera={{ position: position, fov: fov }}
-        gl={{ alpha: transparent }}
-        onCreated={({ gl }) => gl.setClearColor(new THREE.Color(0x000000), transparent ? 0 : 1)}
+        gl={{ alpha: true, antialias: true }}
+        dpr={[1, 2]} 
+        onCreated={({ gl }) => gl.setClearColor(new THREE.Color(0x000000), 0)}
+        className="pointer-events-auto"
       >
-        <ambientLight intensity={Math.PI} />
+        <ambientLight intensity={0.7} />
+        <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} shadow-bias={-0.0001} />
         
-        {/* Simulation Rig */}
-        <Rig />
+        <Rig gravity={gravity} />
         
         <Environment blur={0.75}>
-          <Lightformer intensity={2} color="white" position={[0, -1, 5]} form="ring" scale={[10, 5]} target={[0, 0, 0]} />
-          <Lightformer intensity={0.4} color="white" position={[-1, -1, 1]} form="circle" scale={[10, 5]} target={[0, 0, 0]} />
-          <Lightformer intensity={10} color="white" position={[1, 10, -2]} form="ring" scale={[10, 5]} target={[0, 0, 0]} />
+          <Lightformer intensity={2} color="#fff" position={[0, -1, 5]} form="ring" scale={[10, 5]} target={[0, 0, 0]} />
+          <Lightformer intensity={0.4} color="#A855F7" position={[-1, -1, 1]} form="circle" scale={[10, 5]} target={[0, 0, 0]} />
+          <Lightformer intensity={5} color="#FFD700" position={[1, 10, -2]} form="ring" scale={[10, 5]} target={[0, 0, 0]} />
         </Environment>
       </Canvas>
-      
-      {/* UI Overlay */}
-      <div className="absolute bottom-6 right-6 text-white/30 text-[10px] font-mono pointer-events-none tracking-widest">
-        INTERACTIVE_SIMULATION // HOVER_TO_MOVE
-      </div>
     </div>
   );
 }
 
-function Rig() {
+function Rig({ gravity }) {
+  const band = useRef();
+  const fixed = useRef();
+  const j1 = useRef();
+  const j2 = useRef();
+  const j3 = useRef();
   const card = useRef();
-  const lineGeo = useRef(); // Ref for the line geometry
   
+  const vec = new THREE.Vector3();
+  const ang = new THREE.Vector3();
+  const rot = new THREE.Vector3();
+  const dir = new THREE.Vector3();
+
   const [curve] = useState(() => new THREE.CatmullRomCurve3([
-    new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()
+      new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()
   ]));
-  
-  // Simulation state
-  const targetPos = useRef(new THREE.Vector3());
-  const cardPos = useRef(new THREE.Vector3(0, 0, 0));
-  const cardVel = useRef(new THREE.Vector3(0, 0, 0));
-  const rotation = useRef(new THREE.Euler(0, 0, 0));
   
   const { width, height } = useThree((state) => state.size);
 
   useFrame((state, delta) => {
-    // 1. Calculate Target based on mouse/pointer
+    // Mouse interaction
     const x = (state.pointer.x * width) / 2.5;
     const y = (state.pointer.y * height) / 2.5;
     
-    targetPos.current.set(x, y, 0);
-
-    // 2. Physics-like interpolation
-    const lerpFactor = Math.min(delta * 5, 1);
-    cardPos.current.lerp(targetPos.current, lerpFactor);
-
-    // 3. Calculate rotation
-    const tiltX = (targetPos.current.y - cardPos.current.y) * 0.1;
-    const tiltY = (cardPos.current.x - targetPos.current.x) * 0.1;
-    
-    rotation.current.x = THREE.MathUtils.lerp(rotation.current.x, tiltX, delta * 10);
-    rotation.current.y = THREE.MathUtils.lerp(rotation.current.y, tiltY, delta * 10);
-
-    // 4. Update Card Transform
-    if (card.current) {
-      card.current.position.copy(cardPos.current);
-      card.current.rotation.x = rotation.current.x;
-      card.current.rotation.y = rotation.current.y;
+    if (fixed.current) {
+        easing.damp3(fixed.current.position, [x, y, 0], 0.2, delta);
+        
+        // Follow the leader
+        easing.damp3(j1.current.position, fixed.current.position, 0.1, delta);
+        easing.damp3(j2.current.position, j1.current.position, 0.3, delta); 
+        easing.damp3(j3.current.position, j2.current.position, 0.1, delta);
+        
+        // Gravity
+        j1.current.position.y -= 0.5 * delta * 10;
+        j2.current.position.y -= 1.5 * delta * 10;
+        
+        // Rotation
+        dir.subVectors(j3.current.position, j2.current.position).normalize();
+        ang.copy(dir);
+        
+        const rotX = (j3.current.position.x - j2.current.position.x) * 2;
+        const rotY = (j3.current.position.y - j2.current.position.y) * 2;
+        
+        easing.dampE(card.current.rotation, [rotY, -rotX, 0], 0.2, delta);
+        card.current.position.copy(j3.current.position);
     }
 
-    // 5. Update Lanyard Curve points
-    curve.points[0].set(0, height / 3, 0); // Fixed Top
-    curve.points[3].copy(cardPos.current).add(new THREE.Vector3(0, 1.1, 0)); // Moving Bottom (Card top)
-
-    curve.points[1].lerpVectors(curve.points[0], curve.points[3], 0.33);
-    curve.points[2].lerpVectors(curve.points[0], curve.points[3], 0.66);
+    // Update Curve
+    curve.points[0].copy(j3.current.position);
+    curve.points[1].copy(j2.current.position);
+    curve.points[2].copy(j1.current.position);
+    curve.points[3].copy(fixed.current.position);
     
-    // Gravity sag
-    const dist = curve.points[0].distanceTo(curve.points[3]);
-    const maxDist = 8;
-    const sag = Math.max(0, (maxDist - dist) * 0.2);
-    
-    curve.points[1].y -= sag * 0.5;
-    curve.points[2].y -= sag;
-
-    // Update the Line Geometry using the new points
-    if (lineGeo.current) {
-      lineGeo.current.setFromPoints(curve.getPoints(32));
+    if (band.current) {
+        band.current.geometry.setFromPoints(curve.getPoints(32));
     }
   });
 
   return (
     <>
-      {/* The String (Standard Line) */}
-      <line>
-        <bufferGeometry ref={lineGeo} />
-        <lineBasicMaterial color="white" opacity={0.5} transparent />
-      </line>
+      <group position={[0, 4, 0]}>
+        <mesh ref={fixed} />
+        <mesh ref={j1} />
+        <mesh ref={j2} />
+        <mesh ref={j3} />
+      </group>
 
-      {/* The Card Group */}
+      <Line
+        ref={band}
+        points={[...Array(33)].map(() => [0, 0, 0])}
+        color="white"
+        lineWidth={1.5}
+        opacity={0.6}
+        transparent
+      />
+
       <group ref={card}>
         <CardContent />
       </group>
@@ -111,42 +114,43 @@ function Rig() {
 }
 
 function CardContent() {
+  const texture = useTexture("https://assets.vercel.com/image/upload/v1538361091/repositories/react-three-fiber/logo_t7k53q.png")
+
   return (
-    <group scale={2.25} position={[0, -1.2, 0]}>
-       {/* Front of Card */}
+    <group scale={2.5} position={[0, -1.2, 0]}>
       <mesh>
-        <boxGeometry args={[0.6, 0.9, 0.02]} />
-        <meshStandardMaterial 
-          color="#0a0a0a" 
-          roughness={0.3} 
-          metalness={0.8}
+        <boxGeometry args={[0.6, 0.9, 0.04]} />
+        <meshPhysicalMaterial 
+            color="#050505" 
+            roughness={0.2} 
+            metalness={0.8} 
+            clearcoat={1} 
+            clearcoatRoughness={0.1}
         />
       </mesh>
       
-      {/* Gold Border */}
-      <mesh position={[0, 0, -0.005]}>
-          <boxGeometry args={[0.62, 0.92, 0.01]} />
-          <meshStandardMaterial color="#FFD700" metalness={1} roughness={0.2} />
+      <mesh position={[0, 0, -0.01]}>
+          <boxGeometry args={[0.63, 0.93, 0.03]} />
+          <meshStandardMaterial color="#FFD700" metalness={1} roughness={0.3} />
       </mesh>
 
-      {/* Decorations */}
-      <mesh position={[0, 0.2, 0.02]}>
-          <planeGeometry args={[0.5, 0.05]} />
-          <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={0.5} />
-      </mesh>
-      <mesh position={[0, 0, 0.02]}>
-          <planeGeometry args={[0.4, 0.02]} />
-          <meshStandardMaterial color="#555" />
-      </mesh>
-      <mesh position={[0, -0.05, 0.02]}>
-          <planeGeometry args={[0.2, 0.02]} />
-          <meshStandardMaterial color="#555" />
+      <group position={[0, 0.1, 0.021]}>
+          <Text fontSize={0.08} color="white" font="https://fonts.gstatic.com/s/roboto/v18/KFOmCnqEu92Fr1Mu4mxK.woff">
+            KUSHAL
+          </Text>
+          <Text position={[0, -0.1, 0]} fontSize={0.05} color="#A855F7" font="https://fonts.gstatic.com/s/roboto/v18/KFOmCnqEu92Fr1Mu4mxK.woff">
+            DEVELOPER
+          </Text>
+      </group>
+
+      <mesh position={[0, -0.25, 0.021]}>
+        <planeGeometry args={[0.4, 0.04]} />
+        <meshBasicMaterial color="#333" />
       </mesh>
 
-      {/* Clip Holder */}
-      <mesh position={[0, 0.45, 0]}>
-        <cylinderGeometry args={[0.05, 0.05, 0.1, 16]} rotation={[0,0,Math.PI/2]} />
-          <meshStandardMaterial color="#333" />
+      <mesh position={[0, 0.46, 0]}>
+        <cylinderGeometry args={[0.08, 0.08, 0.1, 32]} rotation={[0,0,Math.PI/2]} />
+          <meshStandardMaterial color="#888" metalness={1} roughness={0.2} />
       </mesh>
     </group>
   )
