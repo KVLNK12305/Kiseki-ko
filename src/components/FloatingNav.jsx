@@ -12,6 +12,7 @@ const NAV_CONFIG = [
     { label: 'Skills', targetId: 'arsenal', icon: 'S' },
     { label: 'Experience', targetId: 'experience', icon: 'E' },
     { label: 'Projects', targetId: 'projects', icon: 'P' },
+    { label: 'Honors', targetId: 'publications', icon: 'R' },
     { label: 'Contact', targetId: 'contact', icon: '@' },
 ];
 

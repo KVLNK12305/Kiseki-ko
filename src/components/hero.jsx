@@ -306,12 +306,23 @@ const Hero = () => {
                                 />
                             </span>
                             <span className="text-[#FFD700] group-hover:translate-y-1 transition-transform duration-300 group-hover:text-white">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" />
                                 </svg>
                             </span>
                         </div>
                     </button>
+
+                    {/* Bottom Scroll Indicator - Separate from button */}
+                    <div
+                        onClick={handleScroll}
+                        className="absolute bottom-[-15vh] md:bottom-[-20vh] left-1/2 -translate-x-1/2 z-30 animate-bounce cursor-pointer opacity-50 hover:opacity-100 transition-opacity"
+                        aria-label="Scroll Down"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 text-[#A855F7]">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                        </svg>
+                    </div>
                 </div>
 
                 {/* --- Lanyard Layer --- */}
