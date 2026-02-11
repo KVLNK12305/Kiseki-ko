@@ -15,7 +15,7 @@ const DigitalVoid = React.memo(() => {
     useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
-        
+
         const ctx = canvas.getContext('2d');
         if (!ctx) return; // Safety check
 
@@ -58,16 +58,16 @@ const DigitalVoid = React.memo(() => {
 
         const initLines = () => {
             scanlines.length = 0;
-            for(let i=0; i<MAX_LINES; i++) scanlines.push(new Scanline());
+            for (let i = 0; i < MAX_LINES; i++) scanlines.push(new Scanline());
         };
 
         const animate = () => {
             if (!ctx) return;
             ctx.clearRect(0, 0, w, h);
-            
+
             // 1. Base "Stealth" Texture
             ctx.fillStyle = 'rgba(255, 255, 255, 0.02)';
-            for(let i=0; i<20; i++) {
+            for (let i = 0; i < 20; i++) {
                 ctx.fillRect(Math.random() * w, Math.random() * h, 1, 1);
             }
 
@@ -78,7 +78,7 @@ const DigitalVoid = React.memo(() => {
             });
 
             // 3. Occasional Glitch Bar
-            if(Math.random() > 0.98) {
+            if (Math.random() > 0.98) {
                 const barH = Math.random() * 50 + 10;
                 const barY = Math.random() * h;
                 ctx.fillStyle = 'rgba(20, 20, 20, 0.8)';
@@ -126,12 +126,12 @@ const Hero = () => {
         gsap.set(containerRef.current, { visibility: 'visible' });
 
         // 1. The "Signal Restoration" Wipe
-        tl.fromTo(slashRef.current, 
-            { clipPath: 'polygon(0 48%, 100% 48%, 100% 52%, 0 52%)' }, 
-            { 
-                clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)', 
-                duration: 1.2, 
-                ease: "expo.inOut" 
+        tl.fromTo(slashRef.current,
+            { clipPath: 'polygon(0 48%, 100% 48%, 100% 52%, 0 52%)' },
+            {
+                clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
+                duration: 1.2,
+                ease: "expo.inOut"
             }
         );
 
@@ -160,7 +160,7 @@ const Hero = () => {
         // 3. Paint Reveal (Violet)
         tl.from(".paint-reveal", {
             scaleX: 0,
-            transformOrigin: "left center", 
+            transformOrigin: "left center",
             duration: 0.8,
             ease: "circ.inOut"
         }, "-=0.6");
@@ -219,27 +219,28 @@ const Hero = () => {
     };
 
     return (
-        <section 
-            ref={containerRef} 
+        <section
+            id="home"
+            ref={containerRef}
             // FIX: h-[100dvh] handles mobile browsers better than h-screen
             className="relative h-[100dvh] w-full bg-[#030305] overflow-hidden flex flex-col items-center justify-center invisible"
         >
             <div ref={slashRef} className="relative w-full h-full flex flex-col items-center justify-center bg-[#030305]">
-                
+
                 {/* Background: Digital Void */}
                 <DigitalVoid />
-                
+
                 {/* Impact Flash Overlay */}
                 <div className="impact-flash absolute inset-0 z-[50] bg-white opacity-0 pointer-events-none mix-blend-overlay"></div>
 
                 {/* --- CONTENT ZONE --- */}
-                <div 
+                <div
                     ref={contentRef}
                     className="relative z-20 w-full max-w-6xl px-6 flex flex-col items-center text-center"
                 >
                     {/* Background Watermark */}
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[15rem] md:text-[20rem] font-black text-[#ffffff03] select-none pointer-events-none opacity-20 whitespace-nowrap" 
-                         style={{ fontFamily: 'serif', filter: 'blur(2px)' }}>
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[15rem] md:text-[20rem] font-black text-[#ffffff03] select-none pointer-events-none opacity-20 whitespace-nowrap"
+                        style={{ fontFamily: 'serif', filter: 'blur(2px)' }}>
                         魔法帝
                     </div>
 
@@ -250,7 +251,7 @@ const Hero = () => {
                         </h2>
                         <div className="h-[1px] w-12 bg-[#A855F7]/50"></div>
                     </div>
-                    
+
                     <div className="relative z-10 mb-8 pointer-events-none" aria-label="Kushal Kurapati">
                         {/* FIRST NAME */}
                         <div className="overflow-visible leading-none mb-2">
@@ -264,9 +265,9 @@ const Hero = () => {
 
                         {/* LAST NAME */}
                         <div className="relative inline-block">
-                            <div className="paint-reveal absolute -inset-4 bg-[#A855F7] -skew-x-12 z-0 mix-blend-multiply opacity-90" 
-                                 style={{ clipPath: 'polygon(5% 0%, 100% 0%, 95% 100%, 0% 100%)' }}></div>
-                            
+                            <div className="paint-reveal absolute -inset-4 bg-[#A855F7] -skew-x-12 z-0 mix-blend-multiply opacity-90"
+                                style={{ clipPath: 'polygon(5% 0%, 100% 0%, 95% 100%, 0% 100%)' }}></div>
+
                             <h1 className="relative z-10 flex justify-center flex-wrap text-6xl md:text-8xl lg:text-[7.5rem] font-black text-white leading-[0.85] tracking-tighter mix-blend-hard-light drop-shadow-[0_5px_15px_rgba(168,85,247,0.5)]">
                                 {lastName.map((char, i) => (
                                     <span key={`last-${i}`} className="hero-text-char inline-block will-change-transform" aria-hidden="true">{char}</span>
@@ -276,7 +277,7 @@ const Hero = () => {
                     </div>
 
                     <div className="hero-desc max-w-lg mx-auto mb-12 pointer-events-auto">
-                        <DecryptedText 
+                        <DecryptedText
                             text="Surpassing limits. Painting the digital void with code and chaos."
                             speed={20}
                             animateOn="view"
@@ -284,8 +285,8 @@ const Hero = () => {
                             className="text-slate-400 font-mono text-sm md:text-base leading-relaxed tracking-wide"
                         />
                     </div>
-                    
-                    <button 
+
+                    <button
                         onClick={handleScroll}
                         className="hero-btn group relative px-8 py-3 bg-transparent overflow-hidden border border-[#A855F7]/30 hover:border-[#FFD700] transition-colors duration-300 pointer-events-auto cursor-pointer"
                     >
@@ -301,17 +302,17 @@ const Hero = () => {
                 <div className="absolute inset-0 w-full h-full z-10 pointer-events-none">
                     {mountLanyard && (
                         <div className="w-full h-full opacity-60 mix-blend-screen pointer-events-auto">
-                            <Lanyard 
-                                position={[0, 0, 20]} 
-                                gravity={[0, -40, 0]} 
+                            <Lanyard
+                                position={[0, 0, 20]}
+                                gravity={[0, -40, 0]}
                                 transparent={true}
-                                fov={55} 
+                                fov={55}
                             />
                         </div>
                     )}
                 </div>
             </div>
-            
+
             {/* Grain Overlay */}
             <div className="absolute inset-0 pointer-events-none z-[60] opacity-10 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] bg-repeat"></div>
         </section>
