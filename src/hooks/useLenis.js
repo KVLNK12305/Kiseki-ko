@@ -1,26 +1,30 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Lenis from "lenis";
 
 export default function useLenis() {
-  const lenisRef = useRef(null);
+  const [lenis, setLenis] = useState(null);
+  const reqIdRef = useRef(null);
 
   useEffect(() => {
-    const lenis = new Lenis({
+    const lenisInstance = new Lenis({
       duration: 1.5,
       lerp: 0.1,
       smoothWheel: true,
     });
 
-    lenisRef.current = lenis;
+    setLenis(lenisInstance);
 
     function raf(time) {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
+      lenisInstance.raf(time);
+      reqIdRef.current = requestAnimationFrame(raf);
     }
-    requestAnimationFrame(raf);
+    reqIdRef.current = requestAnimationFrame(raf);
 
-    return () => lenis.destroy();
+    return () => {
+      lenisInstance.destroy();
+      cancelAnimationFrame(reqIdRef.current);
+    };
   }, []);
 
-  return lenisRef.current;
+  return lenis;
 }
