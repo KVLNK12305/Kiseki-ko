@@ -1,34 +1,43 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
+import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
+import { TextPlugin } from "gsap/TextPlugin";
+
+gsap.registerPlugin(TextPlugin);
 
 const Preloader = ({ onComplete }) => {
     const containerRef = useRef(null);
     const textRef = useRef(null);
     const barRef = useRef(null);
 
-    useEffect(() => {
+    useGSAP(() => {
+        console.log("Preloader: Animation starting");
         const tl = gsap.timeline({
             onComplete: () => {
+                console.log("Preloader: Text sequence complete, fading out");
                 // Fade out preloader
                 gsap.to(containerRef.current, {
                     yPercent: -100,
                     duration: 0.8,
                     ease: "power4.inOut",
-                    onComplete: onComplete
+                    onComplete: () => {
+                        console.log("Preloader: Fade out complete, calling onComplete");
+                        onComplete();
+                    }
                 });
             }
         });
 
         // Initial Text Scramble effect
         const words = ["INITIALIZING...", "LOADING ASSETS...", "CONNECTING TO MAIN...", "SYSTEM READY"];
-        
+
         words.forEach((word) => {
             tl.to(textRef.current, {
                 text: word,
                 duration: 0.4,
                 ease: "none",
                 onStart: () => {
-                    if(textRef.current) textRef.current.innerText = word;
+                    if (textRef.current) textRef.current.innerText = word;
                 }
             }).to({}, { duration: 0.2 }); // Pause
         });
@@ -40,7 +49,7 @@ const Preloader = ({ onComplete }) => {
             ease: "power2.inOut"
         });
 
-    }, [onComplete]);
+    }, { scope: containerRef, dependencies: [onComplete] });
 
     return (
         <div ref={containerRef} className="fixed inset-0 z-[100] bg-[#050505] flex flex-col items-center justify-center">

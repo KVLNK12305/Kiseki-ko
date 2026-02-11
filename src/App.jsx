@@ -20,7 +20,7 @@ function App() {
   // Custom Cursor Logic
   useEffect(() => {
     const cursor = cursorRef.current;
-    
+
     const moveCursor = (e) => {
       if (cursor) {
         cursor.style.left = `${e.clientX}px`;
@@ -32,7 +32,7 @@ function App() {
     const removeHoverClass = () => cursor?.classList.remove('hovered');
 
     window.addEventListener('mousemove', moveCursor);
-    
+
     // Add hover effect to interactive elements
     const links = document.querySelectorAll('a, button, .cursor-interactive');
     links.forEach(link => {
@@ -51,9 +51,6 @@ function App() {
 
   return (
     <>
-      {/* 1. Cinematic Noise Overlay */}
-      <div className="noise-overlay"></div>
-
       {/* 2. Custom Cursor */}
       <div ref={cursorRef} className="custom-cursor hidden md:block"></div>
 
@@ -61,28 +58,28 @@ function App() {
       {isLoading && <Preloader onComplete={() => setIsLoading(false)} />}
 
       {/* 4. Main Content */}
-      <div className={`relative z-10 transition-opacity duration-1000 ${isLoading ? 'opacity-0' : 'opacity-100'}`}>
-        
+      <div className="relative z-10 opacity-100">
+
         {/* Floating Navigation */}
         <FloatingNav lenis={lenis} />
 
         <main className="w-full bg-[#030305] text-[#D4D4D4] selection:bg-[#FFD700] selection:text-black">
           <Hero />
-          
+
           <div className="relative z-20 bg-[#030305]">
-             <Main_story />
-             {/* Add a subtle separator or transition here */}
-             <div className="h-px w-full bg-gradient-to-r from-transparent via-[#FFD700]/20 to-transparent my-10"></div>
-             
-             <Arsenal />
-             <CertsExperience />
-             <Ed_Timeline />
-             
-             {/* The Horizontal Scroll Section */}
-             <Projects />
-             
-             <Honors_n_certs />
-             <Climax />
+            <Main_story />
+            {/* Add a subtle separator or transition here */}
+            <div className="h-px w-full bg-gradient-to-r from-transparent via-[#FFD700]/20 to-transparent my-10"></div>
+
+            <Arsenal />
+            <CertsExperience />
+            <Ed_Timeline />
+
+            {/* The Horizontal Scroll Section */}
+            <Projects />
+
+            <Honors_n_certs />
+            <Climax />
           </div>
         </main>
       </div>
