@@ -2,7 +2,8 @@ import React, { useRef, useState } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { Award, BookOpen, ExternalLink, ScrollText, BadgeCheck, X } from "lucide-react";
+import { Award, BookOpen, ExternalLink, ScrollText, X } from "lucide-react";
+import CertCard from "./CertCard";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -68,9 +69,9 @@ const RESEARCH_ITEMS = [
     title: "Conference Paper (ICSRF 2025)",
     topic: "Open Defecation in Rural Settlements",
     desc: '"Case Study About Open Defecation in Rural Settlement on Rameswaram Island, India."',
-    status: "Accepted for Presentation (Aug 2025)",
+    status: "Published (Nov 2025)",
     icon: <BookOpen className="text-[#FFD700]" size={24} />,
-    link: "#"
+    link: "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=5726162"
   },
   {
     title: "Journal Manuscript",
@@ -80,36 +81,10 @@ const RESEARCH_ITEMS = [
     icon: <ScrollText className="text-[#A855F7]" size={24} />,
     link: "#"
   }
+
 ];
 
-const CertCard = ({ cert, onClick }) => (
-  <div
-    onClick={() => onClick(cert)}
-    className="cert-card flex-shrink-0 w-64 md:w-80 p-6 mx-4 bg-[#0A0A0E] border border-white/10 hover:border-[#FFD700]/50 rounded-lg transition-all duration-300 group relative overflow-hidden cursor-pointer hover:-translate-y-2 hover:shadow-[0_0_20px_rgba(255,215,0,0.1)]"
-  >
-    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-      <Award size={80} className="text-[#FFD700]" />
-    </div>
 
-    <div className="flex justify-between items-start mb-4 relative z-10">
-      <div className="p-2 bg-white/5 rounded border border-[#FFD700]/20">
-        <BadgeCheck className="text-[#FFD700]" size={24} />
-      </div>
-      <span className="text-xs font-mono text-gray-500">{cert.date}</span>
-    </div>
-
-    <h4 className="text-gray-200 font-bold text-lg mb-1 group-hover:text-[#FFD700] transition-colors relative z-10">
-      {cert.title}
-    </h4>
-    <p className="text-sm text-gray-400 font-mono relative z-10">
-      {cert.issuer}
-    </p>
-
-    <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity text-[#FFD700] text-xs font-mono">
-      CLICK TO VIEW
-    </div>
-  </div>
-);
 
 const Honors_n_certs = () => {
   const containerRef = useRef(null);

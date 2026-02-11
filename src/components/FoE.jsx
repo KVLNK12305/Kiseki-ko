@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Cpu, Globe, Database, Cloud, Code, Terminal, 
+import {
+  Cpu, Globe, Database, Cloud, Code, Terminal,
   Layers, Command, Wifi, Box, Shield, Zap
 } from 'lucide-react';
 
@@ -16,7 +17,7 @@ const TECH_NODES = [
   { id: 'ts', label: 'TypeScript', category: 'lang', x: 30, y: 30, icon: <Terminal />, description: 'Type Safety & Logic' },
   { id: 'tail', label: 'Tailwind', category: 'frontend', x: 15, y: 50, icon: <Layers />, description: 'Rapid UI Styling' },
   { id: 'three', label: 'Three.js', category: 'frontend', x: 35, y: 50, icon: <Box />, description: '3D Web Experiences' },
-  
+
   // RIGHT TWIN (Backend/Systems - "Pollux")
   { id: 'rust', label: 'Rust', category: 'core', x: 75, y: 15, icon: <Shield />, description: 'Memory Safety & Speed' },
   { id: 'node', label: 'Node.js', category: 'backend', x: 70, y: 35, icon: <Cpu />, description: 'Async Event Driven' },
@@ -82,13 +83,13 @@ const Arsenal = () => {
     // ISSUE: FoE.jsx used cyan-400/cyan-500 colors which didn't match the gold/violet theme used throughout app
     // SOLUTION: Updated background and grid colors to gold (#FFD700) for consistency with overall design
     <section id="arsenal" className="relative w-full min-h-screen bg-[#030305] text-white overflow-hidden font-mono selection:bg-[#FFD700]/30">
-      
+
       {/* BACKGROUND GRID & DECORATION - Updated to gold theme */}
       <div className="absolute inset-0 bg-[linear-gradient(rgba(255,215,0,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,215,0,0.03)_1px,transparent_1px)] bg-[size:40px_40px] opacity-20" />
       <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-[#FFD700]/10 to-transparent pointer-events-none" />
 
       <div className="relative z-10 container mx-auto px-4 py-20 h-full flex flex-col">
-        
+
         {/* HEADER SECTION - Updated to gold theme for consistency */}
         <div className="mb-12 space-y-4">
           <div className="flex items-center gap-2 text-[#FFD700] text-xs tracking-[0.2em] opacity-80">
@@ -99,7 +100,7 @@ const Arsenal = () => {
           <h2 className="text-5xl md:text-7xl font-bold tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-gray-500">
             TECH ARSENAL
           </h2>
-          
+
           {/* CATEGORY TABS */}
           <div className="flex flex-wrap gap-2 mt-8">
             {CATEGORIES.map((cat) => (
@@ -109,8 +110,8 @@ const Arsenal = () => {
                 // BUG FIX #7: Changed button active color from cyan-500 to gold #FFD700
                 className={`
                   px-4 py-2 text-xs tracking-wider border transition-all duration-300 relative group overflow-hidden
-                  ${activeCategory === cat.id 
-                    ? 'border-[#FFD700] text-[#FFD700] bg-[#FFD700]/10 shadow-[0_0_15px_rgba(255,215,0,0.15)]' 
+                  ${activeCategory === cat.id
+                    ? 'border-[#FFD700] text-[#FFD700] bg-[#FFD700]/10 shadow-[0_0_15px_rgba(255,215,0,0.15)]'
                     : 'border-white/10 text-gray-400 hover:border-white/30 hover:text-white'}
                 `}
               >
@@ -119,9 +120,9 @@ const Arsenal = () => {
                   {cat.label}
                 </span>
                 {activeCategory === cat.id && (
-                  <motion.div 
+                  <motion.div
                     layoutId="activeTab"
-                    className="absolute bottom-0 left-0 h-[2px] w-full bg-[#FFD700]" 
+                    className="absolute bottom-0 left-0 h-[2px] w-full bg-[#FFD700]"
                   />
                 )}
               </button>
@@ -131,11 +132,11 @@ const Arsenal = () => {
 
         {/* MAIN CONSTELLATION AREA */}
         <div className="flex-1 relative min-h-[600px] border border-white/5 rounded-3xl bg-black/20 backdrop-blur-sm overflow-hidden">
-          
+
           {/* INFO HUD (Top Right) */}
           <AnimatePresence>
             {hoveredNode && (
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 20 }}
@@ -156,9 +157,9 @@ const Arsenal = () => {
                 </p>
                 <div className="mt-4 flex gap-2">
                   <div className="h-1 flex-1 bg-gray-800 rounded-full overflow-hidden">
-                    <motion.div 
-                      initial={{ width: 0 }} 
-                      animate={{ width: '100%' }} 
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: '100%' }}
                       className="h-full bg-[#FFD700]"
                     />
                   </div>
@@ -173,7 +174,7 @@ const Arsenal = () => {
             {CONNECTIONS.map(([startId, endId], i) => {
               const startNode = TECH_NODES.find(n => n.id === startId);
               const endNode = TECH_NODES.find(n => n.id === endId);
-              
+
               const isHighlighted = hoveredNode && (hoveredNode.id === startId || hoveredNode.id === endId);
               const isActive = isNodeActive(startNode) && isNodeActive(endNode);
 
@@ -202,15 +203,15 @@ const Arsenal = () => {
             {TECH_NODES.map((node) => {
               const isActive = isNodeActive(node);
               const isHovered = hoveredNode?.id === node.id;
-              
+
               return (
                 <motion.div
                   key={node.id}
                   className={`absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer
                     ${!isActive ? 'opacity-20 grayscale pointer-events-none' : 'opacity-100'}
                   `}
-                  style={{ 
-                    left: `${node.x}%`, 
+                  style={{
+                    left: `${node.x}%`,
                     top: `${node.y}%`,
                   }}
                   animate={{
@@ -229,7 +230,7 @@ const Arsenal = () => {
                   <div className="relative group">
                     {/* Glowing Ring Effect - Updated to gold theme */}
                     {isHovered && (
-                      <motion.div 
+                      <motion.div
                         layoutId="glow"
                         className="absolute -inset-4 bg-[#FFD700]/20 rounded-full blur-xl"
                         initial={{ opacity: 0 }}
@@ -237,13 +238,13 @@ const Arsenal = () => {
                         exit={{ opacity: 0 }}
                       />
                     )}
-                    
+
                     {/* The Node Icon */}
                     <div className={`
                       relative w-12 h-12 md:w-16 md:h-16 rounded-2xl flex items-center justify-center 
                       bg-[#0a0a0a] border transition-all duration-300
-                      ${isHovered 
-                        ? 'border-[#FFD700] shadow-[0_0_30px_rgba(255,215,0,0.3)] scale-110 text-[#FFD700]' 
+                      ${isHovered
+                        ? 'border-[#FFD700] shadow-[0_0_30px_rgba(255,215,0,0.3)] scale-110 text-[#FFD700]'
                         : 'border-white/10 text-gray-400 hover:border-white/40'}
                     `}>
                       <div className="w-6 h-6 md:w-8 md:h-8">
@@ -264,12 +265,12 @@ const Arsenal = () => {
               );
             })}
           </div>
-          
+
           {/* DECORATIVE BACKGROUND ELEMENTS */}
           <div className="absolute bottom-4 left-4 text-[10px] text-gray-600 font-mono">
             COORDS: {mousePos.x.toFixed(2)}, {mousePos.y.toFixed(2)}
           </div>
-           <div className="absolute bottom-4 right-4 text-[10px] text-gray-600 font-mono flex items-center gap-2">
+          <div className="absolute bottom-4 right-4 text-[10px] text-gray-600 font-mono flex items-center gap-2">
             <span className="w-2 h-2 bg-green-500/50 rounded-full animate-pulse"></span>
             NETWORK_STATUS: ONLINE
           </div>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+// eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 
 // Configuration: Map the label to the ACTUAL ID in your DOM
@@ -23,7 +24,7 @@ const FloatingNav = ({ lenis }) => {
     useEffect(() => {
         const handleScroll = () => {
             // Find which section is currently in view
-            let currentSection = activeSection; // Default to current state (don't reset to 'home' blindly)
+            let currentSection = 'home';
 
             // We want to find the section that is closest to the top but not below the fold too much
             // Or typically, the last section that has its top above a certain threshold (meaning we've scrolled past its start)
@@ -93,8 +94,8 @@ const FloatingNav = ({ lenis }) => {
                         // BUG FIX #10 CONTINUED: Added active state styling to show current section
                         // Shows gold background and glow when button corresponds to active section
                         className={`relative group w-10 h-10 flex items-center justify-center rounded-full transition-all duration-300 ${activeSection === item.targetId
-                                ? 'bg-[#FFD700] text-black shadow-[0_0_20px_rgba(255,215,0,0.5)]'
-                                : 'bg-white/5 hover:bg-[#FFD700] hover:text-black'
+                            ? 'bg-[#FFD700] text-black shadow-[0_0_20px_rgba(255,215,0,0.5)]'
+                            : 'bg-white/5 hover:bg-[#FFD700] hover:text-black'
                             }`}
                     >
                         <span className="font-mono font-bold text-xs group-hover:scale-110 transition-transform">{item.icon}</span>
