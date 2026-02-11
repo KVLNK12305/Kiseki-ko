@@ -1,11 +1,10 @@
 import { useEffect, useState, useRef } from 'react';
-// eslint-disable-next-line no-unused-vars
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 
 export default function DecryptedText({
   text,
   speed = 50,
-  maxIterations = 100,
+  maxIterations = 10,
   sequential = false,
   revealDirection = 'start',
   useOriginalCharsOnly = false,
@@ -13,7 +12,7 @@ export default function DecryptedText({
   className = '',
   parentClassName = '',
   encryptedClassName = '',
-  animateOn = 'both',
+  animateOn = 'hover',
   ...props
 }) {
   const [displayText, setDisplayText] = useState(text);
@@ -163,9 +162,9 @@ export default function DecryptedText({
   const hoverProps =
     animateOn === 'hover' || animateOn === 'both'
       ? {
-        onMouseEnter: () => setIsHovering(true),
-        onMouseLeave: () => setIsHovering(false)
-      }
+          onMouseEnter: () => setIsHovering(true),
+          onMouseLeave: () => setIsHovering(false)
+        }
       : {};
 
   return (
@@ -173,8 +172,10 @@ export default function DecryptedText({
       ref={containerRef}
       className={`inline-block whitespace-pre-wrap ${parentClassName}`}
       {...hoverProps}
-      {...props}>
+      {...props}
+    >
       <span className="sr-only">{displayText}</span>
+
       <span aria-hidden="true">
         {displayText.split('').map((char, index) => {
           const isRevealedOrDone = revealedIndices.has(index) || !isScrambling || !isHovering;

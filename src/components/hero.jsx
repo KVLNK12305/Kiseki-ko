@@ -245,7 +245,7 @@ const Hero = () => {
 
                     <div className="relative z-10 mb-8 pointer-events-none" aria-label="Kushal Kurapati">
                         {/* FIRST NAME */}
-                        <div className="overflow-visible leading-none mb-2 mix-blend-difference">
+                        <div className={`overflow-visible leading-none mb-2 mix-blend-difference transition-opacity duration-300 ${startNameAnimation ? 'opacity-100' : 'opacity-0'}`}>
                             <DecryptedText
                                 text="KUSHAL"
                                 speed={80}
@@ -264,7 +264,7 @@ const Hero = () => {
                             <div className="paint-reveal absolute -inset-4 bg-[#A855F7] -skew-x-12 z-0 mix-blend-multiply opacity-90"
                                 style={{ clipPath: 'polygon(5% 0%, 100% 0%, 95% 100%, 0% 100%)' }}></div>
 
-                            <div className="relative z-10 mix-blend-hard-light">
+                            <div className={`relative z-10 mix-blend-hard-light transition-opacity duration-300 ${startNameAnimation ? 'opacity-100' : 'opacity-0'}`}>
                                 <DecryptedText
                                     text="KURAPATI"
                                     speed={80}
