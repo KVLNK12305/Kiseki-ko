@@ -1,52 +1,65 @@
 import React, { useState, useEffect } from 'react';
-// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Cpu, Globe, Database, Cloud, Code, Terminal,
-  Layers, Command, Wifi, Box, Shield, Zap
+
+// We rely on lucide-react ONLY for abstract concepts that don't have official brand logos.
+import { 
+  Network, Radar, Bug, Waypoints, LineChart 
 } from 'lucide-react';
 
+// --- HELPER COMPONENT FOR BRAND LOGOS ---
+// This safely fetches official logos directly from a CDN. No NPM packages to break.
+const BrandIcon = ({ slug, title }) => (
+  <img 
+    src={`https://cdn.simpleicons.org/${slug}/ffffff`} 
+    alt={title} 
+    className="w-7 h-7 md:w-9 md:h-9 object-contain opacity-80 group-hover:opacity-100 transition-opacity"
+  />
+);
+
 // --- CONFIGURATION ---
-
-// The Gemini Constellation Mapping
-// We map tech skills to specific x/y percentage coordinates to mimic the star sign.
 const TECH_NODES = [
-  // LEFT TWIN (Frontend/Interface - "Castor")
-  { id: 'react', label: 'React', category: 'frontend', x: 25, y: 15, icon: <Code />, description: 'Component Architecture' },
-  { id: 'next', label: 'Next.js', category: 'frontend', x: 20, y: 30, icon: <Globe />, description: 'Server Side Rendering' },
-  { id: 'ts', label: 'TypeScript', category: 'lang', x: 30, y: 30, icon: <Terminal />, description: 'Type Safety & Logic' },
-  { id: 'tail', label: 'Tailwind', category: 'frontend', x: 15, y: 50, icon: <Layers />, description: 'Rapid UI Styling' },
-  { id: 'three', label: 'Three.js', category: 'frontend', x: 35, y: 50, icon: <Box />, description: '3D Web Experiences' },
+  // THE BRIDGE: Languages 
+  { id: 'rust', label: 'Rust', category: 'lang', x: 50, y: 15, icon: <BrandIcon slug="rust" title="Rust" />, description: 'Memory-safe systems & eBPF programming', stats: { Paradigm: 'Concurrent', Allocation: 'Manual', Safety: 'Strict' } },
+  { id: 'c', label: 'C', category: 'lang', x: 65, y: 15, icon: <BrandIcon slug="c" title="C" />, description: 'Low-level hardware interfacing', stats: { Level: 'Low/Kernel', Speed: 'Bare-Metal', Paradigm: 'Procedural' } },
+  { id: 'python', label: 'Python', category: 'lang', x: 35, y: 15, icon: <BrandIcon slug="python" title="Python" />, description: 'Automation, scripts & data analysis', stats: { Execution: 'Interpreted', Typing: 'Dynamic', Utility: 'High' } },
+  { id: 'java', label: 'Java', category: 'lang', x: 50, y: 5, icon: <BrandIcon slug="java" title="Java" />, description: 'Enterprise architecture', stats: { Runtime: 'JVM', Typing: 'Static', Paradigm: 'OOP' } },
+  { id: 'js', label: 'JavaScript', category: 'lang', x: 25, y: 20, icon: <BrandIcon slug="javascript" title="JavaScript" />, description: 'Client/Server dynamic behavior', stats: { Engine: 'V8', Concurrency: 'Event-Loop', Paradigm: 'Multi' } },
 
-  // RIGHT TWIN (Backend/Systems - "Pollux")
-  { id: 'rust', label: 'Rust', category: 'core', x: 75, y: 15, icon: <Shield />, description: 'Memory Safety & Speed' },
-  { id: 'node', label: 'Node.js', category: 'backend', x: 70, y: 35, icon: <Cpu />, description: 'Async Event Driven' },
-  { id: 'cpp', label: 'C++', category: 'core', x: 80, y: 35, icon: <Command />, description: 'Low Level Control' },
-  { id: 'docker', label: 'Docker', category: 'devops', x: 65, y: 55, icon: <Box />, description: 'Containerization' },
-  { id: 'aws', label: 'AWS', category: 'cloud', x: 85, y: 55, icon: <Cloud />, description: 'Cloud Infrastructure' },
+  // RIGHT WING: Systems & Security 
+  { id: 'linux', label: 'Linux', category: 'sys-sec', x: 75, y: 35, icon: <BrandIcon slug="linux" title="Linux" />, description: 'OS kernel & environment routing', stats: { Kernel: 'Monolithic', Access: 'Root', Shell: 'Bash/Zsh' } },
+  { id: 'docker', label: 'Docker', category: 'sys-sec', x: 65, y: 45, icon: <BrandIcon slug="docker" title="Docker" />, description: 'Containerized secure deployments', stats: { Isolation: 'High', Footprint: 'Light', Engine: 'Daemon' } },
+  { id: 'network', label: 'Networking', category: 'sys-sec', x: 85, y: 45, icon: <Network className="w-7 h-7 md:w-9 md:h-9 opacity-80" />, description: 'SDN & Protocol routing', stats: { Layer: 'OSI 1-7', Topology: 'Mesh', State: 'Active' } },
+  { id: 'nmap', label: 'Nmap', category: 'sys-sec', x: 75, y: 60, icon: <Radar className="w-7 h-7 md:w-9 md:h-9 opacity-80" />, description: 'Network discovery & auditing', stats: { Mode: 'Reconnaissance', Stealth: 'Variable', Target: 'Ports' } },
+  { id: 'wireshark', label: 'Wireshark', category: 'sys-sec', x: 90, y: 65, icon: <BrandIcon slug="wireshark" title="Wireshark" />, description: 'Deep packet inspection', stats: { Mode: 'Capture', Filter: 'BPF/pcap', Analysis: 'Granular' } },
+  { id: 'ghidra', label: 'Ghidra / RE', category: 'sys-sec', x: 80, y: 80, icon: <Bug className="w-7 h-7 md:w-9 md:h-9 opacity-80" />, description: 'Reverse engineering & SRE', stats: { Phase: 'Static Analysis', Arch: 'Multi', Type: 'Decompiler' } },
 
-  // THE BRIDGE (Shared/Tools/Data)
-  { id: 'sql', label: 'Postgres', category: 'db', x: 50, y: 40, icon: <Database />, description: 'Relational Data' },
-  { id: 'git', label: 'Git', category: 'tools', x: 50, y: 70, icon: <Wifi />, description: 'Version Control' },
-  { id: 'python', label: 'Python', category: 'lang', x: 50, y: 20, icon: <Zap />, description: 'AI & Scripting' },
+  // LEFT WING: Web 
+  { id: 'node', label: 'Node.js', category: 'web', x: 35, y: 35, icon: <BrandIcon slug="nodedotjs" title="Node.js" />, description: 'Asynchronous backend runtime', stats: { Threading: 'Single', I_O: 'Non-blocking', Runtime: 'Backend' } },
+  { id: 'react', label: 'React.js', category: 'web', x: 15, y: 35, icon: <BrandIcon slug="react" title="React" />, description: 'Component-based UI architecture', stats: { DOM: 'Virtual', Paradigm: 'Declarative', Render: 'CSR/SSR' } },
+  { id: 'sockets', label: 'WebSockets', category: 'web', x: 25, y: 45, icon: <Waypoints className="w-7 h-7 md:w-9 md:h-9 opacity-80" />, description: 'Full-duplex TCP channels', stats: { Protocol: 'ws://', State: 'Stateful', Latency: 'Ultra-Low' } },
+  { id: 'tail', label: 'Tailwind', category: 'web', x: 10, y: 50, icon: <BrandIcon slug="tailwindcss" title="Tailwind" />, description: 'Utility-first styling engine', stats: { Strategy: 'Utility', Compilation: 'JIT', Output: 'Optimized' } },
+
+  // BOTTOM LEFT: Data & Visualization
+  { id: 'tableau', label: 'Tableau', category: 'data', x: 20, y: 70, icon: <BrandIcon slug="tableau" title="Tableau" />, description: 'Business intelligence dashboards', stats: { Output: 'Visual', Querying: 'Drag-Drop', Scale: 'Enterprise' } },
+  { id: 'plotly', label: 'Plotly', category: 'data', x: 35, y: 65, icon: <BrandIcon slug="plotly" title="Plotly" />, description: 'Interactive graphing libraries', stats: { Render: 'WebGL/SVG', Source: 'Py/JS', Interactivity: 'High' } },
+  { id: 'matplotlib', label: 'Matplotlib', category: 'data', x: 45, y: 80, icon: <LineChart className="w-7 h-7 md:w-9 md:h-9 opacity-80" />, description: 'Statistical data plotting', stats: { Type: 'Static 2D', API: 'Pyplot', Complexity: 'Granular' } },
 ];
 
-// Define connections (constellation lines)
+// Logical groupings forming the visual "web"
 const CONNECTIONS = [
-  ['react', 'next'], ['react', 'ts'], ['next', 'tail'], ['ts', 'three'], // Left Twin Body
-  ['rust', 'cpp'], ['rust', 'node'], ['node', 'docker'], ['cpp', 'aws'], // Right Twin Body
-  ['ts', 'node'], // The "Handshake" between twins
-  ['python', 'react'], ['python', 'rust'], // Python bridging both heads
-  ['sql', 'node'], ['sql', 'next'], // Database grounding
-  ['git', 'tail'], ['git', 'docker'], // Tools connecting the feet
+  ['java', 'rust'], ['java', 'python'], ['rust', 'c'], ['python', 'js'], 
+  ['rust', 'linux'], ['c', 'linux'], ['linux', 'docker'], ['linux', 'network'],
+  ['network', 'nmap'], ['network', 'wireshark'], ['linux', 'ghidra'], ['nmap', 'wireshark'],
+  ['js', 'node'], ['js', 'react'], ['node', 'sockets'], ['react', 'sockets'], ['react', 'tail'],
+  ['python', 'plotly'], ['python', 'matplotlib'], ['plotly', 'tableau'], ['matplotlib', 'plotly']
 ];
 
 const CATEGORIES = [
-  { id: 'all', label: 'ALL MODULES' },
-  { id: 'core', label: 'CORE / LANG' },
-  { id: 'frontend', label: 'FRONTEND' },
-  { id: 'backend', label: 'BACKEND & DB' },
-  { id: 'cloud', label: 'CLOUD & DEVOPS' },
+  { id: 'all', label: 'ALL_SYSTEMS' },
+  { id: 'lang', label: 'LANGUAGES' },
+  { id: 'sys-sec', label: 'SYSTEMS & SECURITY' },
+  { id: 'web', label: 'WEB_PROTOCOLS' },
+  { id: 'data', label: 'DATA_TELEMETRY' },
 ];
 
 const Arsenal = () => {
@@ -54,7 +67,6 @@ const Arsenal = () => {
   const [hoveredNode, setHoveredNode] = useState(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
-  // Handle global mouse move for parallax effect
   useEffect(() => {
     const handleMouseMove = (e) => {
       setMousePos({
@@ -66,52 +78,41 @@ const Arsenal = () => {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
-  // Filter logic
   const isNodeActive = (node) => {
     if (activeCategory === 'all') return true;
-    if (activeCategory === 'backend' && (node.category === 'db' || node.category === 'backend')) return true;
-    if (activeCategory === 'core' && (node.category === 'lang' || node.category === 'core')) return true;
-    if (activeCategory === 'cloud' && (node.category === 'devops' || node.category === 'cloud')) return true;
     return node.category === activeCategory;
   };
 
   return (
-    // BUG FIX #2: Added missing id="arsenal" to section element
-    // ISSUE: FloatingNav's Skills button targeted 'arsenal' but section had no ID
-    // SOLUTION: Added id="arsenal" to enable smooth scrolling from FloatingNav
-    // BUG FIX #6: Changed color scheme from cyan to match app theme (gold #FFD700 and violet #A855F7)
-    // ISSUE: FoE.jsx used cyan-400/cyan-500 colors which didn't match the gold/violet theme used throughout app
-    // SOLUTION: Updated background and grid colors to gold (#FFD700) for consistency with overall design
     <section id="arsenal" className="relative w-full min-h-screen bg-[#030305] text-white overflow-hidden font-mono selection:bg-[#FFD700]/30">
-
-      {/* BACKGROUND GRID & DECORATION - Updated to gold theme */}
+      
+      {/* BACKGROUND GRID */}
       <div className="absolute inset-0 bg-[linear-gradient(rgba(255,215,0,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,215,0,0.03)_1px,transparent_1px)] bg-[size:40px_40px] opacity-20" />
       <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-[#FFD700]/10 to-transparent pointer-events-none" />
 
       <div className="relative z-10 container mx-auto px-4 py-20 h-full flex flex-col">
-
-        {/* HEADER SECTION - Updated to gold theme for consistency */}
+        
+        {/* HEADER */}
         <div className="mb-12 space-y-4">
           <div className="flex items-center gap-2 text-[#FFD700] text-xs tracking-[0.2em] opacity-80">
             <span>// SYSTEM_INVENTORY</span>
             <span className="w-12 h-[1px] bg-[#FFD700]/50" />
-            <span>V.2.0.26 [OPTIMIZED]</span>
+            <span>STATUS: ACTIVE</span>
           </div>
           <h2 className="text-5xl md:text-7xl font-bold tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-gray-500">
             TECH ARSENAL
           </h2>
 
-          {/* CATEGORY TABS */}
+          {/* FILTERS */}
           <div className="flex flex-wrap gap-2 mt-8">
             {CATEGORIES.map((cat) => (
               <button
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.id)}
-                // BUG FIX #7: Changed button active color from cyan-500 to gold #FFD700
                 className={`
                   px-4 py-2 text-xs tracking-wider border transition-all duration-300 relative group overflow-hidden
-                  ${activeCategory === cat.id
-                    ? 'border-[#FFD700] text-[#FFD700] bg-[#FFD700]/10 shadow-[0_0_15px_rgba(255,215,0,0.15)]'
+                  ${activeCategory === cat.id 
+                    ? 'border-[#FFD700] text-[#FFD700] bg-[#FFD700]/10 shadow-[0_0_15px_rgba(255,215,0,0.15)]' 
                     : 'border-white/10 text-gray-400 hover:border-white/30 hover:text-white'}
                 `}
               >
@@ -119,61 +120,81 @@ const Arsenal = () => {
                   {activeCategory === cat.id && <span className="w-1 h-1 bg-[#FFD700] rounded-full animate-pulse" />}
                   {cat.label}
                 </span>
-                {activeCategory === cat.id && (
-                  <motion.div
-                    layoutId="activeTab"
-                    className="absolute bottom-0 left-0 h-[2px] w-full bg-[#FFD700]"
-                  />
-                )}
               </button>
             ))}
           </div>
         </div>
 
-        {/* MAIN CONSTELLATION AREA */}
-        <div className="flex-1 relative min-h-[600px] border border-white/5 rounded-3xl bg-black/20 backdrop-blur-sm overflow-hidden">
-
-          {/* INFO HUD (Top Right) */}
+        {/* CONSTELLATION MAP */}
+        <div className="flex-1 relative min-h-[600px] border border-white/5 rounded-3xl bg-black/40 backdrop-blur-md overflow-hidden">
+          
+          {/* ADVANCED TELEMETRY HUD */}
           <AnimatePresence>
             {hoveredNode && (
               <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                // BUG FIX #8: Changed border color from cyan-500 to gold #FFD700
-                className="absolute top-8 right-8 z-30 w-64 bg-black/80 border border-[#FFD700]/30 p-4 rounded-xl backdrop-blur-md shadow-2xl"
+                initial={{ opacity: 0, x: 20, scale: 0.95 }}
+                animate={{ opacity: 1, x: 0, scale: 1 }}
+                exit={{ opacity: 0, x: 20, scale: 0.95 }}
+                className="absolute top-8 right-8 z-30 w-72 bg-[#0a0a0c]/90 border border-[#FFD700]/40 p-5 rounded-lg backdrop-blur-xl shadow-2xl"
               >
-                <div className="flex items-center justify-between mb-2 pb-2 border-b border-white/10">
-                  <span className="text-xs text-[#FFD700] tracking-widest">INFO_PANEL</span>
-                  <div className="flex gap-1">
-                    <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-                    <span className="w-2 h-2 rounded-full bg-yellow-500" />
+                <div className="flex items-center justify-between mb-3 pb-2 border-b border-[#FFD700]/20">
+                  <span className="text-[10px] text-[#FFD700] tracking-widest">DIAGNOSTIC_PANEL</span>
+                  <div className="flex gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#FFD700]" />
                   </div>
                 </div>
-                <h3 className="text-xl font-bold text-white mb-1">{hoveredNode.label}</h3>
-                <div className="text-xs text-gray-400 font-mono mb-3">ID: {hoveredNode.id.toUpperCase()}_MOD</div>
-                <p className="text-sm text-gray-300 leading-relaxed border-l-2 border-[#FFD700]/50 pl-3">
+                
+                <h3 className="text-2xl font-bold text-white mb-1 flex items-center gap-3">
+                  {hoveredNode.icon} {hoveredNode.label}
+                </h3>
+                <div className="text-[10px] text-gray-500 font-mono mb-4 bg-white/5 inline-block px-2 py-0.5 rounded">
+                  MOD_ID: 0x{(hoveredNode.id.length * 1024).toString(16).toUpperCase()}
+                </div>
+                
+                <p className="text-xs text-gray-300 leading-relaxed border-l-2 border-[#FFD700]/50 pl-3 mb-5">
                   {hoveredNode.description}
                 </p>
-                <div className="mt-4 flex gap-2">
-                  <div className="h-1 flex-1 bg-gray-800 rounded-full overflow-hidden">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: '100%' }}
-                      className="h-full bg-[#FFD700]"
-                    />
-                  </div>
+
+                {/* Data-Driven Stats Output */}
+                <div className="space-y-2 mb-5">
+                  {Object.entries(hoveredNode.stats).map(([key, value]) => (
+                    <div key={key} className="flex justify-between items-end border-b border-white/5 pb-1">
+                      <span className="text-[10px] text-gray-500 tracking-wider">{key.toUpperCase()}</span>
+                      <span className="text-xs text-[#FFD700]">{value}</span>
+                    </div>
+                  ))}
                 </div>
-                <div className="text-[10px] text-right mt-1 text-[#FFD700]/70">MASTERY LEVEL: SYNCHRONIZED</div>
+
+                {/* Simulated Signal Visualizer */}
+                <div className="flex items-end gap-1 h-6 w-full opacity-80">
+                  {[...Array(16)].map((_, i) => (
+                    <motion.div
+                      key={i}
+                      animate={{ height: ['20%', '100%', '30%', '80%', '10%'] }}
+                      transition={{ 
+                        duration: 1.5 + Math.random(), 
+                        repeat: Infinity, 
+                        ease: "linear",
+                        delay: i * 0.1 
+                      }}
+                      className="flex-1 bg-gradient-to-t from-[#FFD700]/20 to-[#FFD700] rounded-t-sm"
+                    />
+                  ))}
+                </div>
+                <div className="text-[9px] text-center mt-2 text-gray-600 tracking-widest">
+                  LIVE_TELEMETRY_STREAM
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
 
-          {/* CANVAS LAYER (Lines) */}
+          {/* SVG CONNECTIONS */}
           <svg className="absolute inset-0 w-full h-full pointer-events-none z-0">
             {CONNECTIONS.map(([startId, endId], i) => {
               const startNode = TECH_NODES.find(n => n.id === startId);
               const endNode = TECH_NODES.find(n => n.id === endId);
+              if (!startNode || !endNode) return null;
 
               const isHighlighted = hoveredNode && (hoveredNode.id === startId || hoveredNode.id === endId);
               const isActive = isNodeActive(startNode) && isNodeActive(endNode);
@@ -187,9 +208,9 @@ const Arsenal = () => {
                   y1={`${startNode.y}%`}
                   x2={`${endNode.x}%`}
                   y2={`${endNode.y}%`}
-                  stroke={isHighlighted ? '#06b6d4' : '#ffffff'}
-                  strokeWidth={isHighlighted ? 2 : 0.5}
-                  strokeOpacity={isHighlighted ? 0.8 : 0.15}
+                  stroke={isHighlighted ? '#FFD700' : '#ffffff'}
+                  strokeWidth={isHighlighted ? 1.5 : 0.5}
+                  strokeOpacity={isHighlighted ? 0.8 : 0.1}
                   initial={{ pathLength: 0 }}
                   animate={{ pathLength: 1 }}
                   transition={{ duration: 1.5, delay: i * 0.05 }}
@@ -198,7 +219,7 @@ const Arsenal = () => {
             })}
           </svg>
 
-          {/* NODES LAYER */}
+          {/* RENDER NODES */}
           <div className="absolute inset-0 z-10">
             {TECH_NODES.map((node) => {
               const isActive = isNodeActive(node);
@@ -207,56 +228,34 @@ const Arsenal = () => {
               return (
                 <motion.div
                   key={node.id}
-                  className={`absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer
-                    ${!isActive ? 'opacity-20 grayscale pointer-events-none' : 'opacity-100'}
+                  className={`absolute transform -translate-x-1/2 -translate-y-1/2 cursor-crosshair
+                    ${!isActive ? 'opacity-10 grayscale pointer-events-none' : 'opacity-100'}
                   `}
-                  style={{
-                    left: `${node.x}%`,
-                    top: `${node.y}%`,
-                  }}
+                  style={{ left: `${node.x}%`, top: `${node.y}%` }}
                   animate={{
-                    // Floating animation
-                    y: [`${node.y}%`, `${node.y - 2}%`, `${node.y}%`],
-                    x: [`${node.x}%`, `${node.x + (Math.random() - 0.5)}%`, `${node.x}%`]
+                    y: [`${node.y}%`, `${node.y - 1.5}%`, `${node.y}%`],
                   }}
-                  transition={{
-                    duration: 4 + Math.random() * 2,
-                    repeat: Infinity,
-                    ease: "easeInOut"
-                  }}
+                  transition={{ duration: 3 + Math.random() * 2, repeat: Infinity, ease: "easeInOut" }}
                   onMouseEnter={() => setHoveredNode(node)}
                   onMouseLeave={() => setHoveredNode(null)}
                 >
-                  <div className="relative group">
-                    {/* Glowing Ring Effect - Updated to gold theme */}
-                    {isHovered && (
-                      <motion.div
-                        layoutId="glow"
-                        className="absolute -inset-4 bg-[#FFD700]/20 rounded-full blur-xl"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                      />
-                    )}
-
-                    {/* The Node Icon */}
+                  <div className="relative group flex flex-col items-center">
+                    
+                    {/* Node Interface */}
                     <div className={`
-                      relative w-12 h-12 md:w-16 md:h-16 rounded-2xl flex items-center justify-center 
-                      bg-[#0a0a0a] border transition-all duration-300
-                      ${isHovered
-                        ? 'border-[#FFD700] shadow-[0_0_30px_rgba(255,215,0,0.3)] scale-110 text-[#FFD700]'
-                        : 'border-white/10 text-gray-400 hover:border-white/40'}
+                      relative w-12 h-12 md:w-16 md:h-16 rounded-xl flex items-center justify-center 
+                      bg-[#050505] border transition-all duration-300 z-10
+                      ${isHovered 
+                        ? 'border-[#FFD700] shadow-[0_0_20px_rgba(255,215,0,0.4)] scale-110 text-[#FFD700]' 
+                        : 'border-white/10 text-gray-500 hover:border-white/30'}
                     `}>
-                      <div className="w-6 h-6 md:w-8 md:h-8">
-                        {node.icon}
-                      </div>
+                      {node.icon}
                     </div>
 
-                    {/* Label (Always visible or on hover) */}
+                    {/* Minimalist Label */}
                     <div className={`
-                      absolute top-full left-1/2 -translate-x-1/2 mt-3 whitespace-nowrap
-                      text-[10px] tracking-widest font-semibold transition-all duration-300
-                      ${isHovered ? 'text-[#FFD700] translate-y-0 opacity-100' : 'text-gray-500 translate-y-2 opacity-0 group-hover:opacity-100'}
+                      absolute top-full mt-3 whitespace-nowrap text-[10px] tracking-widest font-semibold transition-all duration-300 bg-black/80 px-2 py-1 rounded backdrop-blur-md border border-white/10
+                      ${isHovered ? 'text-[#FFD700] translate-y-0 opacity-100' : 'text-gray-600 -translate-y-2 opacity-0'}
                     `}>
                       {node.label}
                     </div>
@@ -265,14 +264,9 @@ const Arsenal = () => {
               );
             })}
           </div>
-
-          {/* DECORATIVE BACKGROUND ELEMENTS */}
+          
           <div className="absolute bottom-4 left-4 text-[10px] text-gray-600 font-mono">
-            COORDS: {mousePos.x.toFixed(2)}, {mousePos.y.toFixed(2)}
-          </div>
-          <div className="absolute bottom-4 right-4 text-[10px] text-gray-600 font-mono flex items-center gap-2">
-            <span className="w-2 h-2 bg-green-500/50 rounded-full animate-pulse"></span>
-            NETWORK_STATUS: ONLINE
+            SYS_COORD: {mousePos.x.toFixed(2)}, {mousePos.y.toFixed(2)}
           </div>
         </div>
       </div>
