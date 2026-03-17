@@ -270,6 +270,9 @@ const Hero = () => {
                                     speed={80}
                                     maxIterations={25}
                                     characters="KUSHALKURAPATI"
+                                    sequential={true}
+                                    useOriginalCharsOnly={true}
+                                    revealDirection="start"
                                     className="text-6xl md:text-8xl lg:text-[7.5rem] font-black text-white leading-[0.85] tracking-tighter drop-shadow-[0_5px_15px_rgba(168,85,247,0.5)]"
                                     parentClassName="flex justify-center flex-wrap"
                                     encryptedClassName="text-6xl md:text-8xl lg:text-[7.5rem] font-black text-white/30 leading-[0.85] tracking-tighter"

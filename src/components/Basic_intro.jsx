@@ -34,7 +34,7 @@ const Main_story = () => (
                         text="KURAPATI VENKATA LAKSHMI NARASIMHA KUSHAL"
                         parentClassName="text-4xl sm:text-5xl md:text-6xl font-black text-white mb-2 tracking-tighter leading-[0.9]"
                         encryptedClassName="text-gold/50"
-                        animateOn="hover"
+                        animateOn="inViewHover"
                         speed={40}
                         sequential={true}
                         revealDirection="center"
