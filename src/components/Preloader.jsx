@@ -1,9 +1,7 @@
+// src/components/Preloader.jsx
 import React, { useRef } from 'react';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
-import { TextPlugin } from "gsap/TextPlugin";
-
-gsap.registerPlugin(TextPlugin);
 
 const Preloader = ({ onComplete }) => {
     const containerRef = useRef(null);
@@ -11,55 +9,47 @@ const Preloader = ({ onComplete }) => {
     const barRef = useRef(null);
 
     useGSAP(() => {
-        console.log("Preloader: Animation starting");
         const tl = gsap.timeline({
             onComplete: () => {
-                console.log("Preloader: Text sequence complete, fading out");
-                // Fade out preloader
+                // Exit Animation
                 gsap.to(containerRef.current, {
                     yPercent: -100,
                     duration: 0.8,
-                    ease: "power4.inOut",
-                    onComplete: () => {
-                        console.log("Preloader: Fade out complete, calling onComplete");
-                        onComplete();
-                    }
+                    ease: "expo.inOut",
+                    onComplete: onComplete // Call the memoized prop
                 });
             }
         });
 
-        // Initial Text Scramble effect
-        const words = ["INITIALIZING...", "LOADING ASSETS...", "CONNECTING TO MAIN...", "SYSTEM READY"];
+        const words = ["INITIALIZING...", "LOADING ASSETS...", "CONNECTING...", "SYSTEM READY"];
 
+        // Animate text sequence
         words.forEach((word) => {
             tl.to(textRef.current, {
-                text: word,
+                text: word, // TextPlugin handles this automatically
                 duration: 0.4,
                 ease: "none",
-                onStart: () => {
-                    if (textRef.current) textRef.current.innerText = word;
-                }
-            }).to({}, { duration: 0.2 }); // Pause
+            }).to({}, { duration: 0.2 }); // Hold for a beat
         });
 
         // Progress Bar
         gsap.to(barRef.current, {
             width: "100%",
-            duration: 2.5,
+            duration: 2.2,
             ease: "power2.inOut"
         });
 
-    }, { scope: containerRef, dependencies: [onComplete] });
+    }, { scope: containerRef, dependencies: [] }); // Empty deps = run once on mount
 
     return (
-        <div ref={containerRef} className="fixed inset-0 z-[100] bg-[#050505] flex flex-col items-center justify-center">
+        <div ref={containerRef} className="fixed inset-0 z-[100] bg-[#030305] flex flex-col items-center justify-center">
             <div className="w-64">
-                <div className="flex justify-between font-mono text-xs text-[#FFD700] mb-2">
+                <div className="flex justify-between font-mono text-[10px] text-[#A855F7] mb-2 uppercase tracking-widest">
                     <span ref={textRef}>INITIALIZING...</span>
-                    <span>v2.0.26</span>
+                    <span className="opacity-50">v3.1.0</span>
                 </div>
-                <div className="w-full h-[2px] bg-[#1a1a2e] overflow-hidden">
-                    <div ref={barRef} className="h-full bg-[#FFD700] w-0"></div>
+                <div className="w-full h-[1px] bg-[#A855F7]/20 overflow-hidden">
+                    <div ref={barRef} className="h-full bg-[#A855F7] w-0 shadow-[0_0_10px_rgba(168,85,247,0.5)]"></div>
                 </div>
             </div>
         </div>
