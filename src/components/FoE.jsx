@@ -3,6 +3,11 @@ import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from
 import { Network, Radar, Bug, Waypoints, LineChart } from 'lucide-react';
 
 import tableauImg from './images/tableau-software (1).png';
+import osintImg from './images/osint.png';
+import socketIoImg from './images/SocketIo.png';
+import ghidraImg from './images/Ghidra_Logo.png';
+import wiresharkImg from './images/ws.png';
+import matplotlibImg from './images/matplotlib-icon-iodufaod59i61pudzd92.png';
 
 // --- HELPER COMPONENT FOR BRAND LOGOS ---
 const BrandIcon = ({ slug, title, provider = "skill" }) => {
@@ -43,34 +48,34 @@ const BrandIcon = ({ slug, title, provider = "skill" }) => {
 
 // --- CONFIGURATION ---
 const TECH_NODES = [
-  { id: 'rust', label: 'Rust', category: 'lang', x: 50, y: 15, icon: <BrandIcon slug="rust" title="Rust" />, description: 'Memory-safe systems & eBPF programming', stats: { Paradigm: 'Concurrent', Safety: 'Strict' } },
+  { id: 'rust', label: 'Rust', category: 'lang', x: 50, y: 20, icon: <BrandIcon slug="rust" title="Rust" />, description: 'Memory-safe systems & eBPF programming', stats: { Paradigm: 'Concurrent', Safety: 'Strict' } },
   { id: 'c', label: 'C', category: 'lang', x: 65, y: 15, icon: <BrandIcon slug="c" title="C" />, description: 'Low-level hardware interfacing', stats: { Level: 'Low/Kernel', Speed: 'Bare-Metal' } },
   { id: 'python', label: 'Python', category: 'lang', x: 35, y: 15, icon: <BrandIcon slug="python" title="Python" />, description: 'Automation, scripts & data analysis', stats: { Utility: 'High', Typing: 'Dynamic' } },
-  { id: 'java', label: 'Java', category: 'lang', x: 50, y: 5, icon: <BrandIcon slug="java" title="Java" />, description: 'Enterprise architecture', stats: { Runtime: 'JVM', Paradigm: 'OOP' } },
+  { id: 'java', label: 'Java', category: 'lang', x: 50, y: 8, icon: <BrandIcon slug="java" title="Java" />, description: 'Enterprise architecture', stats: { Runtime: 'JVM', Paradigm: 'OOP' } },
   { id: 'js', label: 'JavaScript', category: 'lang', x: 25, y: 20, icon: <BrandIcon slug="js" title="JavaScript" />, description: 'Client/Server dynamic behavior', stats: { Engine: 'V8', Concurrency: 'Event-Loop' } },
 
   { id: 'linux', label: 'Linux', category: 'sys-sec', x: 75, y: 35, icon: <BrandIcon slug="linux" title="Linux" />, description: 'OS kernel & environment routing', stats: { Kernel: 'Monolithic', Shell: 'Zsh' } },
   { id: 'docker', label: 'Docker', category: 'sys-sec', x: 65, y: 45, icon: <BrandIcon slug="docker" title="Docker" />, description: 'Containerized secure deployments', stats: { Isolation: 'High', Engine: 'Daemon' } },
   { id: 'network', label: 'Networking', category: 'sys-sec', x: 85, y: 45, icon: <Network className="w-7 h-7 md:w-9 md:h-9 opacity-80" />, description: 'SDN & Protocol routing', stats: { Layer: 'OSI 1-7', Topology: 'Mesh' } },
-  { id: 'nmap', label: 'Nmap', category: 'sys-sec', x: 75, y: 60, icon: <Radar className="w-7 h-7 md:w-9 md:h-9 opacity-80" />, description: 'Network discovery & auditing', stats: { Mode: 'Recon', Target: 'Ports' } },
-  { id: 'wireshark', label: 'Wireshark', category: 'sys-sec', x: 90, y: 65, icon: <BrandIcon slug="wireshark" title="Wireshark" provider="simple" />, description: 'Deep packet inspection', stats: { Filter: 'BPF/pcap', Analysis: 'Granular' } },
-  { id: 'ghidra', label: 'Ghidra / RE', category: 'sys-sec', x: 80, y: 80, icon: <Bug className="w-7 h-7 md:w-9 md:h-9 opacity-80" />, description: 'Reverse engineering & SRE', stats: { Phase: 'Static', Type: 'Decompiler' } },
+  { id: 'osint', label: 'OSINT', category: 'sys-sec', x: 75, y: 60, icon: <img src={osintImg} alt="OSINT" className="w-7 h-7 md:w-9 md:h-9 object-contain opacity-80 group-hover:opacity-100 transition-opacity invert" />, description: 'Open-source intelligence gathering', stats: { Mode: 'Recon', Target: 'Intel' } },
+  { id: 'wireshark', label: 'Wireshark', category: 'sys-sec', x: 90, y: 65, icon: <img src={wiresharkImg} alt="Wireshark" className="w-7 h-7 md:w-9 md:h-9 object-contain opacity-80 group-hover:opacity-100 transition-opacity" />, description: 'Deep packet inspection', stats: { Filter: 'BPF/pcap', Analysis: 'Granular' } },
+  { id: 'ghidra', label: 'Ghidra / RE', category: 'sys-sec', x: 80, y: 80, icon: <img src={ghidraImg} alt="Ghidra" className="w-7 h-7 md:w-9 md:h-9 object-contain opacity-80 group-hover:opacity-100 transition-opacity" />, description: 'Reverse engineering & SRE', stats: { Phase: 'Static', Type: 'Decompiler' } },
 
   { id: 'node', label: 'Node.js', category: 'web', x: 35, y: 35, icon: <BrandIcon slug="node" title="Node.js" />, description: 'Asynchronous backend runtime', stats: { Threading: 'Single', Runtime: 'Backend' } },
   { id: 'react', label: 'React.js', category: 'web', x: 15, y: 35, icon: <BrandIcon slug="react" title="React" />, description: 'Component-based UI architecture', stats: { DOM: 'Virtual', Render: 'CSR/SSR' } },
-  { id: 'sockets', label: 'WebSockets', category: 'web', x: 25, y: 45, icon: <Waypoints className="w-7 h-7 md:w-9 md:h-9 opacity-80" />, description: 'Full-duplex TCP channels', stats: { Protocol: 'ws://', Latency: 'Ultra-Low' } },
+  { id: 'socketio', label: 'Socket.IO', category: 'web', x: 25, y: 45, icon: <img src={socketIoImg} alt="Socket.IO" className="w-7 h-7 md:w-9 md:h-9 object-contain opacity-80 group-hover:opacity-100 transition-opacity invert" />, description: 'Bidirectional real-time communication', stats: { Latency: 'Ultra-Low', Fallback: 'Polling' } },
   { id: 'tail', label: 'Tailwind', category: 'web', x: 10, y: 50, icon: <BrandIcon slug="tail" title="Tailwind" />, description: 'Utility-first styling engine', stats: { Strategy: 'Utility', Compilation: 'JIT' } },
 
   { id: 'tableau', label: 'Tableau', category: 'data', x: 20, y: 70, icon: <img src={tableauImg} alt="Tableau" className="w-7 h-7 md:w-9 md:h-9 object-contain opacity-80 group-hover:opacity-100 transition-opacity" />, description: 'Business intelligence dashboards', stats: { Output: 'Visual', Scale: 'Enterprise' } },
   { id: 'plotly', label: 'Plotly', category: 'data', x: 35, y: 65, icon: <BrandIcon slug="plotly" title="Plotly" provider="simple" />, description: 'Interactive graphing libraries', stats: { Render: 'WebGL', Interactivity: 'High' } },
-  { id: 'matplotlib', label: 'Matplotlib', category: 'data', x: 45, y: 80, icon: <LineChart className="w-7 h-7 md:w-9 md:h-9 opacity-80" />, description: 'Statistical data plotting', stats: { Type: 'Static 2D', API: 'Pyplot' } },
+  { id: 'matplotlib', label: 'Matplotlib', category: 'data', x: 45, y: 80, icon: <img src={matplotlibImg} alt="Matplotlib" className="w-7 h-7 md:w-9 md:h-9 object-contain opacity-80 group-hover:opacity-100 transition-opacity" />, description: 'Statistical data plotting', stats: { Type: 'Static 2D', API: 'Pyplot' } },
 ];
 
 const CONNECTIONS = [
   ['java', 'rust'], ['java', 'python'], ['rust', 'c'], ['python', 'js'], 
   ['rust', 'linux'], ['c', 'linux'], ['linux', 'docker'], ['linux', 'network'],
-  ['network', 'nmap'], ['network', 'wireshark'], ['linux', 'ghidra'], ['nmap', 'wireshark'],
-  ['js', 'node'], ['js', 'react'], ['node', 'sockets'], ['react', 'sockets'], ['react', 'tail'],
+  ['network', 'osint'], ['network', 'wireshark'], ['linux', 'ghidra'], ['osint', 'wireshark'],
+  ['js', 'node'], ['js', 'react'], ['node', 'socketio'], ['react', 'socketio'], ['react', 'tail'],
   ['python', 'plotly'], ['python', 'matplotlib'], ['plotly', 'tableau'], ['matplotlib', 'plotly']
 ];
 
@@ -110,7 +115,7 @@ const Arsenal = () => {
   const isNodeActive = (node) => activeCategory === 'all' || node.category === activeCategory;
 
   return (
-    <section id="arsenal" className="relative w-full min-h-screen bg-[#030305] text-white overflow-hidden font-mono selection:bg-[#FFD700]/30">
+    <section id="arsenal" className="relative w-full min-h-[120vh] bg-[#030305] text-white overflow-hidden font-mono selection:bg-[#FFD700]/30">
       
       {/* FIXED NOISE OVERLAY (Base64 avoid 403 Forbidden) */}
       <div className="absolute inset-0 pointer-events-none z-[60] opacity-[0.03] bg-[url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyBAMAAAD9tt+fAAAAElBMVEUAAAD8/Pz09PT4+PjMzMz////09TU9AAAAAXRSTlMAQObYZgAAADRJREFUeF5jYGRgYBBgYmBghGInBgYmBnYmRih2YmBgYmBnYmRiZwSJOzGwM7EzsTMyMDAAAGYQAwXpU9mXAAAAAElFTkSuQmCC')] bg-repeat" />
@@ -154,7 +159,7 @@ const Arsenal = () => {
         </div>
 
         {/* CONSTELLATION MAP */}
-        <div className="flex-1 relative min-h-[600px] border border-white/5 rounded-3xl bg-black/40 backdrop-blur-md overflow-hidden">
+        <div className="flex-1 relative min-h-[800px] border border-white/5 rounded-3xl bg-black/40 backdrop-blur-md overflow-hidden">
           
           {/* ADVANCED TELEMETRY HUD */}
           <AnimatePresence>
