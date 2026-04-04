@@ -206,24 +206,18 @@ const Projects = () => {
                                                     </div>
                                                 </div>
                                             ) : (
-                                                <>
-                                                    {/* Stylized placeholder image depending on the project title */}
+                                                <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#050508]">
+                                                    <div className="text-[#FFD700]/50 font-mono text-2xl tracking-[0.3em] font-bold border-2 border-[#FFD700]/20 p-6 rounded-lg rotate-[-5deg] backdrop-blur-sm shadow-[0_0_30px_rgba(255,215,0,0.05)]">
+                                                        COMING SOON
+                                                    </div>
+                                                    
+                                                    {/* Stylized placeholder background image depending on the project title */}
                                                     <img 
                                                         src={`https://api.dicebear.com/7.x/shapes/svg?seed=${project.title}&backgroundColor=050508&shape1Color=FFD700&shape2Color=4c1d95`} 
                                                         alt={`${project.title} abstract representation`} 
-                                                        className="absolute inset-0 w-full h-full object-cover opacity-30 mix-blend-screen scale-110 group-hover:scale-100 transition-transform duration-1000"
+                                                        className="absolute inset-0 w-full h-full object-cover opacity-10 mix-blend-screen scale-110 group-hover:scale-100 transition-transform duration-1000 pointer-events-none"
                                                     />
-                                                    
-                                                    {/* Boot text effect */}
-                                                    <div className="z-20 text-center space-y-3 font-mono">
-                                                        <div className="inline-block px-4 py-2 border border-[#FFD700]/30 bg-[#FFD700]/10 rounded text-[#FFD700] text-sm backdrop-blur-sm">
-                                                            Starting {project.title}.exe ...
-                                                        </div>
-                                                        <p className="text-white/40 text-xs tracking-widest animate-pulse">
-                                                            CONNECTING TO MAIN MAINFRAME
-                                                        </p>
-                                                    </div>
-                                                </>
+                                                </div>
                                             )}
 
                                             {/* Scanlines */}
