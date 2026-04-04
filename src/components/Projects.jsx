@@ -9,31 +9,45 @@ gsap.registerPlugin(ScrollTrigger);
 
 const projects = [
     {
-        title: "Akira",
-        description: "Task management dashboard with real-time updates.",
-        tags: ["Express", "React (Vite)", "Rust", "MongoDB", "Crypto (AES-256, HMAC, Argon2)"],
+        title: "ADG-Polymorph",
+        description: "Security-Aware SDN Deception Framework with kernel-level eBPF/XDP networking. Reduces detection latency to sub-μs using entropy-based anomaly detection.",
+        tags: ["Rust (Aya)", "eBPF/XDP", "Open vSwitch", "Mininet"],
         id: "01",
-        link: "https://github.com/KVLNK12305/Akira"
+        link: "#"
     },
     {
-        title: "SwapCache",
-        description: "Hybrid LRU/LFU cache system with 15% higher hit rates.",
-        tags: ["Python", "Streamlit", "Matplotlib"],
+        title: "GhostShell",
+        description: "A dual-mode Rust TUI combining a decoy interface with a hidden real-time observability dashboard. Features an async telemetry pipeline streaming structured logs.",
+        tags: ["Rust", "Tokio", "LLM APIs", "TUI"],
         id: "02",
-        link: "https://github.com/KVLNK12305/SwapCache"
+        link: "https://github.com/KVLNK12305/GhostShell"
+    },
+    {
+        title: "EeffoC",
+        description: "An Event-Driven Task Orchestration System capturing real-time Discord events. Features a rule-based intent extraction layer routing payloads through Microsoft Graph.",
+        tags: ["Go", "n8n", "Microsoft Graph API", "Workflow Automation"],
+        id: "03",
+        link: "https://github.com/KVLNK12305/EeffoC"
     },
     {
         title: "Everust",
-        description: "Systems programming exploration in Rust.",
-        tags: ["Rust", "Cargo", "Concurrency", "Svelte"],
-        id: "03",
+        description: "A modular platform to experiment with async execution, ownership, and concurrency. Benchmarks system behavior across concurrency models and unsafe boundaries.",
+        tags: ["Rust", "Axum", "Tokio", "Async Runtime"],
+        id: "04",
         link: "https://github.com/KVLNK12305/Everust"
     },
     {
+        title: "AKIRA",
+        description: "A high-throughput API gateway & cryptographic Identity Provider. Uses a Rust-based zero-knowledge key vault via Bun FFI for secure tamper-evident auth logs.",
+        tags: ["Bun", "Express", "React", "Rust", "Crypto"],
+        id: "05",
+        link: "https://github.com/KVLNK12305/Akira"
+    },
+    {
         title: "NovaSketch",
-        description: "An interesting and innovative approach for a collaborative canvas.",
-        tags: ["React", "WebSockets", "MongoDB", "OAuth", "CI/CD", "SonarQube"],
-        id: "04",
+        description: "A real-time collaborative whiteboard using WebSockets. Incorporates fine-grained access control to prevent concurrent conflicts and utilizes static analysis tools.",
+        tags: ["React", "WebSockets", "MongoDB", "OAuth", "SonarCloud"],
+        id: "06",
         link: "https://github.com/Ateliers-io/NovaSketch"
     }
 ];
@@ -50,7 +64,7 @@ const Projects = () => {
             sectionRef.current,
             { translateX: 0 },
             {
-                translateX: "-300vw", // Move left by 3 screen widths (since we have 4 items)
+                translateX: `-${(projects.length - 1) * 100}vw`,
                 ease: "none",
                 duration: 1,
                 scrollTrigger: {
@@ -98,7 +112,7 @@ const Projects = () => {
     return (
         <section id="projects" className="overflow-hidden bg-[#08080E]">
             <div ref={triggerRef}>
-                <div ref={sectionRef} className="flex h-screen w-[400vw] relative">
+                <div ref={sectionRef} className="flex h-screen relative" style={{ width: `${projects.length * 100}vw` }}>
                     
                     {projects.map((project, index) => (
                         <div key={index} className="w-screen h-full flex items-center justify-center p-8 border-r border-white/5 relative">
@@ -174,7 +188,7 @@ const Projects = () => {
 
                                         {/* Feed Content */}
                                         <div className="flex-1 relative bg-[#050508] overflow-hidden flex items-center justify-center">
-                                            {project.title === 'Akira' ? (
+                                            {project.title === 'AKIRA' ? (
                                                 <div
                                                     className="absolute inset-0"
                                                     onMouseEnter={() => setIsAkiraExpanded(true)}
