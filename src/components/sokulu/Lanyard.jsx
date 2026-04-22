@@ -1,4 +1,4 @@
-import { useRef, useState, useMemo } from 'react';
+import { useRef, useState } from 'react';
 import { Canvas, useThree, useFrame } from '@react-three/fiber';
 import { Environment, Lightformer, Text } from '@react-three/drei';
 import { easing } from 'maath';

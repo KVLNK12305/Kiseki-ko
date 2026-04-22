@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef, useMemo, useCallback } from 'react';
+// eslint-disable-next-line no-unused-vars
 import { motion } from 'motion/react';
 
 export default function DecryptedText({

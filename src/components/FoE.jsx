@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { Network, Radar, Bug, Waypoints, LineChart } from 'lucide-react';
 
@@ -94,9 +95,6 @@ const Arsenal = () => {
   // OPTIMIZATION: Use MotionValues to avoid "Maximum update depth" re-render loops
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
-  const springConfig = { damping: 25, stiffness: 150 };
-  const smoothX = useSpring(mouseX, springConfig);
-  const smoothY = useSpring(mouseY, springConfig);
 
   // Coordinate display strings (calculated without re-rendering the whole component)
   const displayX = useTransform(mouseX, (val) => val.toFixed(2));

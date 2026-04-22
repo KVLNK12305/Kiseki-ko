@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useCallback} from 'react';
 import useLenis from './hooks/useLenis';
 import Preloader from './components/Preloader';
 import FloatingNav from './components/FloatingNav';
