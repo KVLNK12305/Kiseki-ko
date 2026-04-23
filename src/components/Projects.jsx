@@ -4,6 +4,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Play, Radio, Terminal } from 'lucide-react';
 import ElectricBorder from './sokulu/ElectricBorder';
 import akiraVideo from './images/Screencast_20260331_001952.webm';
+import f1Video from './images/F1.mp4';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -49,15 +50,23 @@ const projects = [
         tags: ["React", "WebSockets", "MongoDB", "OAuth", "SonarCloud"],
         id: "06",
         link: "https://github.com/Ateliers-io/NovaSketch"
+    },
+    {
+        title: "F1 Evolution",
+        description: "Data analysis of Formula 1 regulatory impacts.",
+        tags: ["Pandas", "Seaborn", "Plotly"],
+        id: "07",
+        link: "https://github.com/KVLNK12305/F1_Case_Study"
     }
 ];
 
 const AKIRA_VIDEO_SRC = akiraVideo;
+const F1_VIDEO_SRC = f1Video;
 
 const Projects = () => {
     const sectionRef = useRef(null);
     const triggerRef = useRef(null);
-    const [isAkiraExpanded, setIsAkiraExpanded] = useState(false);
+    const [expandedVideo, setExpandedVideo] = useState(null);
 
     useEffect(() => {
         const pin = gsap.fromTo(
@@ -84,7 +93,7 @@ const Projects = () => {
     useEffect(() => {
         const handleEscape = (event) => {
             if (event.key === 'Escape') {
-                setIsAkiraExpanded(false);
+                setExpandedVideo(null);
             }
         };
 
@@ -98,7 +107,7 @@ const Projects = () => {
         const originalOverflow = document.body.style.overflow;
         const originalOverscroll = document.body.style.overscrollBehavior;
 
-        if (isAkiraExpanded) {
+        if (expandedVideo) {
             document.body.style.overflow = 'hidden';
             document.body.style.overscrollBehavior = 'none';
         }
@@ -107,7 +116,7 @@ const Projects = () => {
             document.body.style.overflow = originalOverflow;
             document.body.style.overscrollBehavior = originalOverscroll;
         };
-    }, [isAkiraExpanded]);
+    }, [expandedVideo]);
 
     return (
         <section id="projects" className="overflow-hidden bg-[#08080E]">
@@ -188,13 +197,13 @@ const Projects = () => {
 
                                         {/* Feed Content */}
                                         <div className="flex-1 relative bg-[#050508] overflow-hidden flex items-center justify-center">
-                                            {project.title === 'AKIRA' ? (
+                                            {project.title === 'AKIRA' || project.title === 'F1 Evolution' ? (
                                                 <div
                                                     className="absolute inset-0"
-                                                    onMouseEnter={() => setIsAkiraExpanded(true)}
+                                                    onMouseEnter={() => setExpandedVideo(project.title === 'AKIRA' ? AKIRA_VIDEO_SRC : F1_VIDEO_SRC)}
                                                 >
                                                     <video
-                                                        src={AKIRA_VIDEO_SRC}
+                                                        src={project.title === 'AKIRA' ? AKIRA_VIDEO_SRC : F1_VIDEO_SRC}
                                                         autoPlay
                                                         muted
                                                         loop
@@ -232,17 +241,17 @@ const Projects = () => {
                 </div>
             </div>
 
-            {isAkiraExpanded && (
+            {expandedVideo && (
                 <div
                     className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md flex items-center justify-center p-4"
                     style={{ backgroundImage: 'radial-gradient(circle at center, rgba(255, 215, 0, 0.1), rgba(0, 0, 0, 0.95) 55%)' }}
                 >
                     <div
                         className="relative w-full max-w-6xl aspect-video rounded-2xl overflow-hidden border border-[#FFD700]/50 shadow-[0_0_65px_rgba(255,215,0,0.35)]"
-                        onMouseLeave={() => setIsAkiraExpanded(false)}
+                        onMouseLeave={() => setExpandedVideo(null)}
                     >
                         <video
-                            src={AKIRA_VIDEO_SRC}
+                            src={expandedVideo}
                             autoPlay
                             muted
                             loop
