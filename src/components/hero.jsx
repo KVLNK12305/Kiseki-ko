@@ -4,10 +4,11 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import DecryptedText from './sokulu/DecryptedText';
 import Lanyard from './sokulu/Lanyard';
+import profileImg from './images/me.png';
 
 gsap.registerPlugin(ScrollTrigger);
 
-// --- Fixed Sub-Component: "Digital Void" Engine ---
+// ── Digital Void Engine ────────────────────────────────────────
 const DigitalVoid = React.memo(() => {
     const canvasRef = useRef(null);
 
@@ -15,28 +16,24 @@ const DigitalVoid = React.memo(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
-        if (!ctx) return;
-
         let w, h, animationFrame;
         const scanlines = [];
-        const MAX_LINES = 15;
+        const MAX_LINES = 12;
 
         const resize = () => {
-            w = window.innerWidth;
-            h = window.innerHeight;
-            canvas.width = w;
-            canvas.height = h;
+            w = canvas.width = window.innerWidth;
+            h = canvas.height = window.innerHeight;
         };
 
         class Scanline {
             constructor() { this.init(); }
             init() {
-                this.y = Math.random() * h;
-                this.height = Math.random() * 2 + 1;
-                this.speed = Math.random() * 2 + 0.5;
-                this.width = Math.random() * w * 0.5 + w * 0.1;
-                this.x = Math.random() * (w - this.width);
-                this.color = `rgba(168, 85, 247, ${Math.random() * 0.1 + 0.02})`;
+                this.y      = Math.random() * h;
+                this.height = Math.random() * 1.5 + 0.5;
+                this.speed  = Math.random() * 1.5 + 0.3;
+                this.width  = Math.random() * w * 0.6 + w * 0.1;
+                this.x      = Math.random() * (w - this.width);
+                this.color  = `rgba(168, 85, 247, ${Math.random() * 0.08 + 0.01})`;
             }
             update() {
                 this.y += this.speed;
@@ -48,31 +45,70 @@ const DigitalVoid = React.memo(() => {
             }
         }
 
-        const initLines = () => {
+        // Occasional gold sparkle particles
+        const sparkles = [];
+        class Sparkle {
+            constructor() { this.reset(); }
+            reset() {
+                this.x   = Math.random() * (w || window.innerWidth);
+                this.y   = Math.random() * (h || window.innerHeight);
+                this.life = 0;
+                this.maxLife = Math.random() * 60 + 30;
+                this.size = Math.random() * 1.2 + 0.3;
+            }
+            update() {
+                this.life++;
+                if (this.life > this.maxLife) this.reset();
+            }
+            draw() {
+                const prog = this.life / this.maxLife;
+                const alpha = prog < 0.5
+                    ? (prog / 0.5) * 0.5
+                    : ((1 - prog) / 0.5) * 0.5;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 215, 0, ${alpha})`;
+                ctx.fill();
+            }
+        }
+
+        const init = () => {
             scanlines.length = 0;
+            sparkles.length  = 0;
             for (let i = 0; i < MAX_LINES; i++) scanlines.push(new Scanline());
+            for (let i = 0; i < 25; i++) {
+                const s = new Sparkle();
+                s.life = Math.floor(Math.random() * s.maxLife);
+                sparkles.push(s);
+            }
         };
 
         const animate = () => {
             ctx.clearRect(0, 0, w, h);
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.02)';
-            for (let i = 0; i < 20; i++) ctx.fillRect(Math.random() * w, Math.random() * h, 1, 1);
+            // Noise pixels
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.012)';
+            for (let i = 0; i < 15; i++) ctx.fillRect(Math.random() * w, Math.random() * h, 1, 1);
+            // Scanlines
             scanlines.forEach(line => { line.update(); line.draw(); });
-            if (Math.random() > 0.98) {
-                const barH = Math.random() * 50 + 10;
+            // Gold sparkles
+            sparkles.forEach(s => { s.update(); s.draw(); });
+            // Rare horizontal glitch bar
+            if (Math.random() > 0.993) {
+                const barH = Math.random() * 40 + 5;
                 const barY = Math.random() * h;
-                ctx.fillStyle = 'rgba(20, 20, 20, 0.8)';
+                ctx.fillStyle = 'rgba(15, 15, 15, 0.7)';
                 ctx.fillRect(0, barY, w, barH);
-                ctx.fillStyle = 'rgba(255, 215, 0, 0.1)';
-                ctx.fillRect(5, barY, w, 2);
+                ctx.fillStyle = 'rgba(255, 215, 0, 0.06)';
+                ctx.fillRect(5, barY, w - 10, 1);
             }
             animationFrame = requestAnimationFrame(animate);
         };
 
         window.addEventListener('resize', resize);
         resize();
-        initLines();
+        init();
         animate();
+
         return () => {
             window.removeEventListener('resize', resize);
             cancelAnimationFrame(animationFrame);
@@ -82,91 +118,86 @@ const DigitalVoid = React.memo(() => {
     return <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none z-0" />;
 });
 
-// --- Main Hero Component ---
+// ── Main Hero Component ────────────────────────────────────────
 const Hero = () => {
     const containerRef = useRef(null);
-    const contentRef = useRef(null);
-    const slashRef = useRef(null);
-    
-    const [mountLanyard, setMountLanyard] = useState(false);
-    const [signalStatus, setSignalStatus] = useState("Signal_Lost: Retrying...");
+    const contentRef   = useRef(null);
+    const slashRef     = useRef(null);
+
+    const [mountLanyard,       setMountLanyard]       = useState(false);
+    const [signalStatus,       setSignalStatus]       = useState('Signal_Lost: Retrying...');
     const [startNameAnimation, setStartNameAnimation] = useState(false);
-    const [startButtonText, setStartButtonText] = useState(false);
+    const [startButtonText,    setStartButtonText]    = useState(false);
 
     useGSAP(() => {
-        const tl = gsap.timeline({
-            defaults: { ease: "power4.out" }
-        });
+        const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
 
         gsap.set(containerRef.current, { visibility: 'visible' });
 
-        // 1. Digital Wipe Phase
+        // 1. Digital wipe
         tl.fromTo(slashRef.current,
             { clipPath: 'polygon(0 49%, 100% 49%, 100% 51%, 0 51%)' },
             {
                 clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
                 duration: 1.4,
-                ease: "expo.inOut",
-                onStart: () => {
-                    // Trigger name decryption 600ms into the wipe
-                    setTimeout(() => setStartNameAnimation(true), 600);
-                }
+                ease: 'expo.inOut',
+                onStart: () => setTimeout(() => setStartNameAnimation(true), 600),
             }
         )
-        // 2. Content Reveal Phase
-        .from(".paint-reveal", {
+        // 2. Content reveal
+        .from('.paint-reveal', {
             scaleX: 0,
-            transformOrigin: "left center",
+            transformOrigin: 'left center',
             duration: 0.8,
-            ease: "circ.inOut"
-        }, "-=0.4")
-        .from([".signal-tag", ".hero-desc"], {
+            ease: 'circ.inOut',
+        }, '-=0.4')
+        .from(['.signal-tag', '.hero-desc'], {
             opacity: 0,
             x: -20,
             duration: 0.6,
             stagger: 0.15,
-            ease: "power2.out"
-        }, "-=0.3")
-        .from(".hero-btn", {
+            ease: 'power2.out',
+        }, '-=0.3')
+        .from('.hero-btn', {
             y: 20,
             opacity: 0,
             duration: 0.5,
             onStart: () => setStartButtonText(true),
             onComplete: () => {
                 setMountLanyard(true);
-                setSignalStatus("Signal_Acquired: Online");
-            }
-        }, "-=0.2");
+                setSignalStatus('Signal_Acquired: Online');
+            },
+        }, '-=0.2');
 
-        // Loop the Signal Tag pulse
-        gsap.to(".signal-tag", {
+        // Signal pulse
+        gsap.to('.signal-tag', {
             opacity: 0.5,
             duration: 0.1,
             repeat: -1,
             repeatDelay: 4,
             yoyo: true,
-            ease: "none"
+            ease: 'none',
         });
 
-        // Scroll Exit logic
+        // Scroll exit
         gsap.to(contentRef.current, {
             scrollTrigger: {
                 trigger: containerRef.current,
-                start: "top top",
-                end: "bottom center",
-                scrub: true
+                start: 'top top',
+                end: 'bottom center',
+                scrub: true,
             },
             y: -150,
             opacity: 0,
-            filter: "blur(8px)",
-            scale: 0.98
+            filter: 'blur(8px)',
+            scale: 0.98,
         });
 
     }, { scope: containerRef });
 
     const handleScroll = useCallback(() => {
-        const nextSection = document.getElementById('arsenal-intro');
-        if (nextSection) nextSection.scrollIntoView({ behavior: 'smooth' });
+        const next = document.getElementById('arsenal-intro') || document.getElementById('about');
+        if (next) next.scrollIntoView({ behavior: 'smooth' });
     }, []);
 
     return (
@@ -175,112 +206,166 @@ const Hero = () => {
             ref={containerRef}
             className="relative h-[100dvh] w-full bg-[#030305] overflow-hidden flex flex-col items-center justify-center visible"
         >
-            <div ref={slashRef} className="relative w-full h-full flex flex-col items-center justify-center bg-[#030305]">
+            <div
+                ref={slashRef}
+                className="relative w-full h-full flex flex-col items-center justify-center bg-[#030305]"
+            >
                 <DigitalVoid />
-                
-                {/* Impact Overlay */}
-                <div className="absolute inset-0 z-[50] bg-white opacity-0 pointer-events-none mix-blend-overlay"></div>
 
-                <div ref={contentRef} className="relative z-20 w-full max-w-6xl px-6 flex flex-col items-center text-center">
-                    
-                    {/* Kanji Background Watermark */}
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[18rem] md:text-[24rem] font-black text-[#ffffff03] select-none pointer-events-none opacity-10 whitespace-nowrap blur-[1px]"
-                         style={{ fontFamily: 'serif' }}>
+                {/* ── Ghost Profile Photo ─────────────────────────────── */}
+                <div
+                    className="absolute inset-0 z-[1] pointer-events-none overflow-hidden"
+                    aria-hidden="true"
+                >
+                    <img
+                        src={profileImg}
+                        alt=""
+                        className="absolute right-[-5%] top-1/2 -translate-y-1/2
+                                   h-[90%] w-auto object-cover object-top
+                                   opacity-[0.04] grayscale
+                                   scale-x-[-1]"
+                        style={{
+                            maskImage: 'linear-gradient(to left, rgba(0,0,0,0.6) 0%, transparent 70%)',
+                            WebkitMaskImage: 'linear-gradient(to left, rgba(0,0,0,0.6) 0%, transparent 70%)',
+                        }}
+                    />
+                </div>
+
+                {/* Impact white flash overlay */}
+                <div className="absolute inset-0 z-[50] bg-white opacity-0 pointer-events-none mix-blend-overlay" />
+
+                {/* Content */}
+                <div
+                    ref={contentRef}
+                    className="relative z-20 w-full max-w-5xl px-6 md:px-12 flex flex-col items-center text-center"
+                >
+                    {/* Kanji watermark */}
+                    <div
+                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[14rem] md:text-[22rem] font-black text-[#ffffff02] select-none pointer-events-none whitespace-nowrap"
+                        style={{ fontFamily: 'serif' }}
+                        aria-hidden="true"
+                    >
                         魔法帝
                     </div>
 
-                    {/* Signal Status Bar */}
-                    <div className="mb-12 flex items-center gap-4">
-                        <div className="h-px w-8 md:w-16 bg-[#A855F7]/40"></div>
-                        <h2 className="signal-tag font-mono text-[#A855F7] text-[10px] md:text-xs tracking-[0.5em] uppercase opacity-90 drop-shadow-[0_0_8px_rgba(168,85,247,0.5)]">
+                    {/* Signal Status */}
+                    <div className="mb-10 flex items-center gap-4">
+                        <div className="h-px w-8 md:w-12 bg-[#A855F7]/40" />
+                        <h2
+                            className="signal-tag font-mono text-[#A855F7] text-[9px] md:text-[10px] tracking-[0.5em] uppercase opacity-90"
+                            style={{ textShadow: '0 0 8px rgba(168,85,247,0.5)' }}
+                        >
                             {signalStatus}
                         </h2>
-                        <div className="h-px w-8 md:w-16 bg-[#A855F7]/40"></div>
+                        <div className="h-px w-8 md:w-12 bg-[#A855F7]/40" />
                     </div>
 
-                    {/* Name Section */}
-                    <div className="relative z-10 mb-10 select-none" aria-label="Kushal Kurapati">
-                        <div className={`leading-none mb-3 mix-blend-difference transition-opacity duration-500 ${startNameAnimation ? 'opacity-100' : 'opacity-0'}`}>
+                    {/* ── Name Block ─────────────────────────────────── */}
+                    <div className="relative z-10 mb-8 select-none" aria-label="Kushal Kurapati">
+                        {/* KUSHAL — ghost outlined */}
+                        <div
+                            className={`leading-none mb-2 mix-blend-difference transition-opacity duration-500 ${startNameAnimation ? 'opacity-100' : 'opacity-0'}`}
+                        >
                             <DecryptedText
                                 text="KUSHAL"
                                 speed={70}
                                 maxIterations={15}
                                 characters="01X?/$!#%"
-                                className="text-6xl md:text-8xl lg:text-[8rem] font-black text-transparent leading-[0.8] tracking-tighter"
+                                className="text-6xl md:text-8xl lg:text-[8.5rem] font-black text-transparent leading-[0.85] tracking-tight"
                                 encryptedClassName="text-[#A855F7] opacity-40"
-                                animateOn={startNameAnimation ? "view" : ""}
-                                style={{ WebkitTextStroke: '1.5px rgba(255,255,255,0.8)' }}
+                                animateOn={startNameAnimation ? 'view' : ''}
+                                style={{
+                                    fontFamily: 'Bebas Neue, sans-serif',
+                                    WebkitTextStroke: '1.5px rgba(255,255,255,0.75)',
+                                }}
                             />
                         </div>
 
+                        {/* KURAPATI — gold-struck block */}
                         <div className="relative inline-block">
-                            <div className="paint-reveal absolute -inset-x-6 -inset-y-2 bg-[#A855F7] -skew-x-12 z-0 mix-blend-multiply opacity-80"
-                                 style={{ clipPath: 'polygon(2% 0%, 100% 0%, 98% 100%, 0% 100%)' }}></div>
-                            <div className={`relative z-10 mix-blend-screen transition-opacity duration-500 ${startNameAnimation ? 'opacity-100' : 'opacity-0'}`}>
+                            <div
+                                className="paint-reveal absolute -inset-x-6 -inset-y-2 bg-[#A855F7] -skew-x-12 z-0 mix-blend-multiply opacity-80"
+                                style={{ clipPath: 'polygon(2% 0%, 100% 0%, 98% 100%, 0% 100%)' }}
+                            />
+                            <div
+                                className={`relative z-10 mix-blend-screen transition-opacity duration-500 ${startNameAnimation ? 'opacity-100' : 'opacity-0'}`}
+                            >
                                 <DecryptedText
                                     text="KURAPATI"
                                     speed={60}
                                     maxIterations={20}
-                                    sequential={true}
+                                    sequential
                                     revealDirection="start"
-                                    className="text-6xl md:text-8xl lg:text-[8rem] font-black text-white leading-[0.8] tracking-tighter drop-shadow-[0_10px_20px_rgba(168,85,247,0.3)]"
+                                    className="text-6xl md:text-8xl lg:text-[8.5rem] font-black text-white leading-[0.85] tracking-tight"
                                     encryptedClassName="text-white/20"
-                                    animateOn={startNameAnimation ? "view" : ""}
+                                    animateOn={startNameAnimation ? 'view' : ''}
+                                    style={{ fontFamily: 'Bebas Neue, sans-serif' }}
                                 />
                             </div>
                         </div>
                     </div>
 
-                    {/* Description */}
-                    <div className="hero-desc max-w-xl mx-auto mb-14">
+                    {/* ── Description ───────────────────────────────── */}
+                    <div className="hero-desc max-w-lg mx-auto mb-12 border-l-2 border-[#A855F7]/20 pl-5 text-left">
                         <DecryptedText
                             text="Surpassing limits. Painting the digital void with code and chaos."
                             speed={30}
                             animateOn="view"
                             revealDirection="center"
-                            className="text-slate-400 font-mono text-sm md:text-base leading-relaxed tracking-wider opacity-80"
+                            className="text-[#9090A8] font-mono text-sm md:text-[0.9rem] leading-relaxed tracking-wider"
                         />
                     </div>
 
-                    {/* Action Button */}
+                    {/* ── CTA Button ─────────────────────────────────── */}
                     <button
                         onClick={handleScroll}
-                        className="hero-btn group relative px-10 py-4 bg-transparent overflow-hidden border border-[#A855F7]/30 hover:border-[#A855F7] transition-all duration-500 cursor-pointer"
+                        className="hero-btn group relative px-10 py-4 bg-transparent overflow-hidden border border-[#A855F7]/30 hover:border-[#A855F7] transition-all duration-500 cursor-interactive"
+                        aria-label="Dive deeper into portfolio"
                     >
-                        <div className="absolute inset-0 bg-[#A855F7] translate-y-full group-hover:translate-y-0 transition-transform duration-300 opacity-10"></div>
+                        {/* Hover fill */}
+                        <div className="absolute inset-0 bg-[#A855F7] translate-y-full group-hover:translate-y-0 transition-transform duration-300 opacity-10" />
+                        {/* Shimmer sweep */}
+                        <div
+                            className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out opacity-0 group-hover:opacity-100"
+                            style={{
+                                background: 'linear-gradient(90deg, transparent, rgba(255,215,0,0.12), transparent)',
+                            }}
+                        />
                         <div className="flex items-center gap-4 relative z-10">
                             <span className="text-xs font-mono text-white tracking-[0.3em] uppercase">
                                 <DecryptedText
                                     text="Dive Deeper"
                                     speed={80}
-                                    animateOn={startButtonText ? "view" : ""}
+                                    animateOn={startButtonText ? 'view' : ''}
                                     className="text-white"
                                 />
                             </span>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4 text-[#A855F7] group-hover:translate-y-1 transition-transform">
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                strokeWidth={2}
+                                stroke="currentColor"
+                                className="w-4 h-4 text-[#A855F7] group-hover:translate-y-1 transition-transform"
+                            >
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" />
                             </svg>
                         </div>
                     </button>
                 </div>
 
-                {/* Background Lanyard Layer */}
+                {/* Lanyard */}
                 <div className="absolute inset-0 w-full h-full z-10 pointer-events-none overflow-hidden">
                     {mountLanyard && (
-                        <div className="w-full h-full opacity-40 mix-blend-screen">
-                            <Lanyard
-                                position={[0, 0, 15]}
-                                gravity={[0, -30, 0]}
-                                transparent={true}
-                            />
+                        <div className="w-full h-full opacity-35 mix-blend-screen">
+                            <Lanyard position={[0, 0, 15]} gravity={[0, -30, 0]} transparent />
                         </div>
                     )}
                 </div>
             </div>
 
-            {/* Global Grain Texture */}
-            {/* Replace the old Grain Overlay div at the bottom of Hero.jsx */}
-<div className="absolute inset-0 pointer-events-none z-[60] opacity-[0.03] bg-noise"></div>
+            {/* Global grain overlay */}
+            <div className="absolute inset-0 pointer-events-none z-[60] opacity-[0.025] bg-pattern-noise" />
         </section>
     );
 };
