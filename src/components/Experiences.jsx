@@ -62,9 +62,9 @@ const CAREER_FRAMES = [
         type: 'EDUCATION',
         year: '2021',
         role: 'Higher Secondary',
-        org: 'Narayana Junior College',
+        org: 'Allen Career Institute',
         period: '2021 — 2023',
-        location: 'Vijayawada, AP',
+        location: 'Tirupati, AP',
         bullets: [
             'Mathematics, Physics, Chemistry — strong analytical foundation.',
             'High academic standing qualifying for competitive engineering entrance examinations.',
