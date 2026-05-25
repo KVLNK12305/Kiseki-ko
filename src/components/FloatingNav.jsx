@@ -1,114 +1,208 @@
 import React, { useState, useEffect } from 'react';
-// eslint-disable-next-line no-unused-vars
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+    Home, User, Cpu, Briefcase, FolderGit2,
+    Award, Mail, Github, Linkedin
+} from 'lucide-react';
 
-// Configuration: Map the label to the ACTUAL ID in your DOM
-// BUG FIX #1: Updated 'Skills' targetId from empty string to 'arsenal'
-// ISSUE: The Skills button had targetId: '' (empty) which prevented navigation
-// SOLUTION: Connected it to the FoE.jsx (Arsenal) section with id="arsenal"
 const NAV_CONFIG = [
-    { label: 'Home', targetId: 'home', icon: 'H' },
-    { label: 'About', targetId: 'about', icon: 'A' },
-    { label: 'Skills', targetId: 'arsenal', icon: 'S' },
-    { label: 'Experience', targetId: 'experience', icon: 'E' },
-    { label: 'Projects', targetId: 'projects', icon: 'P' },
-    { label: 'Honors', targetId: 'publications', icon: 'R' },
-    { label: 'Contact', targetId: 'contact', icon: '@' },
+    { label: 'Home',       targetId: 'home',         Icon: Home },
+    { label: 'About',      targetId: 'about',         Icon: User },
+    { label: 'Skills',     targetId: 'arsenal',       Icon: Cpu },
+    { label: 'Experience', targetId: 'experience',    Icon: Briefcase },
+    { label: 'Projects',   targetId: 'projects',      Icon: FolderGit2 },
+    { label: 'Honors',     targetId: 'publications',  Icon: Award },
+    { label: 'Contact',    targetId: 'contact',       Icon: Mail },
 ];
 
+const SOCIALS = [
+    { label: 'GitHub',   Icon: Github,   href: 'https://github.com/KVLNK12305' },
+    { label: 'LinkedIn', Icon: Linkedin, href: 'https://www.linkedin.com/in/venkata-lakshmi-narasimha-kushal-kurapati-729ab4289/' },
+];
+
+// ── Sidebar Nav Item ──────────────────────────────────────────
+const NavItem = ({ item, isActive, onClick }) => {
+    const [hovered, setHovered] = useState(false);
+
+    return (
+        <div className="relative flex items-center" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
+            <button
+                onClick={onClick}
+                aria-label={item.label}
+                className={`
+                    relative w-10 h-10 flex items-center justify-center rounded-lg
+                    transition-all duration-300 group cursor-interactive
+                    ${isActive
+                        ? 'text-[#FFD700] bg-[#FFD700]/10'
+                        : 'text-white/30 hover:text-white/70 hover:bg-white/5'
+                    }
+                `}
+            >
+                {/* Active left-border indicator */}
+                {isActive && (
+                    <motion.div
+                        layoutId="active-indicator"
+                        className="absolute -left-3 top-1/2 -translate-y-1/2 w-[2px] h-6 bg-[#FFD700] rounded-r-full"
+                        style={{ boxShadow: '0 0 8px rgba(255,215,0,0.8)' }}
+                    />
+                )}
+                <item.Icon size={16} strokeWidth={isActive ? 2.5 : 1.5} />
+            </button>
+
+            {/* Tooltip — slides right */}
+            <AnimatePresence>
+                {hovered && (
+                    <motion.div
+                        initial={{ opacity: 0, x: -4 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -4 }}
+                        transition={{ duration: 0.15 }}
+                        className="absolute left-14 z-50 whitespace-nowrap px-3 py-1.5 bg-[#0F0F16] border border-[#FFD700]/20 rounded-md pointer-events-none"
+                    >
+                        <span className="font-mono text-[11px] text-[#FFD700] tracking-widest uppercase">
+                            {item.label}
+                        </span>
+                        {/* Arrow */}
+                        <div className="absolute left-0 top-1/2 -translate-x-[5px] -translate-y-1/2 w-0 h-0
+                            border-t-[5px] border-t-transparent
+                            border-r-[5px] border-r-[#FFD700]/20
+                            border-b-[5px] border-b-transparent"
+                        />
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+    );
+};
+
+// ── Social Icon ───────────────────────────────────────────────
+const SocialItem = ({ item }) => {
+    const [hovered, setHovered] = useState(false);
+    return (
+        <div className="relative flex items-center" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
+            <a
+                href={item.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={item.label}
+                className="w-8 h-8 flex items-center justify-center text-white/20 hover:text-[#FFD700] transition-colors duration-300 cursor-interactive"
+            >
+                <item.Icon size={14} strokeWidth={1.5} />
+            </a>
+            <AnimatePresence>
+                {hovered && (
+                    <motion.div
+                        initial={{ opacity: 0, x: -4 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -4 }}
+                        transition={{ duration: 0.15 }}
+                        className="absolute left-12 z-50 whitespace-nowrap px-2.5 py-1 bg-[#0F0F16] border border-white/10 rounded pointer-events-none"
+                    >
+                        <span className="font-mono text-[10px] text-white/50 tracking-widest uppercase">
+                            {item.label}
+                        </span>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+    );
+};
+
+// ── Main FloatingNav ──────────────────────────────────────────
 const FloatingNav = ({ lenis }) => {
-    // BUG FIX #10: Added scroll status tracking to FloatingNav
-    // ISSUE: FloatingNav was not updating which section is currently active
-    // SOLUTION: Added activeSection state and scroll listener to detect current section
     const [activeSection, setActiveSection] = useState('home');
 
     useEffect(() => {
         const handleScroll = () => {
-            // Find which section is currently in view
-            let currentSection = 'home';
-
-            // We want to find the section that is closest to the top but not below the fold too much
-            // Or typically, the last section that has its top above a certain threshold (meaning we've scrolled past its start)
-
+            let current = 'home';
             for (const item of NAV_CONFIG) {
-                const element = document.getElementById(item.targetId);
-                if (element) {
-                    const rect = element.getBoundingClientRect();
-                    // If section top is within viewport or above it (scrolled past), it's a candidate
-                    // A threshold of 40% of viewport height usually works well for "entering" a section
-                    if (rect.top < window.innerHeight * 0.5) {
-                        currentSection = item.targetId;
-                    }
+                const el = document.getElementById(item.targetId);
+                if (el) {
+                    const rect = el.getBoundingClientRect();
+                    if (rect.top < window.innerHeight * 0.5) current = item.targetId;
                 }
             }
-
-            setActiveSection(currentSection);
+            setActiveSection(current);
         };
-
-        // Run once on mount to set initial state
         handleScroll();
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
-        // Attach listeners
-        window.addEventListener('scroll', handleScroll);
-
-        // If lenis is provided, we can also listen to its scroll event for potentially smoother updates
-        // However, standard scroll listener usually suffices as Lenis updates window scroll position.
-        // If switching to lenis event:
-        // if (lenis) lenis.on('scroll', handleScroll);
-
-        return () => {
-            window.removeEventListener('scroll', handleScroll);
-            // if (lenis) lenis.off('scroll', handleScroll);
-        };
-    }, []); // Removed specific dependency to avoid re-attaching too often, window/dom is global
-
-    const scrollToSection = (targetId) => {
-        const element = document.getElementById(targetId);
-
-        if (!element) {
-            console.warn(`[FloatingNav] Warning: Section with id="#${targetId}" not found.`);
-            return;
-        }
-
+    const scrollTo = (targetId) => {
+        const el = document.getElementById(targetId);
+        if (!el) return;
         if (lenis) {
             lenis.scrollTo(`#${targetId}`, {
                 duration: 1.5,
-                easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t))
+                easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
             });
         } else {
-            element.scrollIntoView({ behavior: 'smooth' });
+            el.scrollIntoView({ behavior: 'smooth' });
         }
     };
 
     return (
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] pointer-events-none">
+        <>
+            {/* ── DESKTOP: Vertical Sidebar ──────────────────────────── */}
+            <motion.aside
+                className="hidden md:flex fixed left-0 top-0 h-screen z-[100] flex-col items-center justify-between py-8 w-16
+                           border-r border-white/[0.04] bg-[#030305]/80 backdrop-blur-xl"
+                initial={{ x: -80, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: 2.6, duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
+            >
+                {/* Top spacer — no monogram */}
+                <div className="w-6 h-[1px] bg-[#FFD700]/15 rounded-full" />
+
+                {/* Nav Items */}
+                <nav className="flex flex-col items-center gap-2">
+                    {NAV_CONFIG.map((item) => (
+                        <NavItem
+                            key={item.targetId}
+                            item={item}
+                            isActive={activeSection === item.targetId}
+                            onClick={() => scrollTo(item.targetId)}
+                        />
+                    ))}
+                </nav>
+
+                {/* Socials + bottom line */}
+                <div className="flex flex-col items-center gap-3">
+                    {SOCIALS.map((s) => <SocialItem key={s.label} item={s} />)}
+                    {/* Decorative vertical line */}
+                    <div className="w-[1px] h-12 bg-gradient-to-b from-white/10 to-transparent mt-2" />
+                </div>
+            </motion.aside>
+
+            {/* ── MOBILE: Bottom Floating Pill ───────────────────────── */}
             <motion.div
-                className="flex items-center gap-2 px-3 py-3 bg-[#0f0f12]/80 backdrop-blur-xl border border-white/10 rounded-full shadow-2xl pointer-events-auto"
+                className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] pointer-events-none"
                 initial={{ y: 100, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 2.5, type: 'spring', stiffness: 260, damping: 20 }}
+                transition={{ delay: 2.5, type: 'spring', stiffness: 240, damping: 22 }}
             >
-                {NAV_CONFIG.map((item) => (
-                    <button
-                        key={item.label}
-                        onClick={() => scrollToSection(item.targetId)}
-                        // BUG FIX #10 CONTINUED: Added active state styling to show current section
-                        // Shows gold background and glow when button corresponds to active section
-                        className={`relative group w-10 h-10 flex items-center justify-center rounded-full transition-all duration-300 ${activeSection === item.targetId
-                            ? 'bg-[#FFD700] text-black shadow-[0_0_20px_rgba(255,215,0,0.5)]'
-                            : 'bg-white/5 hover:bg-[#FFD700] hover:text-black'
-                            }`}
-                    >
-                        <span className="font-mono font-bold text-xs group-hover:scale-110 transition-transform">{item.icon}</span>
-
-                        {/* Tooltip */}
-                        <span className="absolute -top-12 left-1/2 -translate-x-1/2 px-2 py-1 bg-[#FFD700] text-black text-[10px] font-bold rounded opacity-0 group-hover:opacity-100 transition-all duration-200 whitespace-nowrap pointer-events-none translate-y-2 group-hover:translate-y-0 shadow-[0_0_10px_rgba(255,215,0,0.5)]">
-                            {item.label.toUpperCase()}
-                        </span>
-                    </button>
-                ))}
+                <div className="flex items-center gap-1 px-3 py-2.5 bg-[#0d0d12]/90 backdrop-blur-xl border border-white/10 rounded-full shadow-2xl pointer-events-auto"
+                     style={{ boxShadow: '0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,215,0,0.05)' }}>
+                    {NAV_CONFIG.map((item) => (
+                        <button
+                            key={item.targetId}
+                            onClick={() => scrollTo(item.targetId)}
+                            aria-label={item.label}
+                            className={`
+                                w-9 h-9 flex items-center justify-center rounded-full transition-all duration-300
+                                ${activeSection === item.targetId
+                                    ? 'bg-[#FFD700] text-black shadow-[0_0_15px_rgba(255,215,0,0.4)]'
+                                    : 'text-white/40 hover:text-white/80'
+                                }
+                            `}
+                        >
+                            <item.Icon size={14} strokeWidth={activeSection === item.targetId ? 2.5 : 1.5} />
+                        </button>
+                    ))}
+                </div>
             </motion.div>
-        </div>
+        </>
     );
 };
 

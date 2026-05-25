@@ -1,108 +1,437 @@
-/* 1. FONT IMPORTS - Placed at the top for maximum stability */
-@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Inter:wght@400;900&display=swap');
+/* ============================================================
+   KISEKI-KO :: GLOBAL DESIGN SYSTEM v5.0
+   Orbitron (display) · Space Grotesk (body) · JetBrains Mono (code)
+   ============================================================ */
+
+/* 1. FONT IMPORTS */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap');
 
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* 2. CUSTOM FONT — Font_1.otf for decorative watermark numbers */
+@font-face {
+  font-family: 'Font1';
+  src: url('/Font_1.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ============================================================
+   3. DESIGN TOKENS
+   ============================================================ */
 @layer base {
   :root {
-    --font-primary: 'Sora', 'Inter', system-ui, sans-serif;
-    --font-mono: 'Roboto Mono', monospace;
+    /* Typography Stack */
+    --font-display: 'Orbitron', 'Arial Black', sans-serif;
+    --font-body:    'Space Grotesk', 'Inter', system-ui, sans-serif;
+    --font-mono:    'JetBrains Mono', 'Fira Code', monospace;
+    --font-deco:    'Font1', serif;
 
-    /* Theme Colors */
-    --color-text: #D4D4D4;
-    --color-heading: #FFD700;
-    --color-background: #030305;
-    --color-accent: #A855F7;
-    --color-button-bg: #12121A;
-    
-    /* Shadcn/UI Variables compatibility */
-    --background: #030305;
-    --foreground: #ffffff;
-    --primary: #A855F7;
-    --accent: #FFD700;
-    --border: rgba(255, 255, 255, 0.1);
+    /* Core Palette */
+    --color-bg:       #030305;
+    --color-bg-2:     #08080E;
+    --color-surface:  #0A0A0F;
+    --color-border:   rgba(255, 255, 255, 0.07);
+
+    --color-text:     #C8C8D4;
+    --color-text-hi:  #E8E8F0;
+    --color-heading:  #FFD700;
+    --color-accent:   #A855F7;
+    --color-white:    #F0EDE8;
+
+    /* Gold system */
+    --gold:           #FFD700;
+    --gold-dim:       rgba(255, 215, 0, 0.3);
+    --gold-glow:      rgba(255, 215, 0, 0.15);
+
+    /* Purple system */
+    --purple:         #A855F7;
+    --purple-dim:     rgba(168, 85, 247, 0.3);
+    --purple-glow:    rgba(168, 85, 247, 0.15);
+
+    /* Shadcn/UI compat */
+    --background:     #030305;
+    --foreground:     #ffffff;
+    --primary:        #A855F7;
+    --accent:         #FFD700;
+    --border:         rgba(255, 255, 255, 0.1);
+  }
+
+  /* BASE RESET & BODY */
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: auto;
+    cursor: none;
+    /* Invisible scrollbar — no gradient, no visual artifacts */
+    scrollbar-width: none; /* Firefox */
+  }
+  html::-webkit-scrollbar {
+    display: none; /* Chrome/Safari/Edge */
   }
 
   body {
-    font-family: var(--font-primary);
+    font-family: var(--font-body);
     color: var(--color-text);
-    background-color: var(--color-background);
+    background-color: var(--color-bg);
     margin: 0;
     min-height: 100vh;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
+    line-height: 1.6;
+    font-weight: 400;
+    letter-spacing: 0.01em;
   }
 
-  h1, h2, h3 { color: var(--color-heading); font-weight: 700; }
-  
+  /* Orbitron for impact display headings */
+  h1 {
+    font-family: var(--font-display);
+    color: var(--color-white);
+    font-weight: 700;
+    line-height: 0.95;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  /* Space Grotesk for structural headings */
+  h2 {
+    font-family: var(--font-body);
+    color: var(--color-white);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+  }
+
+  h3, h4, h5, h6 {
+    font-family: var(--font-body);
+    color: var(--color-text-hi);
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  p {
+    color: var(--color-text);
+    line-height: 1.7;
+  }
+
   ::selection {
-    background-color: var(--color-heading);
+    background-color: var(--gold);
     color: #000;
   }
-  
+
+  @media (hover: none) {
+    html { cursor: auto; }
+  }
 }
 
+/* ============================================================
+   4. MILITARY CURSOR SYSTEM
+   ============================================================ */
+.cursor-military {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 9999;
+  margin-left: -16px;
+  margin-top: -16px;
+  width: 32px;
+  height: 32px;
+  will-change: transform;
+}
+
+.cursor-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 215, 0, 0.7);
+  transition: transform 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              border-color 0.15s ease,
+              border-width 0.15s ease;
+}
+
+.cursor-tick {
+  position: absolute;
+  background: rgba(255, 215, 0, 0.8);
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+.cursor-tick-n, .cursor-tick-s {
+  width: 1px;
+  height: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.cursor-tick-n { top: -7px; }
+.cursor-tick-s { bottom: -7px; }
+
+.cursor-tick-e, .cursor-tick-w {
+  height: 1px;
+  width: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.cursor-tick-e { right: -7px; }
+.cursor-tick-w { left: -7px; }
+
+.cursor-dot {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: var(--gold);
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  transition: transform 0.1s ease, width 0.15s ease, height 0.15s ease;
+}
+
+/* LOCKED STATE — hover over interactive */
+.cursor-military.cursor-locked .cursor-ring {
+  transform: scale(1.6);
+  border-color: var(--gold);
+  border-width: 1.5px;
+}
+.cursor-military.cursor-locked .cursor-dot {
+  width: 5px;
+  height: 5px;
+}
+.cursor-military.cursor-locked .cursor-tick-n { transform: translateX(-50%) scaleY(0.5); }
+.cursor-military.cursor-locked .cursor-tick-s { transform: translateX(-50%) scaleY(0.5); }
+.cursor-military.cursor-locked .cursor-tick-e { transform: translateY(-50%) scaleX(0.5); }
+.cursor-military.cursor-locked .cursor-tick-w { transform: translateY(-50%) scaleX(0.5); }
+
+/* CLICK / FIRE STATE */
+.cursor-military.cursor-clicking .cursor-ring {
+  transform: scale(0.55);
+  border-color: #FFD700;
+  border-width: 2px;
+  transition: transform 0.08s cubic-bezier(0.34, 1.56, 0.64, 1),
+              border-color 0.08s ease;
+}
+.cursor-military.cursor-clicking .cursor-dot {
+  width: 7px;
+  height: 7px;
+  background: #FFD700;
+  box-shadow: 0 0 8px #FFD700, 0 0 16px rgba(255,215,0,0.5);
+  transition: all 0.08s ease;
+}
+.cursor-military.cursor-clicking .cursor-tick-n { transform: translateX(-50%) translateY(3px)  scaleY(0.35); }
+.cursor-military.cursor-clicking .cursor-tick-s { transform: translateX(-50%) translateY(-3px) scaleY(0.35); }
+.cursor-military.cursor-clicking .cursor-tick-e { transform: translateY(-50%) translateX(-3px) scaleX(0.35); }
+.cursor-military.cursor-clicking .cursor-tick-w { transform: translateY(-50%) translateX(3px)  scaleX(0.35); }
+
+/* CLICK RIPPLE BURST */
+.cursor-click-ripple {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9998;
+}
+
+.cursor-click-ripple::before {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 215, 0, 0.9);
+  transform: translate(-50%, -50%);
+  animation: cursor-burst-gold 0.5s cubic-bezier(0.2, 0.8, 0.4, 1) forwards;
+}
+
+.cursor-click-ripple::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(168, 85, 247, 0.7);
+  transform: translate(-50%, -50%);
+  animation: cursor-burst-purple 0.55s cubic-bezier(0.2, 0.8, 0.4, 1) 0.05s forwards;
+}
+
+@keyframes cursor-burst-gold {
+  0%   { width: 6px;  height: 6px;  opacity: 1;   border-width: 2px; }
+  60%  { opacity: 0.6; border-width: 1.5px; }
+  100% { width: 58px; height: 58px; opacity: 0;   border-width: 0.5px; }
+}
+
+@keyframes cursor-burst-purple {
+  0%   { width: 4px;  height: 4px;  opacity: 0.8; border-width: 1.5px; }
+  100% { width: 42px; height: 42px; opacity: 0;   border-width: 0.5px; }
+}
+
+/* ============================================================
+   5. PER-SECTION BACKGROUND PATTERNS
+   ============================================================ */
+
+.bg-pattern-noise {
+  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyBAMAAAD9tt+fAAAAElBMVEUAAAD8/Pz09PT4+PjMzMz////09TU9AAAAAXRSTlMAQObYZgAAADRJREFUeF5jYGRgYBBgYmBghGInBgYmBnYmRih2YmBgYmBnYmRiZwSJOzGwM7EzsTMyMDAAAGYQAwXpU9mXAAAAAElFTkSuQmCC');
+  background-repeat: repeat;
+}
+
+.bg-pattern-grid {
+  background-image:
+    linear-gradient(to right, rgba(255, 215, 0, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 215, 0, 0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.bg-pattern-circuit {
+  background-image:
+    linear-gradient(to right, rgba(168, 85, 247, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(168, 85, 247, 0.05) 1px, transparent 1px),
+    radial-gradient(circle, rgba(168, 85, 247, 0.08) 1px, transparent 1px);
+  background-size: 60px 60px, 60px 60px, 30px 30px;
+  background-position: 0 0, 0 0, 15px 15px;
+}
+
+.bg-pattern-dots {
+  background-image: radial-gradient(
+    circle,
+    rgba(255, 215, 0, 0.06) 1px,
+    transparent 1px
+  );
+  background-size: 28px 28px;
+}
+
+/* Speed lines — manga/racing */
+.bg-speed-lines {
+  background-image: repeating-linear-gradient(
+    88deg,
+    transparent,
+    transparent 2px,
+    rgba(255, 215, 0, 0.012) 2px,
+    rgba(255, 215, 0, 0.012) 3px
+  );
+}
+
+/* ============================================================
+   6. TYPOGRAPHY UTILITIES
+   ============================================================ */
 @layer utilities {
-  /* Fixes the 403 Forbidden Noise Error */
-  .bg-noise {
-    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyBAMAAAD9tt+fAAAAElBMVEUAAAD8/Pz09PT4+PjMzMz////09TU9AAAAAXRSTlMAQObYZgAAADRJREFUeF5jYGRgYBBgYmBghGInBgYmBnYmRih2YmBgYmBnYmRiZwSJOzGwM7EzsTMyMDAAAGYQAwXpU9mXAAAAAElFTkSuQmCC');
-    background-repeat: repeat;
-  }
+  .font-display  { font-family: var(--font-display); }
+  .font-body-ui  { font-family: var(--font-body); }
+  .font-mono-ui  { font-family: var(--font-mono); }
+  .font-deco     { font-family: var(--font-deco); }
 
-  /* Hero Decryption outlined text effect */
+  /* Ghost outlined text */
   .text-ghost {
-    -webkit-text-stroke: 1px rgba(255, 255, 255, 0.5);
-    text-shadow: 0 0 15px rgba(168, 85, 247, 0.3);
+    -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.75);
+    color: transparent;
+    text-shadow: 0 0 20px rgba(168, 85, 247, 0.25);
   }
 
-  /* Tech Grid Background */
+  /* Animated gold shine text */
+  .shine-text {
+    background-image: linear-gradient(
+      90deg,
+      #FFD700 0%,
+      #FFF8B0 40%,
+      #FFD700 60%,
+      #B8860B 100%
+    );
+    background-size: 250% auto;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shine 4s linear infinite;
+  }
+
+  /* Section watermark number (Font_1.otf) */
+  .section-watermark {
+    font-family: var(--font-deco);
+    position: absolute;
+    font-size: clamp(8rem, 20vw, 18rem);
+    font-weight: normal;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(255, 215, 0, 0.06);
+    pointer-events: none;
+    user-select: none;
+    line-height: 1;
+    z-index: 0;
+  }
+
+  /* Tech grid (legacy compat) */
   .bg-tech-grid {
     background-size: 40px 40px;
-    background-image: 
+    background-image:
       linear-gradient(to right, rgba(168, 85, 247, 0.05) 1px, transparent 1px),
       linear-gradient(to bottom, rgba(168, 85, 247, 0.05) 1px, transparent 1px);
   }
 
-  /* Animated Shine Effect */
-  .shine-text {
-    background-image: linear-gradient(90deg, #FFD700 0%, #FFF6A3 50%, #FFD700 100%);
-    background-size: 200% auto;
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: shine 3s linear infinite;
-  }
+  .glow-gold   { box-shadow: 0 0 20px rgba(255, 215, 0, 0.2), 0 0 60px rgba(255, 215, 0, 0.05); }
+  .glow-purple { box-shadow: 0 0 20px rgba(168, 85, 247, 0.2), 0 0 60px rgba(168, 85, 247, 0.05); }
 
-  /* Encrypted Text Accent */
-  .text-encrypted {
-    color: var(--color-accent);
-    opacity: 0.7;
-    filter: blur(0.5px);
+  /* Film sprocket — refined small rectangles */
+  .sprocket-hole {
+    width: 8px;
+    height: 14px;
+    border-radius: 2px;
+    background: rgba(3, 3, 5, 0.95);
+    border: 1px solid rgba(255, 215, 0, 0.06);
+    flex-shrink: 0;
   }
 }
 
-/* Keyframes for optimized animations */
+/* ============================================================
+   7. KEYFRAME ANIMATIONS
+   ============================================================ */
 @keyframes shine {
-  to { background-position: -200% 50%; }
+  to { background-position: -250% 50%; }
 }
 
 @keyframes quick-pulse {
   0%, 100% { opacity: 1; filter: brightness(1); }
-  50% { opacity: 0.6; filter: brightness(1.3); }
-}
-
-.animate-quick-pulse {
-  animation: quick-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  50%       { opacity: 0.6; filter: brightness(1.3); }
 }
 
 @keyframes data-scroll {
   from { background-position: 0 0; }
-  to { background-position: 0 100%; }
+  to   { background-position: 0 100%; }
 }
 
-.animate-data-scroll {
-  animation: data-scroll 20s linear infinite;
+@keyframes float-y {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-8px); }
+}
+
+@keyframes tape-flicker {
+  0%, 98%, 100% { opacity: 1; }
+  99%           { opacity: 0.92; }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 15px rgba(255, 215, 0, 0.3); }
+  50%       { box-shadow: 0 0 35px rgba(255, 215, 0, 0.6), 0 0 60px rgba(255, 215, 0, 0.2); }
+}
+
+@keyframes scan-line {
+  from { top: 0; }
+  to   { top: 100%; }
+}
+
+.animate-quick-pulse  { animation: quick-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+.animate-data-scroll  { animation: data-scroll 20s linear infinite; }
+.animate-float-y      { animation: float-y 4s ease-in-out infinite; }
+.animate-tape-flicker { animation: tape-flicker 8s ease-in-out infinite; }
+.animate-glow-pulse   { animation: glow-pulse 2.5s ease-in-out infinite; }
+
+/* ============================================================
+   8. FOCUS & ACCESSIBILITY
+   ============================================================ */
+:focus-visible {
+  outline: 1.5px solid var(--gold);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
