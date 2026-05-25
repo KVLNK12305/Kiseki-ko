@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Radio, Terminal, Lock, Unlock } from 'lucide-react';
@@ -203,22 +204,30 @@ const DemoPanel = ({ project, revealed }) => {
             </div>
 
             {/* Video expand modal */}
-            {expandedVideo && (
+            {expandedVideo && createPortal(
                 <div
-                    className="fixed inset-0 z-[200] bg-black/90 backdrop-blur-md flex items-center justify-center p-4"
+                    className="fixed inset-0 z-[200] bg-black/90 backdrop-blur-md flex items-center justify-center p-4 cursor-pointer"
                     style={{ background: 'radial-gradient(circle at center, rgba(255,215,0,0.08), rgba(0,0,0,0.95) 60%)' }}
-                    onMouseLeave={() => setExpandedVideo(null)}
+                    onClick={() => setExpandedVideo(null)}
                 >
-                    <div className="relative w-full max-w-6xl aspect-video rounded-2xl overflow-hidden border border-[#FFD700]/40 shadow-[0_0_60px_rgba(255,215,0,0.3)]">
-                        <video src={expandedVideo} autoPlay muted loop playsInline className="w-full h-full object-cover" />
+                    <div 
+                        className="relative w-full h-full sm:h-auto sm:aspect-video max-w-7xl rounded-2xl overflow-hidden border border-[#FFD700]/40 shadow-[0_0_60px_rgba(255,215,0,0.3)] cursor-default flex items-center justify-center bg-black/50"
+                        onMouseLeave={() => setExpandedVideo(null)}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <video src={expandedVideo} autoPlay muted loop playsInline className="w-full h-full object-contain sm:object-cover" />
                         <div className="absolute top-4 left-1/2 -translate-x-1/2 px-3 py-1 rounded border border-[#FFD700]/40 bg-black/60 text-[11px] tracking-[0.2em] font-mono text-[#FFD700]">
                             FOCUS MODE ACTIVE
                         </div>
-                        <div className="absolute bottom-4 right-4 px-3 py-1 rounded border border-white/20 bg-black/60 text-[10px] tracking-widest font-mono text-white/70">
+                        <div className="absolute bottom-4 right-4 px-3 py-1 rounded border border-white/20 bg-black/60 text-[10px] tracking-widest font-mono text-white/70 hidden sm:block">
                             MOVE CURSOR OUT TO CLOSE
                         </div>
+                        <div className="absolute bottom-4 right-4 px-3 py-1 rounded border border-white/20 bg-black/60 text-[10px] tracking-widest font-mono text-white/70 sm:hidden">
+                            TAP OUTSIDE TO CLOSE
+                        </div>
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
         </>
     );
