@@ -107,6 +107,22 @@ const ClassifiedStamp = ({ clearance, revealed }) => (
 const DemoPanel = ({ project, revealed }) => {
     const [expandedVideo, setExpandedVideo] = useState(null);
 
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.key === 'Escape' && expandedVideo) {
+                setExpandedVideo(null);
+            }
+        };
+
+        if (expandedVideo) {
+            window.addEventListener('keydown', handleKeyDown);
+        }
+
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [expandedVideo]);
+
     const hasVideo = project.title === 'AKIRA' || project.title === 'F1 Evolution';
     const videoSrc = project.title === 'AKIRA' ? akiraVideo : f1Video;
 
@@ -220,7 +236,7 @@ const DemoPanel = ({ project, revealed }) => {
                             FOCUS MODE ACTIVE
                         </div>
                         <div className="absolute bottom-4 right-4 px-3 py-1 rounded border border-white/20 bg-black/60 text-[10px] tracking-widest font-mono text-white/70 hidden sm:block">
-                            MOVE CURSOR OUT TO CLOSE
+                            MOVE CURSOR OUT OR PRESS ESC TO CLOSE
                         </div>
                         <div className="absolute bottom-4 right-4 px-3 py-1 rounded border border-white/20 bg-black/60 text-[10px] tracking-widest font-mono text-white/70 sm:hidden">
                             TAP OUTSIDE TO CLOSE
@@ -367,7 +383,7 @@ const Projects = () => {
                         trigger: triggerRef.current,
                         start: 'top top',
                         end: '+=3200',
-                        scrub: 0.6,
+                        scrub: 1.5,
                         pin: true,
                     },
                 }

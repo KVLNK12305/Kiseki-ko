@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { Github, Linkedin } from 'lucide-react';
 import DecryptedText from './sokulu/DecryptedText';
 import Lanyard from './sokulu/Lanyard';
 import profileImg from './images/me.png';
@@ -352,6 +353,28 @@ const Hero = () => {
                             </svg>
                         </div>
                     </button>
+
+                    {/* ── Social Links ───────────────────────────────── */}
+                    <div className="hero-btn flex items-center justify-center gap-6 mt-8 z-20 relative pointer-events-auto">
+                        <a 
+                            href="https://github.com/KVLNK12305" 
+                            target="_blank" 
+                            rel="noreferrer" 
+                            aria-label="GitHub" 
+                            className="text-white/40 hover:text-[#FFD700] hover:scale-110 transition-all duration-300 cursor-interactive p-2"
+                        >
+                            <Github size={22} strokeWidth={1.5} />
+                        </a>
+                        <a 
+                            href="https://www.linkedin.com/in/venkata-lakshmi-narasimha-kushal-kurapati-729ab4289/" 
+                            target="_blank" 
+                            rel="noreferrer" 
+                            aria-label="LinkedIn" 
+                            className="text-white/40 hover:text-[#A855F7] hover:scale-110 transition-all duration-300 cursor-interactive p-2"
+                        >
+                            <Linkedin size={22} strokeWidth={1.5} />
+                        </a>
+                    </div>
                 </div>
 
                 {/* Lanyard */}
