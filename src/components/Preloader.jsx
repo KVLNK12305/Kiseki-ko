@@ -1,6 +1,22 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
+
+// ── Boot Log Lines ─────────────────────────────────────────────
+const BOOT_LINES = [
+    { status: 'OK',   text: 'kernel.modules.loaded' },
+    { status: 'OK',   text: 'mem.stack.allocated — 64GB' },
+    { status: 'OK',   text: 'gpu.renderer.initialized' },
+    { status: 'OK',   text: 'net.signal.scanning...' },
+    { status: 'WARN', text: 'ego.suppressor.bypassed' },
+    { status: 'OK',   text: 'net.signal.acquired — ONLINE' },
+    { status: 'OK',   text: 'crypto.vault.unlocked' },
+    { status: 'OK',   text: 'ui.theme.dark_mode.engaged' },
+    { status: 'OK',   text: 'audio.codec.initialized' },
+    { status: 'OK',   text: 'sys.firewall.hardened' },
+    { status: 'OK',   text: 'portfolio.v4.compiled' },
+    { status: 'OK',   text: 'all_systems.nominal' },
+];
 
 // ── Particle Field Canvas ──────────────────────────────────────
 const ParticleField = ({ canvasRef }) => {
@@ -93,17 +109,34 @@ const Preloader = ({ onComplete }) => {
     const canvasRef    = useRef(null);
     const nameRef      = useRef(null);
     const tagRef       = useRef(null);
-    const barRef       = useRef(null);
-    const barFillRef   = useRef(null);
+    const counterRef   = useRef(null);
+    const logRef       = useRef(null);
+    const flashRef     = useRef(null);
+
+    const [visibleLines, setVisibleLines] = useState([]);
+    const [percentage, setPercentage]     = useState(0);
 
     useGSAP(() => {
         const tl = gsap.timeline({
             onComplete: () => {
-                gsap.to(containerRef.current, {
-                    yPercent: -105,
-                    duration: 0.9,
-                    ease: 'expo.inOut',
-                    onComplete,
+                // White flash punch before exit
+                gsap.to(flashRef.current, {
+                    opacity: 0.2,
+                    duration: 0.08,
+                    ease: 'none',
+                    onComplete: () => {
+                        gsap.to(flashRef.current, {
+                            opacity: 0,
+                            duration: 0.15,
+                            ease: 'power2.out',
+                        });
+                        gsap.to(containerRef.current, {
+                            yPercent: -105,
+                            duration: 0.9,
+                            ease: 'expo.inOut',
+                            onComplete,
+                        });
+                    }
                 });
             }
         });
@@ -136,26 +169,34 @@ const Preloader = ({ onComplete }) => {
               duration: 0.5,
               ease: 'power2.out',
           }, '-=0.1')
-          // 3. Hold
-          .to({}, { duration: 0.9 });
+          // 3. Hold while counter runs
+          .to({}, { duration: 1.2 });
 
-        // Progress bar runs in parallel
-        gsap.to(barFillRef.current, {
-            scaleX: 1,
+        // Percentage counter — ticks from 0 to 100
+        const counterObj = { val: 0 };
+        gsap.to(counterObj, {
+            val: 100,
             duration: 2.6,
             ease: 'power2.inOut',
-            transformOrigin: 'left center',
+            onUpdate: () => {
+                setPercentage(Math.round(counterObj.val));
+            },
+        });
+
+        // Boot log lines — stagger them in
+        BOOT_LINES.forEach((line, i) => {
+            const delay = 0.2 + i * (2.2 / BOOT_LINES.length);
+            gsap.delayedCall(delay, () => {
+                setVisibleLines(prev => [...prev, line]);
+            });
         });
 
     }, { scope: containerRef, dependencies: [] });
 
-    // Split name into individual letter spans
+    // Split name into words, each word on its own line
     const NAME = 'KUSHAL KURAPATI';
-    const letters = NAME.split('').map((ch, i) =>
-        ch === ' '
-            ? <span key={i} className="pl-letter inline-block w-6" />
-            : <span key={i} className="pl-letter inline-block">{ch}</span>
-    );
+    const words = NAME.split(' ');
+    let charOffset = 0;
 
     return (
         <div
@@ -177,39 +218,93 @@ const Preloader = ({ onComplete }) => {
                 }}
             />
 
+            {/* White flash overlay */}
+            <div
+                ref={flashRef}
+                className="absolute inset-0 z-[60] bg-white pointer-events-none"
+                style={{ opacity: 0 }}
+            />
+
             {/* Content */}
-            <div className="relative z-10 text-center px-6">
-                {/* Name */}
+            <div className="relative z-10 text-center px-6 w-full max-w-xl">
+                {/* Name — each word on its own line */}
                 <div ref={nameRef} className="mb-4" style={{ opacity: 0 }}>
                     <h1
-                        className="font-display text-5xl sm:text-7xl md:text-8xl font-black tracking-[0.08em] text-white leading-none"
+                        className="font-display font-black tracking-[0.08em] text-white leading-[0.9]"
                         style={{ fontFamily: 'Bebas Neue, sans-serif' }}
                     >
-                        {letters}
+                        {words.map((word, wi) => {
+                            const startOffset = charOffset;
+                            charOffset += word.length + 1;
+                            return (
+                                <span key={wi} className="block text-5xl sm:text-7xl md:text-8xl">
+                                    {word.split('').map((ch, ci) => (
+                                        <span key={startOffset + ci} className="pl-letter inline-block">{ch}</span>
+                                    ))}
+                                </span>
+                            );
+                        })}
                     </h1>
                 </div>
 
                 {/* Tag line */}
                 <p
                     ref={tagRef}
-                    className="font-mono-ui text-xs md:text-sm tracking-[0.4em] text-[#A855F7]/70 uppercase mb-12"
+                    className="font-mono-ui text-xs md:text-sm tracking-[0.4em] text-[#A855F7]/70 uppercase mb-10"
                     style={{ fontFamily: 'JetBrains Mono, monospace', opacity: 0 }}
                 >
                     // portfolio.v4 &nbsp;::&nbsp; initializing
                 </p>
 
-                {/* Progress bar */}
-                <div ref={barRef} className="w-56 mx-auto">
-                    <div className="flex justify-between font-mono text-[9px] text-[#FFD700]/40 mb-2 tracking-widest uppercase">
-                        <span>LOADING ASSETS</span>
-                        <span>v4.0</span>
-                    </div>
-                    <div className="w-full h-[1px] bg-white/10 overflow-hidden">
-                        <div
-                            ref={barFillRef}
-                            className="h-full w-full bg-gradient-to-r from-[#A855F7] to-[#FFD700]"
-                            style={{ transform: 'scaleX(0)', transformOrigin: 'left center' }}
-                        />
+                {/* ── Percentage Counter ─── */}
+                <div ref={counterRef} className="mb-6">
+                    <span
+                        className="font-mono text-6xl sm:text-7xl md:text-8xl font-black tabular-nums tracking-tighter"
+                        style={{
+                            fontFamily: 'JetBrains Mono, monospace',
+                            color: percentage >= 100 ? '#FFD700' : '#FFFFFF',
+                            textShadow: percentage >= 100
+                                ? '0 0 30px rgba(255,215,0,0.6), 0 0 60px rgba(255,215,0,0.3)'
+                                : '0 0 20px rgba(255,255,255,0.1)',
+                            transition: 'color 0.3s ease, text-shadow 0.3s ease',
+                        }}
+                    >
+                        {String(percentage).padStart(3, '0')}
+                        <span className="text-3xl sm:text-4xl md:text-5xl text-white/30">%</span>
+                    </span>
+                </div>
+
+                {/* ── Terminal Boot Log ─── */}
+                <div
+                    ref={logRef}
+                    className="text-left mx-auto max-w-sm h-36 overflow-hidden relative"
+                >
+                    {/* Top/bottom fade masks */}
+                    <div className="absolute top-0 left-0 right-0 h-8 bg-gradient-to-b from-[#030305] to-transparent z-10 pointer-events-none" />
+                    <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-[#030305] to-transparent z-10 pointer-events-none" />
+
+                    <div className="flex flex-col justify-end h-full overflow-hidden">
+                        {visibleLines.map((line, i) => (
+                            <div
+                                key={i}
+                                className="font-mono text-[10px] sm:text-[11px] leading-relaxed tracking-wider animate-fadeInUp"
+                                style={{
+                                    animation: 'fadeSlideUp 0.3s ease-out forwards',
+                                }}
+                            >
+                                <span
+                                    className="mr-2"
+                                    style={{
+                                        color: line.status === 'OK' ? '#4ade80'
+                                             : line.status === 'WARN' ? '#FFD700'
+                                             : '#ef4444',
+                                    }}
+                                >
+                                    [{line.status}]
+                                </span>
+                                <span className="text-white/40">{line.text}</span>
+                            </div>
+                        ))}
                     </div>
                 </div>
             </div>

@@ -124,19 +124,35 @@ const Hero = () => {
     const containerRef = useRef(null);
     const contentRef   = useRef(null);
     const slashRef     = useRef(null);
+    const heroFlashRef = useRef(null);
 
     const [mountLanyard,       setMountLanyard]       = useState(false);
     const [signalStatus,       setSignalStatus]       = useState('Signal_Lost: Retrying...');
     const [startNameAnimation, setStartNameAnimation] = useState(false);
     const [startButtonText,    setStartButtonText]    = useState(false);
+    const [shaking,            setShaking]            = useState(false);
+    const [showScrollHint,     setShowScrollHint]     = useState(false);
 
     useGSAP(() => {
         const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
 
         gsap.set(containerRef.current, { visibility: 'visible' });
 
+        // 0. Impact flash + shake on reveal
+        tl.call(() => {
+            // White flash
+            if (heroFlashRef.current) {
+                gsap.to(heroFlashRef.current, { opacity: 0.15, duration: 0.08, ease: 'none', onComplete: () => {
+                    gsap.to(heroFlashRef.current, { opacity: 0, duration: 0.2, ease: 'power2.out' });
+                }});
+            }
+            // Screen shake
+            setShaking(true);
+            setTimeout(() => setShaking(false), 300);
+        })
+
         // 1. Digital wipe
-        tl.fromTo(slashRef.current,
+        .fromTo(slashRef.current,
             { clipPath: 'polygon(0 49%, 100% 49%, 100% 51%, 0 51%)' },
             {
                 clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
@@ -167,6 +183,8 @@ const Hero = () => {
             onComplete: () => {
                 setMountLanyard(true);
                 setSignalStatus('Signal_Acquired: Online');
+                // Show scroll hint after everything settles
+                setTimeout(() => setShowScrollHint(true), 800);
             },
         }, '-=0.2');
 
@@ -205,8 +223,14 @@ const Hero = () => {
         <section
             id="home"
             ref={containerRef}
-            className="relative h-[100dvh] w-full bg-[#030305] overflow-hidden flex flex-col items-center justify-center visible"
+            className={`relative h-[100dvh] w-full bg-[#030305] overflow-hidden flex flex-col items-center justify-center visible ${shaking ? 'animate-hero-shake' : ''}`}
         >
+            {/* Impact white flash */}
+            <div
+                ref={heroFlashRef}
+                className="absolute inset-0 z-[55] bg-white pointer-events-none"
+                style={{ opacity: 0 }}
+            />
             <div
                 ref={slashRef}
                 className="relative w-full h-full flex flex-col items-center justify-center bg-[#030305]"
@@ -223,7 +247,7 @@ const Hero = () => {
                         alt=""
                         className="absolute right-[-5%] top-1/2 -translate-y-1/2
                                    h-[90%] w-auto object-cover object-top
-                                   opacity-[0.04] grayscale
+                                   opacity-[0.06] grayscale
                                    scale-x-[-1]"
                         style={{
                             maskImage: 'linear-gradient(to left, rgba(0,0,0,0.6) 0%, transparent 70%)',
@@ -310,9 +334,10 @@ const Hero = () => {
                     <div className="hero-desc max-w-lg mx-auto mb-12 border-l-2 border-[#A855F7]/20 pl-5 text-left">
                         <DecryptedText
                             text="Surpassing limits. Painting the digital void with code and chaos."
-                            speed={30}
+                            speed={15}
+                            sequential
                             animateOn="view"
-                            revealDirection="center"
+                            revealDirection="start"
                             className="text-[#9090A8] font-mono text-sm md:text-[0.9rem] leading-relaxed tracking-wider"
                         />
                     </div>
@@ -375,6 +400,28 @@ const Hero = () => {
                             <Linkedin size={22} strokeWidth={1.5} />
                         </a>
                     </div>
+
+                    {/* ── Scroll Indicator ──────────────────────────── */}
+                    {showScrollHint && (
+                        <div className="hero-btn absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-scroll-bounce z-20">
+                            <span
+                                className="font-mono text-[9px] tracking-[0.4em] text-white/25 uppercase"
+                                style={{ fontFamily: 'JetBrains Mono, monospace' }}
+                            >
+                                SCROLL
+                            </span>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                strokeWidth={1.5}
+                                stroke="currentColor"
+                                className="w-4 h-4 text-[#FFD700]/40"
+                            >
+                                <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                            </svg>
+                        </div>
+                    )}
                 </div>
 
                 {/* Lanyard */}
