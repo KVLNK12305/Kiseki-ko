@@ -188,10 +188,10 @@ const CareerFrame = ({ data }) => (
         </div>
 
         {/* ── Main Layout: Year LEFT | Divider | Content RIGHT ── */}
-        <div className="relative z-10 w-full max-w-6xl mx-auto px-10 flex items-center gap-0 h-full">
+        <div className="relative z-10 w-full max-w-6xl mx-auto px-6 md:px-10 flex flex-col md:flex-row items-start md:items-center justify-center gap-6 md:gap-0 h-full pt-20 md:pt-0">
 
             {/* LEFT — Cinematic Year Display */}
-            <div className="flex flex-col justify-center w-[42%] pr-10 shrink-0">
+            <div className="flex flex-col justify-center w-full md:w-[42%] pr-0 md:pr-10 shrink-0">
                 {/* Status dot + label */}
                 <div className="flex items-center gap-2.5 mb-6">
                     <span
@@ -230,16 +230,16 @@ const CareerFrame = ({ data }) => (
                 </p>
             </div>
 
-            {/* CENTER — Vertical divider */}
+            {/* CENTER — Vertical divider (hidden on mobile) */}
             <div
-                className="self-stretch w-px shrink-0 my-16"
+                className="hidden md:block self-stretch w-px shrink-0 my-16"
                 style={{
                     background: `linear-gradient(to bottom, transparent, ${data.accent}40, ${data.accent}20, transparent)`,
                 }}
             />
 
             {/* RIGHT — Content */}
-            <div className="flex flex-col justify-center pl-10 flex-1 min-w-0">
+            <div className="flex flex-col justify-center pl-0 md:pl-10 flex-1 min-w-0">
                 {/* Role title */}
                 <h2
                     className="mb-2 leading-none"

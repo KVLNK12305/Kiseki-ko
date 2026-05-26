@@ -10,8 +10,8 @@ export default function useLenis() {
     if (isTouchDevice) return;
 
     const lenisInstance = new Lenis({
-      duration: 1.5,
-      lerp: 0.1,
+      duration: 2,
+      lerp: 0.05,
       smoothWheel: true,
     });
 
