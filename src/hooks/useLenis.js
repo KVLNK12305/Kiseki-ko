@@ -6,6 +6,9 @@ export default function useLenis() {
   const reqIdRef = useRef(null);
 
   useEffect(() => {
+    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    if (isTouchDevice) return;
+
     const lenisInstance = new Lenis({
       duration: 1.5,
       lerp: 0.1,

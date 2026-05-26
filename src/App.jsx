@@ -28,6 +28,9 @@ function App() {
 
   // ── Military Crosshair Cursor Logic ─────────────────────────
   useEffect(() => {
+    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    if (isTouchDevice) return;
+
     const cursor = cursorRef.current;
     if (!cursor || isLoading) return;
 
