@@ -166,7 +166,7 @@ const Arsenal = () => {
                 initial={{ opacity: 0, x: 20, scale: 0.95 }}
                 animate={{ opacity: 1, x: 0, scale: 1 }}
                 exit={{ opacity: 0, x: 20, scale: 0.95 }}
-                className="absolute top-8 right-8 z-30 w-72 bg-[#0a0a0c]/90 border border-[#FFD700]/40 p-5 rounded-lg backdrop-blur-xl shadow-2xl"
+                className="absolute top-4 left-4 right-4 md:left-auto md:top-8 md:right-8 z-30 md:w-72 bg-[#0a0a0c]/90 border border-[#FFD700]/40 p-5 rounded-lg backdrop-blur-xl shadow-2xl"
               >
                 <div className="flex items-center justify-between mb-3 pb-2 border-b border-[#FFD700]/20">
                   <span className="text-[10px] text-[#FFD700] tracking-widest">DIAGNOSTIC_PANEL</span>

@@ -383,7 +383,7 @@ const Projects = () => {
                         trigger: triggerRef.current,
                         start: 'top top',
                         end: '+=3200',
-                        scrub: 1.5,
+                        scrub: 2,
                         pin: true,
                     },
                 }

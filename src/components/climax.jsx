@@ -1,4 +1,5 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
+import DecryptedText from './sokulu/DecryptedText';
 
 // ── Black Hole Vortex Canvas ───────────────────────────────────
 const VortexCanvas = ({ containerRef }) => {
@@ -9,15 +10,31 @@ const VortexCanvas = ({ containerRef }) => {
         let animId, w, h;
         let t = 0;
 
+        let mouseX = 0;
+        let mouseY = 0;
+        let targetX = 0;
+        let targetY = 0;
+        let isHovering = false;
+
         const resize = () => {
             w = canvas.width  = canvas.offsetWidth;
             h = canvas.height = canvas.offsetHeight;
         };
 
+        const handleMouseMove = (e) => {
+            const rect = canvas.getBoundingClientRect();
+            mouseX = e.clientX - rect.left - w / 2;
+            mouseY = e.clientY - rect.top - h / 2;
+        };
+
+        const handleMouseEnter = () => { isHovering = true; };
+        const handleMouseLeave = () => { isHovering = false; mouseX = 0; mouseY = 0; };
+
         // Ring system
         const RING_COUNT = 7;
         const rings = Array.from({ length: RING_COUNT }, (_, i) => ({
             radius:    (i + 1) * (Math.min(window.innerWidth, 600) / (RING_COUNT * 1.5)),
+            baseSpeed: 0.0008 + i * 0.0004,
             speed:     0.0008 + i * 0.0004,
             particles: Array.from({ length: 30 + i * 8 }, (_, j) => ({
                 angle: (j / (30 + i * 8)) * Math.PI * 2,
@@ -35,8 +52,11 @@ const VortexCanvas = ({ containerRef }) => {
             ctx.clearRect(0, 0, w, h);
             t += 1;
 
-            const cx = w / 2;
-            const cy = h / 2;
+            targetX += (mouseX - targetX) * 0.05;
+            targetY += (mouseY - targetY) * 0.05;
+
+            const cx = w / 2 + targetX * 0.15;
+            const cy = h / 2 + targetY * 0.15;
 
             // Radial dark gradient background
             const bg = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(w, h) * 0.6);
@@ -47,7 +67,6 @@ const VortexCanvas = ({ containerRef }) => {
 
             // Draw each ring from outside inward
             [...rings].reverse().forEach((ring, ri) => {
-                const actualRi = RING_COUNT - 1 - ri;
                 const maxRadius = (RING_COUNT) * (Math.min(w, h) / (RING_COUNT * 1.5));
                 const normalizedRadius = ring.radius / maxRadius;
 
@@ -55,6 +74,9 @@ const VortexCanvas = ({ containerRef }) => {
                 const r = Math.round(lerp(168, 255, ring.colorT));
                 const g = Math.round(lerp(85,  215, ring.colorT));
                 const b = Math.round(lerp(247,   0, ring.colorT));
+
+                // Speed up on hover
+                ring.speed = lerp(ring.speed, isHovering ? ring.baseSpeed * 3 : ring.baseSpeed, 0.05);
 
                 ring.particles.forEach(p => {
                     p.angle += ring.speed;
@@ -106,11 +128,20 @@ const VortexCanvas = ({ containerRef }) => {
         };
 
         window.addEventListener('resize', resize);
+        canvas.addEventListener('mousemove', handleMouseMove);
+        canvas.addEventListener('mouseenter', handleMouseEnter);
+        canvas.addEventListener('mouseleave', handleMouseLeave);
+        
         resize();
         animate();
 
         return () => {
             window.removeEventListener('resize', resize);
+            if (canvas) {
+                canvas.removeEventListener('mousemove', handleMouseMove);
+                canvas.removeEventListener('mouseenter', handleMouseEnter);
+                canvas.removeEventListener('mouseleave', handleMouseLeave);
+            }
             cancelAnimationFrame(animId);
         };
     }, [containerRef]);
@@ -189,7 +220,14 @@ const Climax = () => {
                     className="text-5xl sm:text-6xl md:text-7xl font-bold italic text-white mb-4 leading-[1.05]"
                     style={{ fontFamily: 'Bebas Neue, sans-serif' }}
                 >
-                    Let's build something
+                    <DecryptedText
+                        text="Let's build something"
+                        speed={50}
+                        animateOn="view"
+                        revealDirection="center"
+                        className="text-white"
+                        encryptedClassName="text-white/20"
+                    />
                     <br />
                     <span
                         className="not-italic"
@@ -200,7 +238,15 @@ const Climax = () => {
                             WebkitTextFillColor: 'transparent',
                         }}
                     >
-                        that matters.
+                        <DecryptedText
+                            text="that matters."
+                            speed={50}
+                            delay={800}
+                            animateOn="view"
+                            revealDirection="center"
+                            className="text-transparent"
+                            encryptedClassName="text-[#FFD700]/30"
+                        />
                     </span>
                 </h2>
 
