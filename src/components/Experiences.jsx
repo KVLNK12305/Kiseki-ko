@@ -9,22 +9,36 @@ const CAREER_FRAMES = [
     {
         frame: '01',
         type: 'EXPERIENCE',
+        year: '2026',
+        role: 'Software Engineer Intern (Cloud & Infra)',
+        org: 'MachineMaze',
+        period: 'Apr 2026 — Jun 2026',
+        location: 'Cloud & Infrastructure',
+        bullets: [
+            'Developed a Splunk-inspired observability platform for ingesting, indexing, and querying infrastructure logs and metrics, enabling centralized system monitoring and troubleshooting.',
+            'Implemented automated incident workflows with Jira-style ticket generation, capturing affected services, log context, and diagnostics to accelerate issue resolution.',
+        ],
+        status: 'INTERNSHIP',
+        statusColor: '#38bdf8',
+        accent: '#38bdf8',
+    },
+    {
+        frame: '02',
+        type: 'EXPERIENCE',
         year: '2025',
-        role: 'Core Team Member',
-        org: 'The Init Club',
+        role: 'Core Team Member (Research)',
+        org: 'Init Club',
         period: 'Dec 2025 — Present',
         location: 'Amrita Vishwa Vidyapeetham',
         bullets: [
-            'Active member of the research squad — innovative ideas, technical insights, strategic solutions.',
-            'Collaborate with core team to design, analyze, and implement research-driven initiatives aligned with club objectives.',
-            'Brainstorming sessions, prototype development, and technical reviews to improve project quality and impact.',
+            'Conducting systems and security-focused research, including protocol analysis, experimentation, and early-stage prototyping.',
         ],
         status: 'ACTIVE',
         statusColor: '#4ade80',
         accent: '#FFD700',
     },
     {
-        frame: '02',
+        frame: '03',
         type: 'EXPERIENCE',
         year: '2024',
         role: 'Student Researcher',
@@ -41,7 +55,7 @@ const CAREER_FRAMES = [
         accent: '#A855F7',
     },
     {
-        frame: '03',
+        frame: '04',
         type: 'EDUCATION',
         year: '2023',
         role: 'B.Tech — Computer Science',
@@ -58,7 +72,7 @@ const CAREER_FRAMES = [
         accent: '#FFD700',
     },
     {
-        frame: '04',
+        frame: '05',
         type: 'EDUCATION',
         year: '2021',
         role: 'Higher Secondary',
@@ -77,11 +91,11 @@ const CAREER_FRAMES = [
 
 // ── Timeline Track Component ───────────────────────────────────
 const TimelineTrack = ({ activeIndex, total }) => (
-    <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-30 flex items-end gap-0 pointer-events-none">
+    <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-30 flex items-end gap-0 pointer-events-none max-w-[90vw] overflow-x-auto">
         {Array.from({ length: total }).map((_, i) => (
             <React.Fragment key={i}>
                 {/* Year label above dot */}
-                <div className="flex flex-col items-center gap-1.5">
+                <div className="flex flex-col items-center gap-1.5 shrink-0">
                     <span
                         className="text-[9px] tracking-[0.2em] transition-all duration-500"
                         style={{
@@ -112,9 +126,8 @@ const TimelineTrack = ({ activeIndex, total }) => (
                 {/* Connecting line between dots */}
                 {i < total - 1 && (
                     <div
-                        className="transition-all duration-700 mb-[4.5px]"
+                        className="transition-all duration-700 mb-[4.5px] shrink-0 w-[32px] sm:w-[48px]"
                         style={{
-                            width: '60px',
                             height: '1px',
                             background: i < activeIndex
                                 ? 'rgba(255,215,0,0.4)'
