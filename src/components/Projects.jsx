@@ -1,60 +1,80 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Radio, Terminal, Lock, Unlock } from 'lucide-react';
-import ElectricBorder from './sokulu/ElectricBorder';
+import { motion, AnimatePresence, useInView } from 'framer-motion';
+import { Lock, ExternalLink, Play, Film } from 'lucide-react';
+import DecryptedText from './sokulu/DecryptedText';
+import useIsMobile from '../hooks/useIsMobile';
 import akiraVideo from './images/Screencast_20260331_001952.webm';
 import f1Video from './images/F1.mp4';
 
-gsap.registerPlugin(ScrollTrigger);
-
 const projects = [
     {
-        title: 'ADG-Polymorph',
-        description: 'Security-Aware SDN Deception Framework with kernel-level eBPF/XDP networking. Reduces detection latency to sub-μs using entropy-based anomaly detection.',
-        tags: [{ name: 'Rust (Aya)', cat: 'lang' }, { name: 'eBPF/XDP', cat: 'sys' }, { name: 'Open vSwitch', cat: 'net' }, { name: 'Mininet', cat: 'net' }],
-        id: '01', link: '#', clearance: 'TOP SECRET',
-    },
-    {
-        title: 'GhostShell',
-        description: 'A dual-mode Rust TUI combining a decoy interface with a hidden real-time observability dashboard. Features an async telemetry pipeline streaming structured logs.',
-        tags: [{ name: 'Rust', cat: 'lang' }, { name: 'Tokio', cat: 'runtime' }, { name: 'LLM APIs', cat: 'ai' }, { name: 'TUI', cat: 'ui' }],
-        id: '02', link: 'https://github.com/KVLNK12305/GhostShell', clearance: 'SECRET',
-    },
-    {
-        title: 'EeffoC',
-        description: 'An Event-Driven Task Orchestration System capturing real-time Discord events. Features a rule-based intent extraction layer routing payloads through Microsoft Graph.',
-        tags: [{ name: 'Go', cat: 'lang' }, { name: 'n8n', cat: 'workflow' }, { name: 'Microsoft Graph', cat: 'api' }, { name: 'Automation', cat: 'sys' }],
-        id: '03', link: 'https://github.com/KVLNK12305/EeffoC', clearance: 'CONFIDENTIAL',
-    },
-    {
-        title: 'Everust',
-        description: 'A modular platform to experiment with async execution, ownership, and concurrency. Benchmarks system behavior across concurrency models and unsafe boundaries.',
-        tags: [{ name: 'Rust', cat: 'lang' }, { name: 'Axum', cat: 'web' }, { name: 'Tokio', cat: 'runtime' }, { name: 'Async', cat: 'sys' }],
-        id: '04', link: 'https://github.com/KVLNK12305/Everust', clearance: 'CONFIDENTIAL',
-    },
-    {
+        id: '05',
         title: 'AKIRA',
-        description: 'A high-throughput API gateway & cryptographic Identity Provider. Uses a Rust-based zero-knowledge key vault via Bun FFI for secure tamper-evident auth logs.',
+        description: 'High-throughput API gateway & cryptographic Identity Provider. Employs a Rust-based zero-knowledge key vault via Bun FFI for secure tamper-evident auth logs.',
         tags: [{ name: 'Bun', cat: 'runtime' }, { name: 'Express', cat: 'web' }, { name: 'React', cat: 'ui' }, { name: 'Rust Crypto', cat: 'sys' }],
-        id: '05', link: 'https://github.com/KVLNK12305/Akira', clearance: 'TOP SECRET',
+        link: 'https://github.com/KVLNK12305/Akira',
+        clearance: 'TOP SECRET',
+        video: akiraVideo,
+        bentoType: 'large',
     },
     {
-        title: 'NovaSketch',
-        description: 'A real-time collaborative whiteboard using WebSockets. Incorporates fine-grained access control to prevent concurrent conflicts and utilizes static analysis tools.',
-        tags: [{ name: 'React', cat: 'ui' }, { name: 'WebSockets', cat: 'net' }, { name: 'MongoDB', cat: 'db' }, { name: 'OAuth', cat: 'auth' }],
-        id: '06', link: 'https://github.com/Ateliers-io/NovaSketch', clearance: 'SECRET',
-    },
-    {
+        id: '07',
         title: 'F1 Evolution',
-        description: 'Data analysis of Formula 1 regulatory impacts. Explores how rule changes affected lap times, team performance, and constructor standings across eras.',
+        description: 'Data analysis of Formula 1 regulatory impacts across eras. Explores performance dynamics, lap time deviations, and team dominance metrics.',
         tags: [{ name: 'Pandas', cat: 'data' }, { name: 'Seaborn', cat: 'viz' }, { name: 'Plotly', cat: 'viz' }],
-        id: '07', link: 'https://github.com/KVLNK12305/F1_Case_Study', clearance: 'UNCLASSIFIED',
+        link: 'https://github.com/KVLNK12305/F1_Case_Study',
+        clearance: 'UNCLASSIFIED',
+        video: f1Video,
+        bentoType: 'wide',
+    },
+    {
+        id: '01',
+        title: 'ADG-Polymorph',
+        description: 'Security-Aware SDN Deception Framework with kernel-level eBPF/XDP networking. Reduces detection latency to sub-μs using entropy anomaly detection.',
+        tags: [{ name: 'Rust (Aya)', cat: 'lang' }, { name: 'eBPF/XDP', cat: 'sys' }, { name: 'Open vSwitch', cat: 'net' }, { name: 'Mininet', cat: 'net' }],
+        link: '#',
+        clearance: 'TOP SECRET',
+        bentoType: 'tall',
+    },
+    {
+        id: '02',
+        title: 'GhostShell',
+        description: 'Rust TUI combining decoy terminal with hidden real-time observability dashboard. Async telemetry pipeline streaming structured logs.',
+        tags: [{ name: 'Rust', cat: 'lang' }, { name: 'Tokio', cat: 'runtime' }, { name: 'LLM APIs', cat: 'ai' }, { name: 'TUI', cat: 'ui' }],
+        link: 'https://github.com/KVLNK12305/GhostShell',
+        clearance: 'SECRET',
+        bentoType: 'standard',
+    },
+    {
+        id: '03',
+        title: 'EeffoC',
+        description: 'Event-Driven Task Orchestration capturing real-time Discord events. Features intent extraction routing payloads through Microsoft Graph.',
+        tags: [{ name: 'Go', cat: 'lang' }, { name: 'n8n', cat: 'workflow' }, { name: 'MS Graph', cat: 'api' }, { name: 'Automation', cat: 'sys' }],
+        link: 'https://github.com/KVLNK12305/EeffoC',
+        clearance: 'CONFIDENTIAL',
+        bentoType: 'standard',
+    },
+    {
+        id: '04',
+        title: 'Everust',
+        description: 'Modular platform experimenting with async execution and ownership. Benchmarks system behavior across concurrency models.',
+        tags: [{ name: 'Rust', cat: 'lang' }, { name: 'Axum', cat: 'web' }, { name: 'Tokio', cat: 'runtime' }, { name: 'Async', cat: 'sys' }],
+        link: 'https://github.com/KVLNK12305/Everust',
+        clearance: 'CONFIDENTIAL',
+        bentoType: 'standard',
+    },
+    {
+        id: '06',
+        title: 'NovaSketch',
+        description: 'Real-time collaborative whiteboard using WebSockets. Fine-grained access control prevents concurrent conflicts.',
+        tags: [{ name: 'React', cat: 'ui' }, { name: 'WebSockets', cat: 'net' }, { name: 'MongoDB', cat: 'db' }, { name: 'OAuth', cat: 'auth' }],
+        link: 'https://github.com/Ateliers-io/NovaSketch',
+        clearance: 'SECRET',
+        bentoType: 'wide',
     },
 ];
 
-// Clearance color mapping
 const CLEARANCE_COLORS = {
     'TOP SECRET':   '#dc2626',
     'SECRET':       '#ea580c',
@@ -62,355 +82,437 @@ const CLEARANCE_COLORS = {
     'UNCLASSIFIED': '#4ade80',
 };
 
-const TAG_CAT_COLORS = {
-    lang: 'rgba(168,85,247,0.15)',
-    sys:  'rgba(239,68,68,0.12)',
-    net:  'rgba(59,130,246,0.12)',
-    web:  'rgba(34,197,94,0.12)',
-    ui:   'rgba(251,146,60,0.12)',
-    data: 'rgba(99,102,241,0.12)',
-    viz:  'rgba(20,184,166,0.12)',
-    ai:   'rgba(217,70,239,0.12)',
-    runtime: 'rgba(234,179,8,0.12)',
-    workflow:'rgba(16,185,129,0.12)',
-    api:  'rgba(14,165,233,0.12)',
-    auth: 'rgba(244,114,182,0.12)',
-    db:   'rgba(251,191,36,0.12)',
+// ── Enhanced Tech Tag Palette with Category Dots ─────────────
+const TAG_CAT_STYLES = {
+    lang:     { bg: 'rgba(168,85,247,0.12)', border: 'rgba(168,85,247,0.3)', dot: '#c084fc', text: '#e9d5ff' },
+    sys:      { bg: 'rgba(239,68,68,0.12)', border: 'rgba(239,68,68,0.3)', dot: '#f87171', text: '#fca5a5' },
+    net:      { bg: 'rgba(59,130,246,0.12)', border: 'rgba(59,130,246,0.3)', dot: '#60a5fa', text: '#bfdbfe' },
+    web:      { bg: 'rgba(34,197,94,0.12)', border: 'rgba(34,197,94,0.3)', dot: '#4ade80', text: '#bbf7d0' },
+    ui:       { bg: 'rgba(251,146,60,0.12)', border: 'rgba(251,146,60,0.3)', dot: '#fb923c', text: '#fed7aa' },
+    data:     { bg: 'rgba(99,102,241,0.12)', border: 'rgba(99,102,241,0.3)', dot: '#818cf8', text: '#c7d2fe' },
+    viz:      { bg: 'rgba(20,184,166,0.12)', border: 'rgba(20,184,166,0.3)', dot: '#2dd4bf', text: '#99f6e4' },
+    ai:       { bg: 'rgba(217,70,239,0.12)', border: 'rgba(217,70,239,0.3)', dot: '#e879f9', text: '#f5d0fe' },
+    runtime:  { bg: 'rgba(234,179,8,0.12)', border: 'rgba(234,179,8,0.3)', dot: '#facc15', text: '#fef08a' },
+    workflow: { bg: 'rgba(16,185,129,0.12)', border: 'rgba(16,185,129,0.3)', dot: '#34d399', text: '#a7f3d0' },
+    api:      { bg: 'rgba(14,165,233,0.12)', border: 'rgba(14,165,233,0.3)', dot: '#38bdf8', text: '#bae6fd' },
+    auth:     { bg: 'rgba(244,114,182,0.12)', border: 'rgba(244,114,182,0.3)', dot: '#f472b6', text: '#fbcfe8' },
+    db:       { bg: 'rgba(251,191,36,0.12)', border: 'rgba(251,191,36,0.3)', dot: '#fbbf24', text: '#fef3c7' },
 };
 
-// ── Classified Stamp ───────────────────────────────────────────
-const ClassifiedStamp = ({ clearance, revealed }) => (
-    <div
-        className="absolute inset-0 flex items-center justify-center pointer-events-none z-20 transition-opacity duration-500"
-        style={{ opacity: revealed ? 0 : 1 }}
-        aria-hidden="true"
-    >
-        <div style={{ transform: 'rotate(-12deg)' }}>
-            <span
-                className="font-mono font-black text-lg tracking-[0.3em] uppercase border-2 px-3 py-1"
-                style={{
-                    color: CLEARANCE_COLORS[clearance] || '#dc2626',
-                    borderColor: (CLEARANCE_COLORS[clearance] || '#dc2626') + '55',
-                    opacity: 0.5,
-                    fontFamily: 'Roboto Mono, monospace',
-                    textShadow: `0 0 20px ${CLEARANCE_COLORS[clearance] || '#dc2626'}`,
-                    whiteSpace: 'nowrap',
-                }}
-            >
-                {clearance}
-            </span>
-        </div>
-    </div>
-);
-
-// ── Demo Panel ─────────────────────────────────────────────────
-const DemoPanel = ({ project, revealed }) => {
-    const [expandedVideo, setExpandedVideo] = useState(null);
+// ── Background Sparkles (Disabled on Mobile for Performance) ──
+const AmbientSparkles = React.memo(({ isMobile }) => {
+    const canvasRef = useRef(null);
 
     useEffect(() => {
-        const handleKeyDown = (e) => {
-            if (e.key === 'Escape' && expandedVideo) {
-                setExpandedVideo(null);
-            }
+        if (isMobile) return; // Skip heavy canvas animation on mobile screens
+
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        let w, h, animationFrame;
+
+        const resize = () => {
+            w = canvas.width = window.innerWidth;
+            h = canvas.height = canvas.parentElement.clientHeight;
         };
 
-        if (expandedVideo) {
-            window.addEventListener('keydown', handleKeyDown);
+        const sparkles = [];
+        class Sparkle {
+            constructor() { this.reset(true); }
+            reset(randomLife = false) {
+                this.x = Math.random() * (w || window.innerWidth);
+                this.y = Math.random() * (h || window.innerHeight);
+                this.maxLife = Math.random() * 80 + 40;
+                this.life = randomLife ? Math.random() * this.maxLife : 0;
+                this.size = Math.random() * 1.5 + 0.5;
+            }
+            update() {
+                this.life++;
+                if (this.life > this.maxLife) this.reset();
+            }
+            draw() {
+                const prog = this.life / this.maxLife;
+                const alpha = prog < 0.5 ? (prog / 0.5) * 0.3 : ((1 - prog) / 0.5) * 0.3;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 215, 0, ${alpha})`;
+                ctx.fill();
+            }
         }
 
-        return () => {
-            window.removeEventListener('keydown', handleKeyDown);
+        const init = () => {
+            sparkles.length = 0;
+            for (let i = 0; i < 20; i++) sparkles.push(new Sparkle());
         };
-    }, [expandedVideo]);
 
-    const hasVideo = project.title === 'AKIRA' || project.title === 'F1 Evolution';
-    const videoSrc = project.title === 'AKIRA' ? akiraVideo : f1Video;
+        const animate = () => {
+            ctx.clearRect(0, 0, w, h);
+            sparkles.forEach(s => { s.update(); s.draw(); });
+            animationFrame = requestAnimationFrame(animate);
+        };
+
+        window.addEventListener('resize', resize);
+        resize();
+        init();
+        animate();
+
+        return () => {
+            window.removeEventListener('resize', resize);
+            cancelAnimationFrame(animationFrame);
+        };
+    }, [isMobile]);
+
+    if (isMobile) return null;
 
     return (
-        <>
-            <div
-                className="relative h-[380px] rounded-2xl border overflow-hidden transition-all duration-700"
-                style={{
-                    background: '#050508',
-                    borderColor: revealed ? 'rgba(255,215,0,0.25)' : 'rgba(255,255,255,0.05)',
-                    boxShadow: revealed ? '0 0 30px rgba(255,215,0,0.08)' : 'none',
-                }}
-            >
-                {/* Classified stamp overlay */}
-                <ClassifiedStamp clearance={project.clearance} revealed={revealed} />
+        <canvas
+            ref={canvasRef}
+            className="absolute inset-0 pointer-events-none z-0"
+            style={{ opacity: 0.8 }}
+        />
+    );
+});
 
-                {/* Mock browser chrome */}
-                <div className="w-full h-8 border-b border-white/[0.06] flex items-center px-4 justify-between bg-[#0a0a0f] shrink-0 z-10 relative">
-                    <div className="flex gap-2">
-                        <div className="w-2.5 h-2.5 rounded-full bg-red-500/70" />
-                        <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/70" />
-                        <div className="w-2.5 h-2.5 rounded-full bg-green-500/70" />
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <Radio className="w-3 h-3 text-green-400 animate-pulse" />
-                        <span className="text-[9px] text-green-400 font-mono tracking-widest">
-                            {revealed ? 'LIVE FEED' : 'SIGNAL BLOCKED'}
-                        </span>
-                    </div>
-                    <Terminal className="w-3.5 h-3.5 text-white/20" />
-                </div>
+// ── Custom SVG Placeholder ────────────────────────────────────
+const ProjectSVGPlaceholder = ({ id }) => {
+    const numId = parseInt(id) || 1;
+    const shapes = [
+        <polygon key="1" points="100,45 145,70 145,120 100,145 55,120 55,70" fill="none" stroke="#FFD700" strokeWidth="1.5" opacity="0.35" className="animate-quick-pulse" />,
+        <g key="2" stroke="#A855F7" strokeWidth="1.2" fill="none" opacity="0.4">
+            <circle cx="100" cy="95" r="35" strokeDasharray="4,4" />
+            <circle cx="100" cy="95" r="20" />
+            <path d="M 60,95 L 140,95 M 100,55 L 100,135" strokeWidth="0.8" />
+        </g>,
+        <g key="3" stroke="#22c55e" strokeWidth="1.5" fill="none" opacity="0.4" strokeLinecap="round">
+            <path d="M 60,65 L 140,65" />
+            <path d="M 100,65 L 100,125" strokeDasharray="3,3" />
+            <circle cx="60" cy="65" r="5" fill="#050508" />
+            <circle cx="140" cy="65" r="5" fill="#050508" />
+            <rect x="75" y="105" width="50" height="20" rx="3" />
+        </g>,
+        <g key="4" stroke="#3b82f6" strokeWidth="1.5" fill="none" opacity="0.4">
+            <path d="M60,95 C60,70 140,70 140,95 C140,120 60,120 60,95 Z" />
+            <circle cx="100" cy="95" r="6" fill="#3b82f6" opacity="0.5" />
+        </g>,
+        <polygon key="5" points="100,55 135,125 65,125" fill="none" stroke="#dc2626" strokeWidth="1.5" opacity="0.35" />,
+        <g key="6" stroke="#eab308" strokeWidth="1.5" fill="none" opacity="0.4">
+            <rect x="70" y="65" width="60" height="60" rx="6" />
+            <path d="M 80,105 L 100,85 L 120,105" />
+        </g>,
+        <g key="7" stroke="#f97316" strokeWidth="1.2" fill="none" opacity="0.4">
+            <path d="M50,110 L150,85 L115,65 Z" />
+        </g>
+    ];
 
-                {/* Content area */}
-                <div className="flex-1 relative bg-[#050508] overflow-hidden"
-                     style={{ height: 'calc(100% - 32px)' }}>
-                    {/* Scan-reveal animation when declassified */}
-                    <div
-                        className="absolute inset-0 transition-all duration-700"
-                        style={{
-                            clipPath: revealed
-                                ? 'polygon(0 0, 100% 0, 100% 100%, 0 100%)'
-                                : 'polygon(0 0, 100% 0, 100% 0, 0 0)',
-                        }}
-                    >
-                        {hasVideo ? (
-                            <div
-                                className="absolute inset-0"
-                                onMouseEnter={() => revealed && setExpandedVideo(videoSrc)}
-                            >
-                                <video
-                                    src={videoSrc}
-                                    autoPlay
-                                    muted
-                                    loop
-                                    playsInline
-                                    className="absolute inset-0 w-full h-full object-cover"
-                                />
-                                <div className="absolute bottom-3 right-3 z-20 px-2 py-1 rounded border border-[#FFD700]/40 bg-black/50 text-[10px] font-mono text-[#FFD700] tracking-widest">
-                                    HOVER: EXPAND
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="absolute inset-0 flex items-center justify-center">
-                                <img
-                                    src={`https://api.dicebear.com/7.x/shapes/svg?seed=${project.title}&backgroundColor=050508&shape1Color=FFD700&shape2Color=4c1d95`}
-                                    alt=""
-                                    className="absolute inset-0 w-full h-full object-cover opacity-15 mix-blend-screen scale-110"
-                                />
-                                <div
-                                    className="font-mono text-lg tracking-[0.3em] font-bold border-2 p-5 rounded-lg rotate-[-4deg] backdrop-blur-sm"
-                                    style={{
-                                        color: 'rgba(255,215,0,0.4)',
-                                        borderColor: 'rgba(255,215,0,0.15)',
-                                    }}
-                                >
-                                    COMING SOON
-                                </div>
-                            </div>
-                        )}
-                    </div>
+    const activeShape = shapes[(numId - 1) % shapes.length];
 
-                    {/* Blocked state */}
-                    {!revealed && (
-                        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 z-10">
-                            <Lock size={32} className="text-white/10" />
-                            <span className="font-mono text-[11px] text-white/20 tracking-[0.3em] uppercase">
-                                Hover to Declassify
-                            </span>
-                        </div>
-                    )}
-
-                    {/* Scan-line overlay */}
-                    <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.025)_1px,transparent_1px)] bg-[size:100%_4px] pointer-events-none z-30" />
-                </div>
-            </div>
-
-            {/* Video expand modal */}
-            {expandedVideo && createPortal(
-                <div
-                    className="fixed inset-0 z-[200] bg-black/90 backdrop-blur-md flex items-center justify-center p-4 cursor-pointer"
-                    style={{ background: 'radial-gradient(circle at center, rgba(255,215,0,0.08), rgba(0,0,0,0.95) 60%)' }}
-                    onClick={() => setExpandedVideo(null)}
-                >
-                    <div 
-                        className="relative w-full h-full sm:h-auto sm:aspect-video max-w-7xl rounded-2xl overflow-hidden border border-[#FFD700]/40 shadow-[0_0_60px_rgba(255,215,0,0.3)] cursor-default flex items-center justify-center bg-black/50"
-                        onMouseLeave={() => setExpandedVideo(null)}
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <video src={expandedVideo} autoPlay muted loop playsInline className="w-full h-full object-contain sm:object-cover" />
-                        <div className="absolute top-4 left-1/2 -translate-x-1/2 px-3 py-1 rounded border border-[#FFD700]/40 bg-black/60 text-[11px] tracking-[0.2em] font-mono text-[#FFD700]">
-                            FOCUS MODE ACTIVE
-                        </div>
-                        <div className="absolute bottom-4 right-4 px-3 py-1 rounded border border-white/20 bg-black/60 text-[10px] tracking-widest font-mono text-white/70 hidden sm:block">
-                            MOVE CURSOR OUT OR PRESS ESC TO CLOSE
-                        </div>
-                        <div className="absolute bottom-4 right-4 px-3 py-1 rounded border border-white/20 bg-black/60 text-[10px] tracking-widest font-mono text-white/70 sm:hidden">
-                            TAP OUTSIDE TO CLOSE
-                        </div>
-                    </div>
-                </div>,
-                document.body
-            )}
-        </>
+    return (
+        <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 190" preserveAspectRatio="none">
+            <defs>
+                <pattern id={`card-grid-${id}`} width="12" height="12" patternUnits="userSpaceOnUse">
+                    <path d="M 12 0 L 0 0 0 12" fill="none" stroke="rgba(255, 255, 255, 0.02)" strokeWidth="1" />
+                </pattern>
+                <radialGradient id={`card-glow-${id}`} cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stopColor="rgba(255, 215, 0, 0.04)" />
+                    <stop offset="100%" stopColor="rgba(5, 5, 8, 0)" />
+                </radialGradient>
+            </defs>
+            <rect width="100%" height="100%" fill="#050508" />
+            <rect width="100%" height="100%" fill={`url(#card-grid-${id})`} />
+            <rect width="100%" height="100%" fill={`url(#card-glow-${id})`} />
+            <g transform="translate(0, 0)">
+                {activeShape}
+            </g>
+        </svg>
     );
 };
 
-// ── Project Slide ──────────────────────────────────────────────
-const ProjectSlide = ({ project }) => {
+// ── Video Modal ───────────────────────────────────────────────
+const VideoModal = ({ videoSrc, onClose }) => {
+    return createPortal(
+        <AnimatePresence>
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="fixed inset-0 z-[200] bg-black/95 backdrop-blur-md flex items-center justify-center p-4 cursor-pointer"
+                style={{ background: 'radial-gradient(circle at center, rgba(255,215,0,0.05), rgba(0,0,0,0.97) 75%)' }}
+                onClick={onClose}
+            >
+                <div className="absolute top-0 left-0 right-0 h-[44px] pointer-events-none overflow-hidden flex items-center justify-center gap-4 opacity-30" aria-hidden="true">
+                    {Array.from({ length: 40 }).map((_, i) => <div key={i} className="sprocket-hole w-[12px] h-[18px] bg-black border border-white/10 rounded-sm" />)}
+                </div>
+                <div className="absolute bottom-0 left-0 right-0 h-[44px] pointer-events-none overflow-hidden flex items-center justify-center gap-4 opacity-30" aria-hidden="true">
+                    {Array.from({ length: 40 }).map((_, i) => <div key={i} className="sprocket-hole w-[12px] h-[18px] bg-black border border-white/10 rounded-sm" />)}
+                </div>
+
+                <motion.div 
+                    initial={{ scale: 0.9, y: 15 }}
+                    animate={{ scale: 1, y: 0 }}
+                    exit={{ scale: 0.9, y: 15 }}
+                    transition={{ type: 'spring', damping: 25, stiffness: 220 }}
+                    className="relative w-full h-auto aspect-video max-w-6xl rounded-2xl overflow-hidden border border-[#FFD700]/30 shadow-[0_0_50px_rgba(255,215,0,0.15)] cursor-default flex items-center justify-center bg-[#050508]"
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    <video src={videoSrc} autoPlay controls className="w-full h-full object-contain" />
+                    <div className="absolute top-4 left-4 px-3 py-1 rounded border border-[#FFD700]/30 bg-black/70 text-[10px] tracking-[0.3em] font-mono text-[#FFD700] backdrop-blur-sm">
+                        FULL TRANSMISSION ACTIVE
+                    </div>
+                    <button 
+                        onClick={onClose}
+                        className="absolute top-4 right-4 w-10 h-10 rounded-full border border-white/10 hover:border-[#FFD700]/50 hover:text-[#FFD700] bg-black/70 text-[12px] text-white/70 flex items-center justify-center transition-colors cursor-interactive"
+                    >
+                        ✕
+                    </button>
+                </motion.div>
+            </motion.div>
+        </AnimatePresence>,
+        document.body
+    );
+};
+
+// ── Bento Project Card with Screen-Size Proxy & Tech Tag Polish ─
+const BentoCard = ({ project, index, onOpenVideo, isMobile }) => {
     const [revealed, setRevealed] = useState(false);
+    const [mousePos, setMousePos] = useState({ x: 50, y: 50 });
+    const cardRef = useRef(null);
+    const videoRef = useRef(null);
+    const isInView = useInView(cardRef, { once: false, amount: 0.2 });
+
     const clearanceColor = CLEARANCE_COLORS[project.clearance] || '#dc2626';
 
+    const bentoSpanClass = {
+        large: 'bento-span-large',
+        wide: 'bento-span-wide',
+        tall: 'bento-span-tall',
+        standard: 'bento-span-standard',
+    }[project.bentoType] || 'bento-span-standard';
+
+    const handleMouseMove = (e) => {
+        if (isMobile || !cardRef.current) return;
+        const rect = cardRef.current.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const xPercent = (x / rect.width) * 100;
+        const yPercent = (y / rect.height) * 100;
+
+        cardRef.current.style.setProperty('--mouse-x', `${xPercent}%`);
+        cardRef.current.style.setProperty('--mouse-y', `${yPercent}%`);
+
+        // Offset floating aperture (190px x 120px) so cursor never covers the video
+        const apertureW = 190;
+        const apertureH = 120;
+
+        // Position offset: top-right of cursor
+        let peekX = x + 25;
+        let peekY = y - apertureH - 15;
+
+        // Smart flip / clamp so preview stays inside card boundary
+        if (peekX + apertureW > rect.width - 12) {
+            peekX = x - apertureW - 20;
+        }
+        if (peekX < 12) {
+            peekX = 12;
+        }
+        if (peekY < 12) {
+            peekY = y + 25;
+        }
+        if (peekY + apertureH > rect.height - 12) {
+            peekY = rect.height - apertureH - 12;
+        }
+
+        setMousePos({ x: peekX, y: peekY });
+    };
+
+    const handleMouseEnter = () => {
+        setRevealed(true);
+        if (!isMobile && videoRef.current && project.video) {
+            videoRef.current.play().catch(() => {});
+        }
+    };
+
+    const handleMouseLeave = () => {
+        setRevealed(false);
+        if (!isMobile && videoRef.current && project.video) {
+            videoRef.current.pause();
+        }
+    };
+
     return (
-        <div
-            className="w-screen h-full flex-shrink-0 flex items-center justify-center p-8 border-r border-white/[0.04] relative"
-            style={{ minWidth: '100vw' }}
+        <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ type: 'spring', damping: 20, stiffness: 80, delay: index * 0.08 }}
+            ref={cardRef}
+            className={`project-card ${bentoSpanClass} group relative flex flex-col justify-between p-6 cursor-pointer`}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+            onMouseMove={handleMouseMove}
+            onClick={() => project.video && onOpenVideo(project.video)}
         >
-            {/* Large bg number (Font_1.otf) */}
-            <span
-                className="absolute top-8 left-10 select-none pointer-events-none"
-                aria-hidden="true"
-                style={{
-                    fontFamily: 'Font1, serif',
-                    fontSize: 'clamp(6rem, 18vw, 18rem)',
-                    color: 'transparent',
-                    WebkitTextStroke: '1px rgba(255,215,0,0.04)',
-                    lineHeight: 1,
-                }}
-            >
-                {project.id}
-            </span>
+            {/* Background SVG illustration */}
+            <div className="absolute inset-0 z-0 opacity-15 pointer-events-none transition-opacity duration-500 group-hover:opacity-25">
+                <ProjectSVGPlaceholder id={project.id} />
+            </div>
 
-            <div
-                className="max-w-5xl w-full grid grid-cols-1 lg:grid-cols-2 gap-10 items-center"
-                onMouseEnter={() => setRevealed(true)}
-                onMouseLeave={() => setRevealed(false)}
-            >
-                {/* ── Dossier Card ─── */}
-                <div className="order-2 lg:order-1">
-                    <ElectricBorder color="#FFD700">
-                        <div className="bg-[#0D0D14] p-8 rounded-xl border border-white/[0.06] relative overflow-hidden group">
-
-                            {/* Dossier header */}
-                            <div className="flex items-center justify-between mb-6">
-                                <span className="font-mono text-[10px] tracking-[0.4em] text-white/20 uppercase">
-                                    CASE FILE // {project.id}
-                                </span>
-                                <div className="flex items-center gap-2">
-                                    <span
-                                        className="font-mono text-[10px] tracking-[0.2em] uppercase"
-                                        style={{ color: clearanceColor + '99' }}
-                                    >
-                                        {project.clearance}
-                                    </span>
-                                    <span
-                                        className="w-1.5 h-1.5 rounded-full"
-                                        style={{ background: clearanceColor, opacity: 0.6 }}
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Title — Playfair italic */}
-                            <h3
-                                className="text-3xl md:text-4xl font-bold italic text-white mb-4 leading-tight transition-colors duration-300 group-hover:text-[#FFD700]"
-                                style={{ fontFamily: 'Rajdhani, system-ui, sans-serif' }}
-                            >
-                                {project.title}
-                            </h3>
-
-                            {/* Declassified indicator */}
-                            <div className="flex items-center gap-2 mb-4">
-                                {revealed
-                                    ? <Unlock size={12} className="text-green-400" />
-                                    : <Lock size={12} className="text-white/20" />
-                                }
-                                <span className={`font-mono text-[10px] tracking-widest uppercase transition-colors duration-300 ${revealed ? 'text-green-400' : 'text-white/20'}`}>
-                                    {revealed ? 'DECLASSIFIED' : 'CLASSIFIED'}
-                                </span>
-                            </div>
-
-                            <p className="text-[#9090A8] mb-7 leading-relaxed text-sm md:text-base">
-                                {project.description}
-                            </p>
-
-                            {/* Tech tags */}
-                            <div className="flex flex-wrap gap-2 mb-7">
-                                {project.tags.map(tag => (
-                                    <span
-                                        key={tag.name}
-                                        className="px-3 py-1 text-[11px] font-mono rounded-full border border-white/[0.08]"
-                                        style={{
-                                            background: TAG_CAT_COLORS[tag.cat] || 'rgba(255,255,255,0.04)',
-                                            color: 'rgba(255,215,0,0.8)',
-                                        }}
-                                    >
-                                        {tag.name}
-                                    </span>
-                                ))}
-                            </div>
-
-                            {/* Access link */}
-                            <a
-                                href={project.link}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="inline-flex items-center gap-2 font-mono text-xs tracking-[0.25em] uppercase text-white/60 hover:text-[#FFD700] transition-colors duration-300 cursor-interactive border border-white/10 hover:border-[#FFD700]/40 px-4 py-2"
-                            >
-                                [ ACCESS CODEBASE ]
-                                <span className="text-base">↗</span>
-                            </a>
-                        </div>
-                    </ElectricBorder>
+            {/* Desktop Only: Tactical Floating Video Peek HUD (Offset from Cursor) */}
+            {!isMobile && project.video && isInView && (
+                <div 
+                    className="video-peek-aperture"
+                    style={{ left: `${mousePos.x}px`, top: `${mousePos.y}px` }}
+                >
+                    <video 
+                        ref={videoRef}
+                        src={project.video}
+                        muted
+                        loop
+                        playsInline
+                        preload="metadata"
+                    />
+                    {/* Tactical HUD overlays */}
+                    <div className="absolute inset-0 bg-scanlines pointer-events-none opacity-30" />
+                    <div className="absolute top-1.5 left-2 right-2 flex justify-between items-center pointer-events-none z-10">
+                        <span className="text-[7.5px] font-mono tracking-widest text-[#FFD700] bg-black/75 px-1.5 py-0.5 rounded border border-[#FFD700]/30 backdrop-blur-[2px]">
+                            LIVE_FEED
+                        </span>
+                        <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                    </div>
+                    <div className="absolute bottom-1.5 left-2 text-[7.5px] font-mono tracking-widest text-white/60 bg-black/65 px-1.5 py-0.5 rounded pointer-events-none z-10">
+                        CAM_0{project.id}
+                    </div>
                 </div>
+            )}
 
-                {/* ── Demo Panel ─── */}
-                <div className="order-1 lg:order-2">
-                    <DemoPanel project={project} revealed={revealed} />
+            {/* Header / Meta */}
+            <div className="relative z-20 flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                    <span className="font-mono text-[9px] tracking-[0.25em] text-white/30 uppercase">
+                        FILE // {project.id}
+                    </span>
+                    {project.video && (
+                        <span className="inline-flex items-center gap-1 text-[8.5px] font-mono text-[#FFD700] bg-[#FFD700]/10 border border-[#FFD700]/30 px-2 py-0.5 rounded-full shadow-[0_0_10px_rgba(255,215,0,0.15)]">
+                            {isMobile ? <Film size={9} /> : <Play size={8} className="fill-[#FFD700]" />}
+                            {isMobile ? 'TAP TO WATCH' : 'PEEK'}
+                        </span>
+                    )}
+                </div>
+                <div className="flex items-center gap-1.5">
+                    <span className="font-mono text-[9px] tracking-[0.15em] uppercase" style={{ color: clearanceColor }}>
+                        {project.clearance}
+                    </span>
+                    <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: clearanceColor }} />
                 </div>
             </div>
-        </div>
+
+            {/* Title & Description */}
+            <div className="relative z-20 flex-1 flex flex-col justify-end">
+                <h3 className={`font-bold text-white mb-2 leading-tight transition-colors duration-300 group-hover:text-[#FFD700] tracking-wide ${project.bentoType === 'large' ? 'text-3xl lg:text-4xl' : 'text-xl'}`} style={{ fontFamily: 'var(--font-display)' }}>
+                    {revealed && !isMobile ? (
+                        <DecryptedText text={project.title} speed={60} animateOn="hover" />
+                    ) : project.title}
+                </h3>
+                <p className={`text-white/60 text-xs leading-relaxed font-body-ui mb-4 ${project.bentoType === 'large' ? 'text-sm lg:text-base max-w-xl' : 'line-clamp-3'}`}>
+                    {project.description}
+                </p>
+            </div>
+
+            {/* Enhanced Tech Tags & Action Footer */}
+            <div className="relative z-20 pt-3 border-t border-white/5 flex flex-wrap items-center justify-between gap-2 mt-auto">
+                <div className="flex flex-wrap gap-1.5">
+                    {project.tags.map((tag) => {
+                        const style = TAG_CAT_STYLES[tag.cat] || {
+                            bg: 'rgba(255,255,255,0.03)',
+                            border: 'rgba(255,255,255,0.1)',
+                            dot: '#FFD700',
+                            text: 'rgba(255,215,0,0.85)',
+                        };
+
+                        return (
+                            <span
+                                key={tag.name}
+                                className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-mono font-medium rounded-md border backdrop-blur-md transition-all duration-300 hover:scale-105"
+                                style={{
+                                    background: style.bg,
+                                    borderColor: style.border,
+                                    color: style.text,
+                                }}
+                            >
+                                <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: style.dot }} />
+                                {tag.name}
+                            </span>
+                        );
+                    })}
+                </div>
+
+                <a 
+                    href={project.link} 
+                    target="_blank" 
+                    rel="noreferrer" 
+                    onClick={(e) => e.stopPropagation()}
+                    className="inline-flex items-center gap-1.5 font-mono text-[9.5px] tracking-[0.2em] uppercase text-white/40 hover:text-[#FFD700] transition-colors duration-300 ml-auto pt-1 sm:pt-0"
+                >
+                    <span>CODEBASE</span>
+                    <ExternalLink size={10} />
+                </a>
+            </div>
+
+            {/* Background Watermark */}
+            <span className="absolute bottom-2 right-4 select-none pointer-events-none opacity-[0.03] font-deco text-7xl" style={{ color: 'transparent', WebkitTextStroke: '1px #FFD700' }}>
+                {project.id}
+            </span>
+        </motion.div>
     );
 };
 
 // ── Main Projects Component ────────────────────────────────────
 const Projects = () => {
-    const triggerRef = useRef(null);
-    const sectionRef = useRef(null);
-
-    useEffect(() => {
-        const ctx = gsap.context(() => {
-            gsap.fromTo(
-                sectionRef.current,
-                { translateX: 0 },
-                {
-                    translateX: `-${(projects.length - 1) * 100}vw`,
-                    ease: 'none',
-                    duration: 1,
-                    scrollTrigger: {
-                        trigger: triggerRef.current,
-                        start: 'top top',
-                        end: '+=3200',
-                        scrub: 2,
-                        pin: true,
-                    },
-                }
-            );
-        });
-        return () => ctx.revert();
-    }, []);
+    const [expandedVideo, setExpandedVideo] = useState(null);
+    const isMobile = useIsMobile();
 
     return (
-        <section
-            id="projects"
-            className="relative overflow-hidden bg-[#08080E]"
-        >
-            {/* Circuit pattern */}
-            <div className="absolute inset-0 bg-pattern-circuit opacity-40 pointer-events-none" />
+        <section id="projects" className="relative py-24 bg-[#08080E] overflow-hidden min-h-screen flex flex-col">
+            {/* Background elements */}
+            <AmbientSparkles isMobile={isMobile} />
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(255,215,0,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,215,0,0.03)_1px,transparent_1px)] bg-[size:40px_40px] opacity-20 pointer-events-none" />
+            <div className="absolute inset-0 bg-[url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyBAMAAAD9tt+fAAAAElBMVEUAAAD8/Pz09PT4+PjMzMz////09TU9AAAAAXRSTlMAQObYZgAAADRJREFUeF5jYGRgYBBgYmBghGInBgYmBnYmRih2YmBgYmBnYmRiZwSJOzGwM7EzsTMyMDAAAGYQAwXpU9mXAAAAAElFTkSuQmCC')] bg-repeat opacity-[0.03] pointer-events-none z-[60]" />
+            <div className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-[#030305] to-transparent pointer-events-none z-10" />
+            <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-[#030305] to-transparent pointer-events-none z-10" />
 
-            <div ref={triggerRef}>
-                <div
-                    ref={sectionRef}
-                    className="flex h-screen relative"
-                    style={{ width: `${projects.length * 100}vw` }}
-                >
+            <div className="max-w-7xl mx-auto px-6 md:px-8 relative z-20 w-full flex-1 flex flex-col">
+                {/* Header */}
+                <div className="mb-12 space-y-4">
+                    <div className="flex items-center gap-2 text-[#FFD700] text-xs tracking-[0.2em] opacity-80">
+                        <span>// CLASSIFIED_ARCHIVES</span>
+                        <span className="w-12 h-[1px] bg-[#FFD700]/50" />
+                        <span>STATUS: ACTIVE</span>
+                    </div>
+                    <h2 className="text-5xl md:text-7xl font-bold tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-gray-500" style={{ fontFamily: 'var(--font-display)' }}>
+                        CASE FILES
+                    </h2>
+                    <p className="text-white/40 text-sm md:text-base font-mono max-w-2xl leading-relaxed mt-4">
+                        Operational network structures, systems programming architectures, and deployment pipelines — declassified for technical analysis.
+                        {isMobile ? ' Tap any card to view transmission.' : ' Hover cards with video clips to peek live feeds.'}
+                    </p>
+                </div>
+
+                {/* Bento Grid */}
+                <div className="bento-grid">
                     {projects.map((project, i) => (
-                        <ProjectSlide key={project.id} project={project} />
+                        <BentoCard 
+                            key={project.id} 
+                            project={project} 
+                            index={i} 
+                            onOpenVideo={(src) => setExpandedVideo(src)}
+                            isMobile={isMobile}
+                        />
                     ))}
                 </div>
             </div>
+
+            {/* Fullscreen Video Modal on Click */}
+            {expandedVideo && <VideoModal videoSrc={expandedVideo} onClose={() => setExpandedVideo(null)} />}
         </section>
     );
 };
