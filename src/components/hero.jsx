@@ -5,6 +5,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Github, Linkedin } from 'lucide-react';
 import DecryptedText from './sokulu/DecryptedText';
 import Lanyard from './sokulu/Lanyard';
+import useIsMobile from '../hooks/useIsMobile';
 import profileImg from './images/me.png';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -132,6 +133,8 @@ const Hero = () => {
     const [startButtonText,    setStartButtonText]    = useState(false);
     const [shaking,            setShaking]            = useState(false);
     const [showScrollHint,     setShowScrollHint]     = useState(false);
+
+    const isMobile = useIsMobile();
 
     useGSAP(() => {
         const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
@@ -363,7 +366,7 @@ const Hero = () => {
                                     text="Dive Deeper"
                                     speed={80}
                                     animateOn={startButtonText ? 'view' : ''}
-                                    className="text-white"
+                                    className="text-[#ffffff]"
                                 />
                             </span>
                             <svg
@@ -424,14 +427,12 @@ const Hero = () => {
                     )}
                 </div>
 
-                {/* Lanyard */}
-                <div className="absolute inset-0 w-full h-full z-10 pointer-events-none overflow-hidden">
-                    {mountLanyard && (
-                        <div className="w-full h-full opacity-35 mix-blend-screen">
-                            <Lanyard position={[0, 0, 15]} gravity={[0, -30, 0]} transparent />
-                        </div>
-                    )}
-                </div>
+                {/* Lanyard - Desktop Only */}
+                {!isMobile && mountLanyard && (
+                    <div className="absolute inset-0 w-full h-full z-10 pointer-events-none overflow-hidden opacity-35 mix-blend-screen">
+                        <Lanyard position={[0, 0, 15]} gravity={[0, -30, 0]} transparent />
+                    </div>
+                )}
             </div>
 
             {/* Global grain overlay */}
