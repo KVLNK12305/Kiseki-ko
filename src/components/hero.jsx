@@ -2,16 +2,15 @@ import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Github, Linkedin } from 'lucide-react';
-import DecryptedText from './sokulu/DecryptedText';
-import Lanyard from './sokulu/Lanyard';
+import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { Github, Linkedin, Mail, ArrowRight, ArrowUpRight, Globe } from 'lucide-react';
 import useIsMobile from '../hooks/useIsMobile';
 import profileImg from './images/me.png';
 
 gsap.registerPlugin(ScrollTrigger);
 
-// ── Digital Void Engine ────────────────────────────────────────
-const DigitalVoid = React.memo(() => {
+// ── Subtle Celestial Sparkle Engine ───────────────────────────
+const CelestialField = React.memo(() => {
     const canvasRef = useRef(null);
 
     useEffect(() => {
@@ -19,90 +18,54 @@ const DigitalVoid = React.memo(() => {
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
         let w, h, animationFrame;
-        const scanlines = [];
-        const MAX_LINES = 12;
+        const particles = [];
+        const MAX_P = 28;
 
         const resize = () => {
             w = canvas.width = window.innerWidth;
             h = canvas.height = window.innerHeight;
         };
 
-        class Scanline {
-            constructor() { this.init(); }
-            init() {
-                this.y      = Math.random() * h;
-                this.height = Math.random() * 1.5 + 0.5;
-                this.speed  = Math.random() * 1.5 + 0.3;
-                this.width  = Math.random() * w * 0.6 + w * 0.1;
-                this.x      = Math.random() * (w - this.width);
-                this.color  = `rgba(168, 85, 247, ${Math.random() * 0.08 + 0.01})`;
-            }
-            update() {
-                this.y += this.speed;
-                if (this.y > h) this.init();
-            }
-            draw() {
-                ctx.fillStyle = this.color;
-                ctx.fillRect(this.x, this.y, this.width, this.height);
-            }
-        }
-
-        // Occasional gold sparkle particles
-        const sparkles = [];
-        class Sparkle {
+        class Spark {
             constructor() { this.reset(); }
             reset() {
-                this.x   = Math.random() * (w || window.innerWidth);
-                this.y   = Math.random() * (h || window.innerHeight);
-                this.life = 0;
-                this.maxLife = Math.random() * 60 + 30;
+                this.x = Math.random() * (w || window.innerWidth);
+                this.y = Math.random() * (h || window.innerHeight);
+                this.vx = (Math.random() - 0.5) * 0.2;
+                this.vy = (Math.random() - 0.5) * 0.2;
                 this.size = Math.random() * 1.2 + 0.3;
+                this.life = 0;
+                this.maxLife = Math.random() * 140 + 70;
+                this.isGold = Math.random() > 0.45;
             }
             update() {
+                this.x += this.vx;
+                this.y += this.vy;
                 this.life++;
                 if (this.life > this.maxLife) this.reset();
             }
             draw() {
                 const prog = this.life / this.maxLife;
-                const alpha = prog < 0.5
-                    ? (prog / 0.5) * 0.5
-                    : ((1 - prog) / 0.5) * 0.5;
+                const alpha = prog < 0.5 ? (prog / 0.5) * 0.5 : ((1 - prog) / 0.5) * 0.5;
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(255, 215, 0, ${alpha})`;
+                ctx.fillStyle = this.isGold ? `rgba(255, 215, 0, ${alpha})` : `rgba(168, 85, 247, ${alpha * 0.7})`;
                 ctx.fill();
             }
         }
 
         const init = () => {
-            scanlines.length = 0;
-            sparkles.length  = 0;
-            for (let i = 0; i < MAX_LINES; i++) scanlines.push(new Scanline());
-            for (let i = 0; i < 25; i++) {
-                const s = new Sparkle();
-                s.life = Math.floor(Math.random() * s.maxLife);
-                sparkles.push(s);
+            particles.length = 0;
+            for (let i = 0; i < MAX_P; i++) {
+                const p = new Spark();
+                p.life = Math.floor(Math.random() * p.maxLife);
+                particles.push(p);
             }
         };
 
         const animate = () => {
             ctx.clearRect(0, 0, w, h);
-            // Noise pixels
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.012)';
-            for (let i = 0; i < 15; i++) ctx.fillRect(Math.random() * w, Math.random() * h, 1, 1);
-            // Scanlines
-            scanlines.forEach(line => { line.update(); line.draw(); });
-            // Gold sparkles
-            sparkles.forEach(s => { s.update(); s.draw(); });
-            // Rare horizontal glitch bar
-            if (Math.random() > 0.993) {
-                const barH = Math.random() * 40 + 5;
-                const barY = Math.random() * h;
-                ctx.fillStyle = 'rgba(15, 15, 15, 0.7)';
-                ctx.fillRect(0, barY, w, barH);
-                ctx.fillStyle = 'rgba(255, 215, 0, 0.06)';
-                ctx.fillRect(5, barY, w - 10, 1);
-            }
+            particles.forEach(p => { p.update(); p.draw(); });
             animationFrame = requestAnimationFrame(animate);
         };
 
@@ -120,323 +83,365 @@ const DigitalVoid = React.memo(() => {
     return <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none z-0" />;
 });
 
-// ── Main Hero Component ────────────────────────────────────────
+// ── KISEKI // KUSHAL KURAPATI HERO ─────────────────────────────
 const Hero = () => {
-    const containerRef = useRef(null);
-    const contentRef   = useRef(null);
-    const slashRef     = useRef(null);
-    const heroFlashRef = useRef(null);
-
-    const [mountLanyard,       setMountLanyard]       = useState(false);
-    const [signalStatus,       setSignalStatus]       = useState('Signal_Lost: Retrying...');
-    const [startNameAnimation, setStartNameAnimation] = useState(false);
-    const [startButtonText,    setStartButtonText]    = useState(false);
-    const [shaking,            setShaking]            = useState(false);
-    const [showScrollHint,     setShowScrollHint]     = useState(false);
-
     const isMobile = useIsMobile();
+    const sectionRef = useRef(null);
+    const slashRef = useRef(null);
+    const flashRef = useRef(null);
+    const contourSvgRef = useRef(null);
 
+    const [currentTime, setCurrentTime] = useState('');
+    const [domainOverdrive, setDomainOverdrive] = useState(false);
+
+    const triggerDomainBurst = useCallback(() => {
+        setDomainOverdrive(prev => !prev);
+    }, []);
+
+    // Dynamic Live Clock
+    useEffect(() => {
+        const update = () => {
+            const now = new Date();
+            setCurrentTime(now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true }));
+        };
+        update();
+        const t = setInterval(update, 1000);
+        return () => clearInterval(t);
+    }, []);
+
+    // ── Mouse Physics for Subtle Restrained Parallax ───────────
+    const mouseX = useMotionValue(0);
+    const mouseY = useMotionValue(0);
+    const springConfig = { damping: 28, stiffness: 140, mass: 0.7 };
+    const portraitX = useSpring(useTransform(mouseX, [-0.5, 0.5], [-16, 16]), springConfig);
+    const portraitY = useSpring(useTransform(mouseY, [-0.5, 0.5], [-10, 10]), springConfig);
+    const linesX = useSpring(useTransform(mouseX, [-0.5, 0.5], [22, -22]), springConfig);
+    const textTiltX = useSpring(useTransform(mouseX, [-0.5, 0.5], [-8, 8]), springConfig);
+    const textTiltY = useSpring(useTransform(mouseY, [-0.5, 0.5], [-6, 6]), springConfig);
+
+    const handleMouseMove = (e) => {
+        if (isMobile) return;
+        const x = e.clientX / window.innerWidth - 0.5;
+        const y = e.clientY / window.innerHeight - 0.5;
+        mouseX.set(x);
+        mouseY.set(y);
+    };
+
+    const handleMouseLeave = () => {
+        if (isMobile) return;
+        mouseX.set(0);
+        mouseY.set(0);
+    };
+
+    // ── Smooth Entrance Animation ──────────────────────────────
     useGSAP(() => {
         const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
 
-        gsap.set(containerRef.current, { visibility: 'visible' });
-
-        // 0. Impact flash + shake on reveal
-        tl.call(() => {
-            // White flash
-            if (heroFlashRef.current) {
-                gsap.to(heroFlashRef.current, { opacity: 0.15, duration: 0.08, ease: 'none', onComplete: () => {
-                    gsap.to(heroFlashRef.current, { opacity: 0, duration: 0.2, ease: 'power2.out' });
-                }});
-            }
-            // Screen shake
-            setShaking(true);
-            setTimeout(() => setShaking(false), 300);
-        })
-
-        // 1. Digital wipe
+        tl.fromTo(flashRef.current,
+            { opacity: 0.6 },
+            { opacity: 0, duration: 0.45, ease: 'power2.out' }
+        )
         .fromTo(slashRef.current,
             { clipPath: 'polygon(0 49%, 100% 49%, 100% 51%, 0 51%)' },
-            {
-                clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
-                duration: 1.4,
-                ease: 'expo.inOut',
-                onStart: () => setTimeout(() => setStartNameAnimation(true), 600),
-            }
+            { clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)', duration: 1.1, ease: 'expo.inOut' },
+            '-=0.35'
         )
-        // 2. Content reveal
-        .from('.paint-reveal', {
-            scaleX: 0,
-            transformOrigin: 'left center',
-            duration: 0.8,
-            ease: 'circ.inOut',
-        }, '-=0.4')
-        .from(['.signal-tag', '.hero-desc'], {
-            opacity: 0,
-            x: -20,
-            duration: 0.6,
-            stagger: 0.15,
-            ease: 'power2.out',
-        }, '-=0.3')
-        .from('.hero-btn', {
-            y: 20,
-            opacity: 0,
-            duration: 0.5,
-            onStart: () => setStartButtonText(true),
-            onComplete: () => {
-                setMountLanyard(true);
-                setSignalStatus('Signal_Acquired: Online');
-                // Show scroll hint after everything settles
-                setTimeout(() => setShowScrollHint(true), 800);
-            },
-        }, '-=0.2');
+        .fromTo('.editorial-line',
+            { strokeDashoffset: 500 },
+            { strokeDashoffset: 0, duration: 1.4, stagger: 0.05, ease: 'power2.out' },
+            '-=0.6'
+        )
+        .fromTo(['.hero-left-pane', '.hero-right-pane', '.hero-header-bar', '.hero-footer-bar'],
+            { opacity: 0, y: 20 },
+            { opacity: 1, y: 0, duration: 0.8, stagger: 0.1, ease: 'power2.out' },
+            '-=0.8'
+        );
+    }, { scope: sectionRef });
 
-        // Signal pulse
-        gsap.to('.signal-tag', {
-            opacity: 0.5,
-            duration: 0.1,
-            repeat: -1,
-            repeatDelay: 4,
-            yoyo: true,
-            ease: 'none',
-        });
+    const handleEnterDomain = useCallback(() => {
+        const target = document.getElementById('systems') || document.getElementById('arsenal') || document.getElementById('projects');
+        if (target) target.scrollIntoView({ behavior: 'smooth' });
+    }, []);
 
-        // Scroll exit
-        gsap.to(contentRef.current, {
-            scrollTrigger: {
-                trigger: containerRef.current,
-                start: 'top top',
-                end: 'bottom center',
-                scrub: true,
-            },
-            y: -150,
-            opacity: 0,
-            filter: 'blur(8px)',
-            scale: 0.98,
-        });
-
-    }, { scope: containerRef });
-
-    const handleScroll = useCallback(() => {
-        const next = document.getElementById('arsenal-intro') || document.getElementById('about');
-        if (next) next.scrollIntoView({ behavior: 'smooth' });
+    const handleOverclock = useCallback(() => {
+        const target = document.getElementById('lab') || document.getElementById('archive') || document.getElementById('projects');
+        if (target) target.scrollIntoView({ behavior: 'smooth' });
     }, []);
 
     return (
         <section
             id="home"
-            ref={containerRef}
-            className={`relative h-[100dvh] w-full bg-[#030305] overflow-hidden flex flex-col items-center justify-center visible ${shaking ? 'animate-hero-shake' : ''}`}
+            ref={sectionRef}
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
+            className="relative h-[100dvh] w-full bg-[#030305] overflow-hidden flex flex-col justify-between select-none"
         >
-            {/* Impact white flash */}
-            <div
-                ref={heroFlashRef}
-                className="absolute inset-0 z-[55] bg-white pointer-events-none"
-                style={{ opacity: 0 }}
-            />
-            <div
-                ref={slashRef}
-                className="relative w-full h-full flex flex-col items-center justify-center bg-[#030305]"
-            >
-                <DigitalVoid />
+            {/* Subtle Screen Reveal Flash */}
+            <div ref={flashRef} className="absolute inset-0 z-[60] bg-white pointer-events-none opacity-0" />
 
-                {/* ── Ghost Profile Photo ─────────────────────────────── */}
-                <div
-                    className="absolute inset-0 z-[1] pointer-events-none overflow-hidden"
-                    aria-hidden="true"
-                >
-                    <img
-                        src={profileImg}
-                        alt=""
-                        className="absolute right-[-5%] top-1/2 -translate-y-1/2
-                                   h-[90%] w-auto object-cover object-top
-                                   opacity-[0.06] grayscale
-                                   scale-x-[-1]"
-                        style={{
-                            maskImage: 'linear-gradient(to left, rgba(0,0,0,0.6) 0%, transparent 70%)',
-                            WebkitMaskImage: 'linear-gradient(to left, rgba(0,0,0,0.6) 0%, transparent 70%)',
-                        }}
-                    />
-                </div>
+            <div ref={slashRef} className="relative w-full h-full flex flex-col justify-between">
+                <CelestialField />
 
-                {/* Impact white flash overlay */}
-                <div className="absolute inset-0 z-[50] bg-white opacity-0 pointer-events-none mix-blend-overlay" />
+                {/* Restrained Atmospheric Lighting */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] sm:w-[1200px] h-[700px] bg-gradient-to-r from-[#A855F7]/10 via-[#FFD700]/10 to-[#EAB308]/08 rounded-full blur-[180px] pointer-events-none z-0" />
 
-                {/* Content */}
-                <div
-                    ref={contentRef}
-                    className="relative z-20 w-full max-w-5xl px-6 md:px-12 flex flex-col items-center text-center"
-                >
-                    {/* Kanji watermark */}
-                    <div
-                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[14rem] md:text-[22rem] font-black text-[#ffffff02] select-none pointer-events-none whitespace-nowrap"
-                        style={{ fontFamily: 'serif' }}
-                        aria-hidden="true"
+                {/* ── 1. TOP HEADER BAR ──────────────────────────────── */}
+                <header className="hero-header-bar relative z-30 w-full px-6 sm:px-12 md:px-16 pt-6 sm:pt-8 flex items-center justify-between text-xs font-mono tracking-widest text-[#9090A8] uppercase border-b border-white/5 pb-4">
+                    <div className="flex items-center gap-3">
+                        <span className="flex h-2 w-2 relative">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FFD700] opacity-75" />
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-[#FFD700]" />
+                        </span>
+                        <span className="text-[#F0EDE8] font-medium tracking-widest">
+                            KISEKI · ARCHITECT
+                        </span>
+                    </div>
+
+                    <div className="flex items-center gap-6 sm:gap-8">
+                        <span className="hidden sm:inline-block text-[#6B7280]">
+                            軌跡 · AP-SOUTH-1
+                        </span>
+                        <div className="flex items-center gap-1.5 text-[#FFD700]">
+                            <span className="text-[10px] text-[#6B7280]">UTC</span>
+                            <span className="font-mono font-medium">{currentTime || '08:00:00 PM'}</span>
+                        </div>
+                    </div>
+                </header>
+
+                {/* ── 2. CENTER IMMERSIVE STAGE ──────────────────────── */}
+                <div className="relative z-20 flex-1 w-full max-w-[1700px] mx-auto px-6 sm:px-12 md:px-16 flex flex-col lg:flex-row items-center justify-between gap-6 py-2 overflow-hidden">
+                    
+                    {/* Generative Vector Topological Contour Waves */}
+                    <motion.svg
+                        ref={contourSvgRef}
+                        style={{ x: isMobile ? 0 : linesX }}
+                        className="absolute inset-0 w-full h-full pointer-events-none opacity-30 z-0 overflow-visible"
+                        viewBox="0 0 1200 800"
+                        fill="none"
                     >
-                        魔法帝
-                    </div>
+                        {[0, 35, 70, 105, 140, 175, 210].map((offset, i) => (
+                            <path
+                                key={i}
+                                className="editorial-line"
+                                d={`M ${220 + offset * 1.3} 0 C ${380 + offset} 220, ${480 + offset} 480, ${720 + offset * 1.1} 800`}
+                                stroke="#FFD700"
+                                strokeWidth="1"
+                                strokeOpacity={0.6 - i * 0.07}
+                                strokeDasharray="500"
+                                strokeDashoffset="0"
+                            />
+                        ))}
+                    </motion.svg>
 
-                    {/* Signal Status */}
-                    <div className="mb-10 flex items-center gap-4">
-                        <div className="h-px w-8 md:w-12 bg-[#A855F7]/40" />
-                        <h2
-                            className="signal-tag font-mono text-[#A855F7] text-[9px] md:text-[10px] tracking-[0.5em] uppercase opacity-90"
-                            style={{ textShadow: '0 0 8px rgba(168,85,247,0.5)' }}
-                        >
-                            {signalStatus}
-                        </h2>
-                        <div className="h-px w-8 md:w-12 bg-[#A855F7]/40" />
-                    </div>
+                    {/* ── LEFT COLUMN: SYSTEMS & CORE CODENAME ──────── */}
+                    <motion.div
+                        style={{
+                            x: isMobile ? 0 : textTiltX,
+                            y: isMobile ? 0 : textTiltY,
+                        }}
+                        className="hero-left-pane z-20 flex-1 max-w-md xl:max-w-lg text-left"
+                    >
+                        {/* Operator Badge */}
+                        <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-sm bg-[#FFD700]/08 border border-[#FFD700]/25 text-[10px] font-mono text-[#FFD700] uppercase tracking-[0.25em] mb-4">
+                            <span className="h-1.5 w-1.5 rounded-full bg-[#FFD700]" />
+                            <span>KUSHAL KURAPATI</span>
+                        </div>
 
-                    {/* ── Name Block ─────────────────────────────────── */}
-                    <div className="relative z-10 mb-8 select-none" aria-label="Kushal Kurapati">
-                        {/* KUSHAL — ghost outlined */}
-                        <div
-                            className={`leading-none mb-2 mix-blend-difference transition-opacity duration-500 ${startNameAnimation ? 'opacity-100' : 'opacity-0'}`}
+                        {/* Primary Visual Statement: SYSTEMS */}
+                        <h1 
+                            className="text-6xl sm:text-7xl md:text-8xl lg:text-[7.8rem] font-normal text-[#F0EDE8] mb-3 tracking-tight leading-[0.9]"
+                            style={{ fontFamily: 'Playfair Display, Georgia, serif' }}
                         >
-                            <DecryptedText
-                                text="KUSHAL"
-                                speed={70}
-                                maxIterations={15}
-                                characters="01X?/$!#%"
-                                className="text-6xl md:text-8xl lg:text-[8.5rem] font-black text-transparent leading-[0.85] tracking-tight"
-                                encryptedClassName="text-[#A855F7] opacity-40"
-                                animateOn={startNameAnimation ? 'view' : ''}
+                            Systems
+                        </h1>
+
+                        {/* Stacked Visual Philosophy */}
+                        <div className="text-xl sm:text-2xl md:text-[1.75rem] font-mono text-[#FFD700] font-bold mb-4 tracking-wide leading-tight space-y-0.5">
+                            <div>I BUILD.</div>
+                            <div>I BREAK.</div>
+                            <div>I REBUILD.</div>
+                        </div>
+
+                        {/* Engineered Copy */}
+                        <div className="space-y-1.5 mb-8 text-[#C8C8D4] text-sm sm:text-base leading-relaxed max-w-md">
+                            <p>
+                                Architecting high-concurrency systems, low-level <span className="text-white font-medium">Rust</span> pipelines, and active cyber defense.
+                            </p>
+                            <p className="text-[#9090A8] text-xs sm:text-sm font-mono">
+                                Turning complexity into bare-metal performance.
+                            </p>
+                        </div>
+
+                        {/* Interactive Buttons */}
+                        <div className="flex flex-wrap items-center gap-4">
+                            <button
+                                onClick={handleEnterDomain}
+                                className="group inline-flex items-center gap-3 px-6 py-3.5 bg-[#FFD700]/10 border border-[#FFD700]/50 hover:bg-[#FFD700] hover:text-black text-xs font-mono uppercase tracking-widest text-[#FFD700] transition-all duration-300 rounded-none cursor-interactive"
+                            >
+                                <span className="font-bold">ENTER DOMAIN</span>
+                                <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                            </button>
+
+                            <button
+                                onClick={handleOverclock}
+                                className="group inline-flex items-center gap-2 px-5 py-3.5 bg-transparent border border-[#A855F7]/35 hover:border-[#A855F7] text-xs font-mono uppercase tracking-widest text-[#A855F7] transition-all duration-300 rounded-none cursor-interactive"
+                            >
+                                <span>OVERCLOCK</span>
+                                <ArrowUpRight size={14} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                            </button>
+                        </div>
+                    </motion.div>
+
+                    {/* ── CENTER: OPERATOR IDENTITY PORTRAIT (CLEAN NO BEHIND TEXT) ── */}
+                    <div className="relative z-10 flex-1 flex items-end justify-center w-full h-[58vh] sm:h-[70vh] md:h-[78vh] max-h-[800px] pointer-events-none">
+                        {/* Portrait Image Wrapper */}
+                        <motion.div
+                            style={{
+                                x: isMobile ? 0 : portraitX,
+                                y: isMobile ? 0 : portraitY,
+                            }}
+                            className="relative w-[310px] sm:w-[390px] md:w-[460px] lg:w-[500px] h-full flex items-end justify-center"
+                        >
+                            {/* Central Character Cutout Artwork */}
+                            <img
+                                src={profileImg}
+                                alt="Kushal Kurapati"
+                                draggable="false"
+                                className="relative z-10 w-full h-full object-contain object-bottom filter grayscale contrast-[1.12] brightness-[1.04] transition-all duration-700 hover:filter-none"
                                 style={{
-                                    fontFamily: 'Bebas Neue, sans-serif',
-                                    WebkitTextStroke: '1.5px rgba(255,255,255,0.75)',
+                                    maskImage: 'linear-gradient(to bottom, black 85%, transparent 100%)',
+                                    WebkitMaskImage: 'linear-gradient(to bottom, black 85%, transparent 100%)',
                                 }}
                             />
+
+                            {/* ── Interactive Crescent Moon Button (Toggles Overclock) ── */}
+                            <motion.button
+                                type="button"
+                                onClick={triggerDomainBurst}
+                                whileHover={{ scale: 1.25, rotate: -5 }}
+                                whileTap={{ scale: 0.9 }}
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ duration: 0.8, delay: 0.5 }}
+                                className="absolute top-4 right-2 sm:right-6 z-30 pointer-events-auto cursor-interactive p-2 rounded-full bg-white/[0.03] hover:bg-[#FFD700]/15 border border-white/10 hover:border-[#FFD700]/50 transition-colors duration-300"
+                                title="Toggle Domain Overclock (月)"
+                                aria-label="Toggle Domain Overclock"
+                            >
+                                <svg
+                                    viewBox="0 0 24 24"
+                                    className={`w-6 h-6 sm:w-7 sm:h-7 transition-all duration-500 -rotate-12 ${
+                                        domainOverdrive
+                                            ? 'text-[#EF4444] drop-shadow-[0_0_24px_rgba(239,68,68,0.95)]'
+                                            : 'text-[#FFD700] drop-shadow-[0_0_14px_rgba(255,215,0,0.5)] hover:drop-shadow-[0_0_24px_rgba(255,215,0,0.9)]'
+                                    }`}
+                                    fill="currentColor"
+                                >
+                                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                                </svg>
+                            </motion.button>
+
+                            {/* Handwritten Signature Script */}
+                            <div 
+                                className="absolute bottom-4 -right-4 sm:-right-8 z-30 text-[#9090A8]/50 text-xl sm:text-2xl md:text-3xl font-normal rotate-[-8deg] pointer-events-none select-none"
+                                style={{ fontFamily: 'Caveat, cursive' }}
+                            >
+                                Kushal Kurapati
+                            </div>
+                        </motion.div>
+                    </div>
+
+                    {/* ── RIGHT COLUMN: BEYOND THE MACHINE (PERSONALITY) ── */}
+                    <motion.div
+                        style={{
+                            x: isMobile ? 0 : textTiltX,
+                            y: isMobile ? 0 : textTiltY,
+                        }}
+                        className="hero-right-pane z-20 flex-1 max-w-[240px] text-left lg:text-left flex flex-col justify-center"
+                    >
+                        {/* Reframed Header */}
+                        <div className="font-mono text-[10px] sm:text-xs text-[#9090A8] tracking-[0.25em] uppercase mb-2">
+                            BEYOND
+                            <br />
+                            THE MACHINE
                         </div>
 
-                        {/* KURAPATI — gold-struck block */}
-                        <div className="relative inline-block">
-                            <div
-                                className="paint-reveal absolute -inset-x-6 -inset-y-2 bg-[#A855F7] -skew-x-12 z-0 mix-blend-multiply opacity-80"
-                                style={{ clipPath: 'polygon(2% 0%, 100% 0%, 98% 100%, 0% 100%)' }}
-                            />
-                            <div
-                                className={`relative z-10 mix-blend-screen transition-opacity duration-500 ${startNameAnimation ? 'opacity-100' : 'opacity-0'}`}
+                        {/* Organic Handwritten Contrast Elements */}
+                        <div className="space-y-0 my-1 select-none">
+                            <div 
+                                className="text-4xl sm:text-5xl md:text-6xl font-bold text-[#FFD700] leading-[0.95]"
+                                style={{ fontFamily: 'Caveat, cursive' }}
                             >
-                                <DecryptedText
-                                    text="KURAPATI"
-                                    speed={60}
-                                    maxIterations={20}
-                                    sequential
-                                    revealDirection="start"
-                                    className="text-6xl md:text-8xl lg:text-[8.5rem] font-black text-white leading-[0.85] tracking-tight"
-                                    encryptedClassName="text-white/20"
-                                    animateOn={startNameAnimation ? 'view' : ''}
-                                    style={{ fontFamily: 'Bebas Neue, sans-serif' }}
-                                />
+                                art.
+                            </div>
+                            <div 
+                                className="text-4xl sm:text-5xl md:text-6xl font-bold text-[#F0EDE8] leading-[0.95]"
+                                style={{ fontFamily: 'Caveat, cursive' }}
+                            >
+                                cook.
+                            </div>
+                            <div 
+                                className="text-4xl sm:text-5xl md:text-6xl font-bold text-[#A855F7] leading-[0.95]"
+                                style={{ fontFamily: 'Caveat, cursive' }}
+                            >
+                                life.
                             </div>
                         </div>
-                    </div>
 
-                    {/* ── Description ───────────────────────────────── */}
-                    <div className="hero-desc max-w-lg mx-auto mb-12 border-l-2 border-[#A855F7]/20 pl-5 text-left">
-                        <DecryptedText
-                            text="Surpassing limits. Painting the digital void with code and chaos."
-                            speed={15}
-                            sequential
-                            animateOn="view"
-                            revealDirection="start"
-                            className="text-[#9090A8] font-mono text-sm md:text-[0.9rem] leading-relaxed tracking-wider"
-                        />
-                    </div>
-
-                    {/* ── CTA Button ─────────────────────────────────── */}
-                    <button
-                        onClick={handleScroll}
-                        className="hero-btn group relative px-10 py-4 bg-transparent overflow-hidden border border-[#A855F7]/30 hover:border-[#A855F7] transition-all duration-500 cursor-interactive"
-                        aria-label="Dive deeper into portfolio"
-                    >
-                        {/* Hover fill */}
-                        <div className="absolute inset-0 bg-[#A855F7] translate-y-full group-hover:translate-y-0 transition-transform duration-300 opacity-10" />
-                        {/* Shimmer sweep */}
-                        <div
-                            className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out opacity-0 group-hover:opacity-100"
-                            style={{
-                                background: 'linear-gradient(90deg, transparent, rgba(255,215,0,0.12), transparent)',
-                            }}
-                        />
-                        <div className="flex items-center gap-4 relative z-10">
-                            <span className="text-xs font-mono text-white tracking-[0.3em] uppercase">
-                                <DecryptedText
-                                    text="Dive Deeper"
-                                    speed={80}
-                                    animateOn={startButtonText ? 'view' : ''}
-                                    className="text-[#ffffff]"
-                                />
-                            </span>
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                strokeWidth={2}
-                                stroke="currentColor"
-                                className="w-4 h-4 text-[#A855F7] group-hover:translate-y-1 transition-transform"
-                            >
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" />
-                            </svg>
+                        <div className="text-[10px] font-mono text-[#6B7280] tracking-widest uppercase mt-3">
+                            軌跡 · TRAJECTORY
                         </div>
-                    </button>
+                    </motion.div>
 
-                    {/* ── Social Links ───────────────────────────────── */}
-                    <div className="hero-btn flex items-center justify-center gap-6 mt-8 z-20 relative pointer-events-auto">
-                        <a 
-                            href="https://github.com/KVLNK12305" 
-                            target="_blank" 
-                            rel="noreferrer" 
-                            aria-label="GitHub" 
-                            className="text-white/40 hover:text-[#FFD700] hover:scale-110 transition-all duration-300 cursor-interactive p-2"
-                        >
-                            <Github size={22} strokeWidth={1.5} />
-                        </a>
-                        <a 
-                            href="https://www.linkedin.com/in/venkata-lakshmi-narasimha-kushal-kurapati-729ab4289/" 
-                            target="_blank" 
-                            rel="noreferrer" 
-                            aria-label="LinkedIn" 
-                            className="text-white/40 hover:text-[#A855F7] hover:scale-110 transition-all duration-300 cursor-interactive p-2"
-                        >
-                            <Linkedin size={22} strokeWidth={1.5} />
-                        </a>
-                    </div>
-
-                    {/* ── Scroll Indicator ──────────────────────────── */}
-                    {showScrollHint && (
-                        <div className="hero-btn absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-scroll-bounce z-20">
-                            <span
-                                className="font-mono text-[9px] tracking-[0.4em] text-white/25 uppercase"
-                                style={{ fontFamily: 'JetBrains Mono, monospace' }}
-                            >
-                                SCROLL
-                            </span>
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                strokeWidth={1.5}
-                                stroke="currentColor"
-                                className="w-4 h-4 text-[#FFD700]/40"
-                            >
-                                <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-                            </svg>
-                        </div>
-                    )}
                 </div>
 
-                {/* Lanyard - Desktop Only */}
-                {!isMobile && mountLanyard && (
-                    <div className="absolute inset-0 w-full h-full z-10 pointer-events-none overflow-hidden opacity-35 mix-blend-screen">
-                        <Lanyard position={[0, 0, 15]} gravity={[0, -30, 0]} transparent />
+                {/* ── 3. BOTTOM FOOTER BAR ───────────────────────────── */}
+                <footer className="hero-footer-bar relative z-30 w-full px-6 sm:px-12 md:px-16 pb-6 sm:pb-8 flex items-center justify-between text-xs font-mono text-[#9090A8] border-t border-white/5 pt-4">
+                    {/* Social Links */}
+                    <div className="flex items-center gap-5">
+                        <a
+                            href="https://github.com/KVLNK12305"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="GitHub"
+                            className="text-[#6B7280] hover:text-[#FFD700] hover:scale-110 transition-all p-1 cursor-interactive"
+                        >
+                            <Github size={16} />
+                        </a>
+                        <a
+                            href="https://www.linkedin.com/in/venkata-lakshmi-narasimha-kushal-kurapati-729ab4289/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="LinkedIn"
+                            className="text-[#6B7280] hover:text-[#A855F7] hover:scale-110 transition-all p-1 cursor-interactive"
+                        >
+                            <Linkedin size={16} />
+                        </a>
+                        <a
+                            href="mailto:kurapatikushal@gmail.com"
+                            aria-label="Email"
+                            className="text-[#6B7280] hover:text-white hover:scale-110 transition-all p-1 cursor-interactive"
+                        >
+                            <Mail size={16} />
+                        </a>
                     </div>
-                )}
+
+                    {/* Operational Signature */}
+                    <div className="hidden md:flex items-center gap-3 text-[11px] text-[#6B7280]">
+                        <span>KISEKI · KUSHAL KURAPATI</span>
+                        <span>·</span>
+                        <span className="text-[#FFD700]">STATUS ● OPERATIONAL</span>
+                    </div>
+
+                    {/* Domain Branding */}
+                    <div className="flex items-center gap-2 text-[#9090A8]">
+                        <Globe size={13} className="text-[#FFD700]" />
+                        <span className="font-mono">kushal.kiseki.dev</span>
+                    </div>
+                </footer>
             </div>
 
-            {/* Global grain overlay */}
-            <div className="absolute inset-0 pointer-events-none z-[60] opacity-[0.025] bg-pattern-noise" />
+            {/* Global Grain */}
+            <div className="absolute inset-0 pointer-events-none z-[60] opacity-[0.02] bg-pattern-noise" />
         </section>
     );
 };
