@@ -4,7 +4,7 @@
    ============================================================ */
 
 /* 1. FONT IMPORTS */
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Caveat:wght@400;600;700&display=swap');
 
 @import "tailwindcss";
 @import "tw-animate-css";
@@ -68,12 +68,19 @@
 
   html {
     scroll-behavior: auto;
-    cursor: none;
     /* Invisible scrollbar — no gradient, no visual artifacts */
     scrollbar-width: none; /* Firefox */
   }
   html::-webkit-scrollbar {
     display: none; /* Chrome/Safari/Edge */
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    html, body, *, *::before, *::after,
+    a, button, input, textarea, select, [role="button"],
+    .cursor-pointer, .cursor-interactive, .cursor-default {
+      cursor: none !important;
+    }
   }
 
   body {
@@ -133,136 +140,64 @@
 }
 
 /* ============================================================
-   4. MILITARY CURSOR SYSTEM
+   4. TUX PENGUIN & DUCKCHAIN HYBRID CURSOR SYSTEM
    ============================================================ */
-.cursor-military {
+.cursor-hybrid {
   position: fixed;
   top: 0;
   left: 0;
   pointer-events: none;
   z-index: 9999;
-  margin-left: -16px;
-  margin-top: -16px;
-  width: 32px;
-  height: 32px;
+  margin-left: -22px;
+  margin-top: -22px;
+  width: 52px;
+  height: 52px;
   will-change: transform;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.cursor-ring {
+.cursor-tux, .cursor-duck {
   position: absolute;
   inset: 0;
-  border-radius: 50%;
-  border: 1px solid rgba(255, 215, 0, 0.7);
-  transition: transform 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-              border-color 0.15s ease,
-              border-width 0.15s ease;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: -webkit-optimize-contrast;
+  filter: drop-shadow(0 3px 10px rgba(0, 0, 0, 0.65));
+  transition: opacity 0.18s ease, transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.cursor-tick {
-  position: absolute;
-  background: rgba(255, 215, 0, 0.8);
-  transition: transform 0.15s ease, opacity 0.15s ease;
-}
-.cursor-tick-n, .cursor-tick-s {
-  width: 1px;
-  height: 5px;
-  left: 50%;
-  transform: translateX(-50%);
-}
-.cursor-tick-n { top: -7px; }
-.cursor-tick-s { bottom: -7px; }
-
-.cursor-tick-e, .cursor-tick-w {
-  height: 1px;
-  width: 5px;
-  top: 50%;
-  transform: translateY(-50%);
-}
-.cursor-tick-e { right: -7px; }
-.cursor-tick-w { left: -7px; }
-
-.cursor-dot {
-  position: absolute;
-  width: 3px;
-  height: 3px;
-  background: var(--gold);
-  border-radius: 50%;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  transition: transform 0.1s ease, width 0.15s ease, height 0.15s ease;
+.cursor-tux {
+  opacity: 1;
+  transform: scale(1);
 }
 
-/* LOCKED STATE — hover over interactive */
-.cursor-military.cursor-locked .cursor-ring {
-  transform: scale(1.6);
-  border-color: var(--gold);
-  border-width: 1.5px;
-}
-.cursor-military.cursor-locked .cursor-dot {
-  width: 5px;
-  height: 5px;
-}
-.cursor-military.cursor-locked .cursor-tick-n { transform: translateX(-50%) scaleY(0.5); }
-.cursor-military.cursor-locked .cursor-tick-s { transform: translateX(-50%) scaleY(0.5); }
-.cursor-military.cursor-locked .cursor-tick-e { transform: translateY(-50%) scaleX(0.5); }
-.cursor-military.cursor-locked .cursor-tick-w { transform: translateY(-50%) scaleX(0.5); }
-
-/* CLICK / FIRE STATE */
-.cursor-military.cursor-clicking .cursor-ring {
-  transform: scale(0.55);
-  border-color: #FFD700;
-  border-width: 2px;
-  transition: transform 0.08s cubic-bezier(0.34, 1.56, 0.64, 1),
-              border-color 0.08s ease;
-}
-.cursor-military.cursor-clicking .cursor-dot {
-  width: 7px;
-  height: 7px;
-  background: #FFD700;
-  box-shadow: 0 0 8px #FFD700, 0 0 16px rgba(255,215,0,0.5);
-  transition: all 0.08s ease;
-}
-.cursor-military.cursor-clicking .cursor-tick-n { transform: translateX(-50%) translateY(3px)  scaleY(0.35); }
-.cursor-military.cursor-clicking .cursor-tick-s { transform: translateX(-50%) translateY(-3px) scaleY(0.35); }
-.cursor-military.cursor-clicking .cursor-tick-e { transform: translateY(-50%) translateX(-3px) scaleX(0.35); }
-.cursor-military.cursor-clicking .cursor-tick-w { transform: translateY(-50%) translateX(3px)  scaleX(0.35); }
-
-/* CLICK RIPPLE BURST */
-.cursor-click-ripple {
-  position: fixed;
-  pointer-events: none;
-  z-index: 9998;
+.cursor-duck {
+  opacity: 0;
+  transform: scale(0.6) rotate(-15deg);
 }
 
-.cursor-click-ripple::before {
-  content: '';
-  position: absolute;
-  border-radius: 50%;
-  border: 1.5px solid rgba(255, 215, 0, 0.9);
-  transform: translate(-50%, -50%);
-  animation: cursor-burst-gold 0.5s cubic-bezier(0.2, 0.8, 0.4, 1) forwards;
+/* LOCKED / HOVER STATE — Switches from Tux to Duck pointer */
+.cursor-hybrid.cursor-locked .cursor-tux {
+  opacity: 0;
+  transform: scale(0.5);
 }
 
-.cursor-click-ripple::after {
-  content: '';
-  position: absolute;
-  border-radius: 50%;
-  border: 1px solid rgba(168, 85, 247, 0.7);
-  transform: translate(-50%, -50%);
-  animation: cursor-burst-purple 0.55s cubic-bezier(0.2, 0.8, 0.4, 1) 0.05s forwards;
+.cursor-hybrid.cursor-locked .cursor-duck {
+  opacity: 1;
+  transform: scale(1.15) rotate(0deg);
+  filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.65)) drop-shadow(0 2px 6px rgba(0, 0, 0, 0.7));
 }
 
-@keyframes cursor-burst-gold {
-  0%   { width: 6px;  height: 6px;  opacity: 1;   border-width: 2px; }
-  60%  { opacity: 0.6; border-width: 1.5px; }
-  100% { width: 58px; height: 58px; opacity: 0;   border-width: 0.5px; }
+/* CLICK STATE — Squish physics */
+.cursor-hybrid.cursor-clicking {
+  transform: scale(0.82);
+  transition: transform 0.08s ease;
 }
 
-@keyframes cursor-burst-purple {
-  0%   { width: 4px;  height: 4px;  opacity: 0.8; border-width: 1.5px; }
-  100% { width: 42px; height: 42px; opacity: 0;   border-width: 0.5px; }
-}
+
 
 /* ============================================================
    5. PER-SECTION BACKGROUND PATTERNS
