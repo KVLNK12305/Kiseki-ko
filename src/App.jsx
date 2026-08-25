@@ -5,13 +5,13 @@ import FloatingNav from './components/FloatingNav';
 
 // Components
 import Hero from './components/hero';
-import Main_story from './components/Basic_intro';
 import Arsenal from './components/FoE';
 import CertsExperience from './components/Experiences';
 import Ed_Timeline from './components/Edtimeline';
 import Projects from './components/Projects';
 import Honors_n_certs from './components/Honors_n_certs';
 import Climax from './components/climax';
+import SpatialRift from './components/sokulu/SpatialRift';
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -52,20 +52,8 @@ function App() {
       if (target) cursor.classList.remove('cursor-locked');
     };
 
-    // ── Click / Fire state — compress + dual shockwave rings ──
-    const spawnRipple = (x, y) => {
-      const ripple = document.createElement('div');
-      ripple.className = 'cursor-click-ripple';
-      ripple.style.left = `${x}px`;
-      ripple.style.top  = `${y}px`;
-      document.body.appendChild(ripple);
-      // Self-destruct after longest animation (0.55s + 0.05s delay + buffer)
-      setTimeout(() => ripple.remove(), 750);
-    };
-
-    const handleMouseDown = (e) => {
+    const handleMouseDown = () => {
       cursor.classList.add('cursor-clicking');
-      spawnRipple(e.clientX, e.clientY);
     };
     const handleMouseUp = () => {
       cursor.classList.remove('cursor-clicking');
@@ -98,18 +86,26 @@ function App() {
   return (
     <div className="bg-[#030305] min-h-screen">
 
-      {/* ── Military Crosshair Cursor ─────────────────────────── */}
+      {/* ── Tux Penguin & DuckChain Hybrid Cursor ─────────────── */}
       <div
         ref={cursorRef}
-        className="cursor-military hidden md:block transition-opacity duration-200"
+        className="cursor-hybrid hidden md:flex transition-opacity duration-200"
         aria-hidden="true"
       >
-        <div className="cursor-ring" />
-        <div className="cursor-tick cursor-tick-n" />
-        <div className="cursor-tick cursor-tick-s" />
-        <div className="cursor-tick cursor-tick-e" />
-        <div className="cursor-tick cursor-tick-w" />
-        <div className="cursor-dot" />
+        {/* Normal state: Linux Tux Penguin */}
+        <img
+          src="/cursors/tux-cursor.png"
+          alt="Tux Cursor"
+          className="cursor-tux"
+          draggable="false"
+        />
+        {/* Interactive Hover state: DuckChain Duck Pointer */}
+        <img
+          src="/cursors/duck-pointer.png"
+          alt="Duck Pointer"
+          className="cursor-duck"
+          draggable="false"
+        />
       </div>
 
       {/* ── Boot Sequence ─────────────────────────────────────── */}
@@ -124,18 +120,31 @@ function App() {
           <Hero />
 
           <div className="relative z-20 bg-[#030305]">
-            <Main_story />
+            <SpatialRift label="01 · ACTIVE DEFENSE & SECURITY" kanji="防衛" />
 
-            {/* Section Separator */}
-            <div className="h-px w-full bg-gradient-to-r from-transparent via-[#A855F7]/20 to-transparent my-16" />
+            <div id="security">
+              <Arsenal />
+              <CertsExperience />
+              <Ed_Timeline />
+            </div>
 
-            <Arsenal />
-            <CertsExperience />
-            <Ed_Timeline />
+            <SpatialRift label="02 · SYSTEMS & DEPLOYMENTS" kanji="領域" />
 
-            <Projects />
-            <Honors_n_certs />
-            <Climax />
+            <div id="systems">
+              <Projects />
+            </div>
+
+            <SpatialRift label="03 · ARCHIVE & EVIDENCE" kanji="栄誉" />
+
+            <div id="archive">
+              <Honors_n_certs />
+            </div>
+
+            <SpatialRift label="04 · SINGULARITY & CONTACT" kanji="極致" />
+
+            <div id="contact">
+              <Climax />
+            </div>
           </div>
         </main>
       </div>

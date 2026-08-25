@@ -253,7 +253,7 @@ const Preloader = ({ onComplete }) => {
                     className="font-mono-ui text-xs md:text-sm tracking-[0.4em] text-[#A855F7]/70 uppercase mb-10"
                     style={{ fontFamily: 'JetBrains Mono, monospace', opacity: 0 }}
                 >
-                    // portfolio.v4 &nbsp;::&nbsp; initializing
+                    KISEKI &nbsp;·&nbsp; INITIALIZING SYSTEM
                 </p>
 
                 {/* ── Percentage Counter ─── */}

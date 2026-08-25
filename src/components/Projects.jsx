@@ -302,7 +302,7 @@ const ProjectSlide = ({ project }) => {
                         <div className="bg-[#0D0D14] p-8 rounded-xl border border-white/[0.06] relative overflow-hidden group">
                             <div className="flex items-center justify-between mb-6">
                                 <span className="font-mono text-[10px] tracking-[0.4em] text-white/20 uppercase">
-                                    CASE FILE // {project.id}
+                                    CASE FILE · {project.id}
                                 </span>
                                 <div className="flex items-center gap-2">
                                     <span
@@ -401,7 +401,7 @@ const MobileBentoCard = ({ project, index, onOpenVideo }) => {
             <div className="relative z-20 flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                     <span className="font-mono text-[9px] tracking-[0.25em] text-white/30 uppercase">
-                        FILE // {project.id}
+                        FILE · {project.id}
                     </span>
                     {project.video && (
                         <span className="inline-flex items-center gap-1 text-[8.5px] font-mono text-[#FFD700] bg-[#FFD700]/10 border border-[#FFD700]/30 px-2 py-0.5 rounded-full">
@@ -509,7 +509,7 @@ const Projects = () => {
             <section id="projects" className="relative py-16 bg-[#08080E] min-h-screen flex flex-col px-6">
                 <div className="mb-10 space-y-3">
                     <div className="flex items-center gap-2 text-[#FFD700] text-xs tracking-[0.2em] opacity-80">
-                        <span>// CLASSIFIED_ARCHIVES</span>
+                        <span>CLASSIFIED ARCHIVES</span>
                         <span className="w-12 h-[1px] bg-[#FFD700]/50" />
                         <span>STATUS: ACTIVE</span>
                     </div>
