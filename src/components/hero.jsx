@@ -3,14 +3,14 @@ import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
-import { Github, Linkedin, Mail, ArrowRight, ArrowUpRight, Globe } from 'lucide-react';
+import { Github, Linkedin, Mail, ArrowRight, Zap, Globe } from 'lucide-react';
 import useIsMobile from '../hooks/useIsMobile';
 import profileImg from './images/me.png';
 
 gsap.registerPlugin(ScrollTrigger);
 
 // ── Subtle Celestial Sparkle Engine ───────────────────────────
-const CelestialField = React.memo(() => {
+const CelestialField = React.memo(({ overdrive }) => {
     const canvasRef = useRef(null);
 
     useEffect(() => {
@@ -19,7 +19,7 @@ const CelestialField = React.memo(() => {
         const ctx = canvas.getContext('2d');
         let w, h, animationFrame;
         const particles = [];
-        const MAX_P = 28;
+        const MAX_P = overdrive ? 50 : 28;
 
         const resize = () => {
             w = canvas.width = window.innerWidth;
@@ -31,12 +31,12 @@ const CelestialField = React.memo(() => {
             reset() {
                 this.x = Math.random() * (w || window.innerWidth);
                 this.y = Math.random() * (h || window.innerHeight);
-                this.vx = (Math.random() - 0.5) * 0.2;
-                this.vy = (Math.random() - 0.5) * 0.2;
-                this.size = Math.random() * 1.2 + 0.3;
+                this.vx = (Math.random() - 0.5) * (overdrive ? 0.4 : 0.2);
+                this.vy = (Math.random() - 0.5) * (overdrive ? 0.4 : 0.2);
+                this.size = Math.random() * (overdrive ? 1.8 : 1.2) + 0.3;
                 this.life = 0;
                 this.maxLife = Math.random() * 140 + 70;
-                this.isGold = Math.random() > 0.45;
+                this.isGold = Math.random() > 0.4;
             }
             update() {
                 this.x += this.vx;
@@ -46,10 +46,10 @@ const CelestialField = React.memo(() => {
             }
             draw() {
                 const prog = this.life / this.maxLife;
-                const alpha = prog < 0.5 ? (prog / 0.5) * 0.5 : ((1 - prog) / 0.5) * 0.5;
+                const alpha = prog < 0.5 ? (prog / 0.5) * 0.6 : ((1 - prog) / 0.5) * 0.6;
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fillStyle = this.isGold ? `rgba(255, 215, 0, ${alpha})` : `rgba(168, 85, 247, ${alpha * 0.7})`;
+                ctx.fillStyle = this.isGold ? `rgba(255, 215, 0, ${alpha})` : `rgba(168, 85, 247, ${alpha * 0.8})`;
                 ctx.fill();
             }
         }
@@ -78,7 +78,7 @@ const CelestialField = React.memo(() => {
             window.removeEventListener('resize', resize);
             cancelAnimationFrame(animationFrame);
         };
-    }, []);
+    }, [overdrive]);
 
     return <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none z-0" />;
 });
@@ -94,7 +94,8 @@ const Hero = () => {
     const [currentTime, setCurrentTime] = useState('');
     const [domainOverdrive, setDomainOverdrive] = useState(false);
 
-    const triggerDomainBurst = useCallback(() => {
+    const triggerDomainBurst = useCallback((e) => {
+        if (e) e.stopPropagation();
         setDomainOverdrive(prev => !prev);
     }, []);
 
@@ -163,11 +164,6 @@ const Hero = () => {
         if (target) target.scrollIntoView({ behavior: 'smooth' });
     }, []);
 
-    const handleOverclock = useCallback(() => {
-        const target = document.getElementById('lab') || document.getElementById('archive') || document.getElementById('projects');
-        if (target) target.scrollIntoView({ behavior: 'smooth' });
-    }, []);
-
     return (
         <section
             id="home"
@@ -180,20 +176,24 @@ const Hero = () => {
             <div ref={flashRef} className="absolute inset-0 z-[60] bg-white pointer-events-none opacity-0" />
 
             <div ref={slashRef} className="relative w-full h-full flex flex-col justify-between">
-                <CelestialField />
+                <CelestialField overdrive={domainOverdrive} />
 
                 {/* Restrained Atmospheric Lighting */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] sm:w-[1200px] h-[700px] bg-gradient-to-r from-[#A855F7]/10 via-[#FFD700]/10 to-[#EAB308]/08 rounded-full blur-[180px] pointer-events-none z-0" />
+                <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] sm:w-[1200px] h-[700px] rounded-full blur-[180px] pointer-events-none z-0 transition-all duration-700 ${
+                    domainOverdrive 
+                        ? 'bg-gradient-to-r from-[#EF4444]/20 via-[#FFD700]/22 to-[#A855F7]/18 scale-110' 
+                        : 'bg-gradient-to-r from-[#A855F7]/10 via-[#FFD700]/10 to-[#EAB308]/08'
+                }`} />
 
                 {/* ── 1. TOP HEADER BAR ──────────────────────────────── */}
                 <header className="hero-header-bar relative z-30 w-full px-6 sm:px-12 md:px-16 pt-6 sm:pt-8 flex items-center justify-between text-xs font-mono tracking-widest text-[#9090A8] uppercase border-b border-white/5 pb-4">
                     <div className="flex items-center gap-3">
                         <span className="flex h-2 w-2 relative">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FFD700] opacity-75" />
-                            <span className="relative inline-flex rounded-full h-2 w-2 bg-[#FFD700]" />
+                            <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${domainOverdrive ? 'bg-red-400' : 'bg-[#FFD700]'}`} />
+                            <span className={`relative inline-flex rounded-full h-2 w-2 ${domainOverdrive ? 'bg-red-500' : 'bg-[#FFD700]'}`} />
                         </span>
                         <span className="text-[#F0EDE8] font-medium tracking-widest">
-                            KISEKI · ARCHITECT
+                            {domainOverdrive ? 'KISEKI · OVERCLOCK ACTIVE' : 'KISEKI · ARCHITECT'}
                         </span>
                     </div>
 
@@ -224,9 +224,9 @@ const Hero = () => {
                                 key={i}
                                 className="editorial-line"
                                 d={`M ${220 + offset * 1.3} 0 C ${380 + offset} 220, ${480 + offset} 480, ${720 + offset * 1.1} 800`}
-                                stroke="#FFD700"
-                                strokeWidth="1"
-                                strokeOpacity={0.6 - i * 0.07}
+                                stroke={domainOverdrive ? '#EF4444' : '#FFD700'}
+                                strokeWidth={domainOverdrive ? '1.5' : '1'}
+                                strokeOpacity={domainOverdrive ? 0.8 - i * 0.08 : 0.6 - i * 0.07}
                                 strokeDasharray="500"
                                 strokeDashoffset="0"
                             />
@@ -283,17 +283,21 @@ const Hero = () => {
                             </button>
 
                             <button
-                                onClick={handleOverclock}
-                                className="group inline-flex items-center gap-2 px-5 py-3.5 bg-transparent border border-[#A855F7]/35 hover:border-[#A855F7] text-xs font-mono uppercase tracking-widest text-[#A855F7] transition-all duration-300 rounded-none cursor-interactive"
+                                onClick={triggerDomainBurst}
+                                className={`group inline-flex items-center gap-2 px-5 py-3.5 text-xs font-mono uppercase tracking-widest transition-all duration-300 rounded-none cursor-interactive ${
+                                    domainOverdrive
+                                        ? 'bg-[#A855F7]/20 border border-[#A855F7] text-white shadow-[0_0_20px_rgba(168,85,247,0.4)]'
+                                        : 'bg-transparent border border-[#A855F7]/35 hover:border-[#A855F7] text-[#A855F7]'
+                                }`}
                             >
-                                <span>OVERCLOCK</span>
-                                <ArrowUpRight size={14} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                                <Zap size={14} className={domainOverdrive ? 'text-[#FFD700] animate-bounce' : 'text-[#A855F7]'} />
+                                <span>{domainOverdrive ? 'OVERCLOCK ACTIVE' : 'OVERCLOCK'}</span>
                             </button>
                         </div>
                     </motion.div>
 
-                    {/* ── CENTER: OPERATOR IDENTITY PORTRAIT (CLEAN NO BEHIND TEXT) ── */}
-                    <div className="relative z-10 flex-1 flex items-end justify-center w-full h-[58vh] sm:h-[70vh] md:h-[78vh] max-h-[800px] pointer-events-none">
+                    {/* ── CENTER: OPERATOR IDENTITY PORTRAIT ────────── */}
+                    <div className="relative z-20 flex-1 flex items-end justify-center w-full h-[58vh] sm:h-[70vh] md:h-[78vh] max-h-[800px]">
                         {/* Portrait Image Wrapper */}
                         <motion.div
                             style={{
@@ -307,7 +311,11 @@ const Hero = () => {
                                 src={profileImg}
                                 alt="Kushal Kurapati"
                                 draggable="false"
-                                className="relative z-10 w-full h-full object-contain object-bottom filter grayscale contrast-[1.12] brightness-[1.04] transition-all duration-700 hover:filter-none"
+                                className={`relative z-10 w-full h-full object-contain object-bottom transition-all duration-700 pointer-events-none select-none ${
+                                    domainOverdrive
+                                        ? 'filter-none drop-shadow-[0_0_50px_rgba(255,215,0,0.7)] contrast-[1.15]'
+                                        : 'filter grayscale contrast-[1.12] brightness-[1.04] hover:filter-none'
+                                }`}
                                 style={{
                                     maskImage: 'linear-gradient(to bottom, black 85%, transparent 100%)',
                                     WebkitMaskImage: 'linear-gradient(to bottom, black 85%, transparent 100%)',
@@ -318,21 +326,25 @@ const Hero = () => {
                             <motion.button
                                 type="button"
                                 onClick={triggerDomainBurst}
-                                whileHover={{ scale: 1.25, rotate: -5 }}
-                                whileTap={{ scale: 0.9 }}
+                                whileHover={{ scale: 1.25, rotate: -8 }}
+                                whileTap={{ scale: 0.88 }}
                                 initial={{ opacity: 0, scale: 0.8 }}
                                 animate={{ opacity: 1, scale: 1 }}
-                                transition={{ duration: 0.8, delay: 0.5 }}
-                                className="absolute top-4 right-2 sm:right-6 z-30 pointer-events-auto cursor-interactive p-2 rounded-full bg-white/[0.03] hover:bg-[#FFD700]/15 border border-white/10 hover:border-[#FFD700]/50 transition-colors duration-300"
+                                transition={{ duration: 0.5 }}
+                                className={`absolute top-4 right-2 sm:right-6 z-40 p-2.5 rounded-full cursor-interactive border transition-all duration-300 ${
+                                    domainOverdrive
+                                        ? 'bg-[#EF4444]/20 border-[#EF4444] shadow-[0_0_30px_rgba(239,68,68,0.7)]'
+                                        : 'bg-black/40 hover:bg-[#FFD700]/15 border-white/15 hover:border-[#FFD700]/60 shadow-[0_0_20px_rgba(0,0,0,0.5)]'
+                                }`}
                                 title="Toggle Domain Overclock (月)"
                                 aria-label="Toggle Domain Overclock"
                             >
                                 <svg
                                     viewBox="0 0 24 24"
-                                    className={`w-6 h-6 sm:w-7 sm:h-7 transition-all duration-500 -rotate-12 ${
+                                    className={`w-6 h-6 sm:w-8 sm:h-8 transition-all duration-500 -rotate-12 ${
                                         domainOverdrive
                                             ? 'text-[#EF4444] drop-shadow-[0_0_24px_rgba(239,68,68,0.95)]'
-                                            : 'text-[#FFD700] drop-shadow-[0_0_14px_rgba(255,215,0,0.5)] hover:drop-shadow-[0_0_24px_rgba(255,215,0,0.9)]'
+                                            : 'text-[#FFD700] drop-shadow-[0_0_14px_rgba(255,215,0,0.6)]'
                                     }`}
                                     fill="currentColor"
                                 >
@@ -429,7 +441,9 @@ const Hero = () => {
                     <div className="hidden md:flex items-center gap-3 text-[11px] text-[#6B7280]">
                         <span>KISEKI · KUSHAL KURAPATI</span>
                         <span>·</span>
-                        <span className="text-[#FFD700]">STATUS ● OPERATIONAL</span>
+                        <span className={domainOverdrive ? 'text-red-400 font-bold' : 'text-[#FFD700]'}>
+                            {domainOverdrive ? 'STATUS ● OVERCLOCK' : 'STATUS ● OPERATIONAL'}
+                        </span>
                     </div>
 
                     {/* Domain Branding */}
