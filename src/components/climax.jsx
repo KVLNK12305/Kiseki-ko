@@ -1,5 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import DecryptedText from './sokulu/DecryptedText';
+import DevPrism3D from './sokulu/DevPrism3D';
+import useIsMobile from '../hooks/useIsMobile';
 
 // ── Black Hole Vortex Canvas ───────────────────────────────────
 const VortexCanvas = ({ containerRef }) => {
@@ -168,6 +170,7 @@ const StaticVortex = () => (
 // ── Main Climax Component ─────────────────────────────────────
 const Climax = () => {
     const canvasRef = useRef(null);
+    const isMobile = useIsMobile();
 
     // Detect reduced motion preference
     const prefersReducedMotion =
@@ -196,9 +199,16 @@ const Climax = () => {
                 )}
             </div>
 
+            {/* 3D Developer Prism in the Singularity Vortex (Desktop Only) */}
+            {!isMobile && (
+                <div className="absolute inset-0 z-[1] pointer-events-none opacity-45">
+                    <DevPrism3D />
+                </div>
+            )}
+
             {/* Radial mask — darkens edges to frame the content */}
             <div
-                className="absolute inset-0 z-[1] pointer-events-none"
+                className="absolute inset-0 z-[2] pointer-events-none"
                 style={{
                     background: 'radial-gradient(ellipse at center, transparent 20%, rgba(0,0,0,0.7) 70%, rgba(0,0,0,0.95) 100%)',
                 }}
@@ -212,7 +222,7 @@ const Climax = () => {
                     className="font-mono text-[10px] tracking-[0.5em] text-[#A855F7]/60 uppercase mb-6"
                     style={{ fontFamily: 'JetBrains Mono, monospace' }}
                 >
-                    // 06 &nbsp;·&nbsp; WHAT'S NEXT
+                    06 &nbsp;·&nbsp; WHAT'S NEXT
                 </p>
 
                 {/* Main heading — Playfair italic */}
@@ -255,7 +265,7 @@ const Climax = () => {
                     className="font-mono text-[11px] text-white/30 tracking-[0.35em] uppercase mb-12"
                     style={{ fontFamily: 'JetBrains Mono, monospace' }}
                 >
-                    // currently accepting new missions
+                    CURRENTLY ACCEPTING NEW MISSIONS
                 </p>
 
                 {/* CTA */}

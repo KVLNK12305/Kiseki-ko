@@ -190,7 +190,7 @@ const CareerFrame = ({ data }) => (
                 className="text-[10px] tracking-[0.5em] uppercase"
                 style={{ fontFamily: 'var(--font-mono)', color: 'rgba(255,215,0,0.25)' }}
             >
-                FRAME_{data.frame} &nbsp;//&nbsp; {data.type}
+                FRAME_{data.frame} &nbsp;·&nbsp; {data.type}
             </span>
             <span
                 className="text-[10px] tracking-[0.3em]"

@@ -1,18 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-    Home, User, Cpu, Briefcase, FolderGit2,
-    Award, Mail, Github, Linkedin
+    Home, Shield, Cpu, Award, Mail, Github, Linkedin
 } from 'lucide-react';
 
 const NAV_CONFIG = [
-    { label: 'Home',       targetId: 'home',         Icon: Home },
-    { label: 'About',      targetId: 'about',         Icon: User },
-    { label: 'Skills',     targetId: 'arsenal',       Icon: Cpu },
-    { label: 'Experience', targetId: 'experience',    Icon: Briefcase },
-    { label: 'Projects',   targetId: 'projects',      Icon: FolderGit2 },
-    { label: 'Honors',     targetId: 'publications',  Icon: Award },
-    { label: 'Contact',    targetId: 'contact',       Icon: Mail },
+    { label: '00 · Origin',     targetId: 'home',         Icon: Home },
+    { label: '01 · Security',   targetId: 'security',     Icon: Shield },
+    { label: '02 · Systems',    targetId: 'systems',      Icon: Cpu },
+    { label: '03 · Archive',    targetId: 'archive',      Icon: Award },
+    { label: '04 · Contact',    targetId: 'contact',      Icon: Mail },
 ];
 
 const SOCIALS = [

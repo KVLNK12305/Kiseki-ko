@@ -126,7 +126,7 @@ const Arsenal = () => {
         {/* HEADER */}
         <div className="mb-12 space-y-4">
           <div className="flex items-center gap-2 text-[#FFD700] text-xs tracking-[0.2em] opacity-80">
-            <span>// SYSTEM_INVENTORY</span>
+            <span>SYSTEM INVENTORY</span>
             <span className="w-12 h-[1px] bg-[#FFD700]/50" />
             <span>STATUS: ACTIVE</span>
           </div>

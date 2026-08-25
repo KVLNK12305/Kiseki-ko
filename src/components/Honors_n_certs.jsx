@@ -243,7 +243,7 @@ const Honors_n_certs = () => {
                     </div>
                     <div>
                         <p className="font-mono text-[10px] tracking-[0.4em] text-[#A855F7]/70 uppercase mb-2">
-                            // RECOGNITION & RESEARCH
+                            RECOGNITION &amp; RESEARCH
                         </p>
                         <h2
                             className="text-4xl md:text-5xl font-bold text-white leading-tight"
