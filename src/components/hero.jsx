@@ -134,37 +134,34 @@ const Hero = () => {
         mouseY.set(0);
     };
 
-    // ── Smooth Entrance Animation ──────────────────────────────
+    // ── Smooth Entrance & Living Topology ──────────────────────────
     useGSAP(() => {
-        const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
-
-        tl.fromTo(flashRef.current,
-            { opacity: 0.6 },
-            { opacity: 0, duration: 0.45, ease: 'power2.out' }
-        )
-        .fromTo(slashRef.current,
-            { clipPath: 'polygon(0 49%, 100% 49%, 100% 51%, 0 51%)' },
-            { clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)', duration: 1.1, ease: 'expo.inOut' },
-            '-=0.35'
-        );
-
         if (contourSvgRef.current) {
-            tl.fromTo('.editorial-line',
+            gsap.fromTo('.editorial-line',
                 { strokeDashoffset: 500 },
-                { strokeDashoffset: 0, duration: 1.4, stagger: 0.05, ease: 'power2.out' },
-                '-=0.6'
+                {
+                    strokeDashoffset: 0,
+                    duration: 1.4,
+                    stagger: 0.05,
+                    ease: 'power2.out',
+                    onComplete: () => {
+                        // Continuous living topological contour sweep
+                        if (!isMobile) {
+                            gsap.to('.editorial-line', {
+                                strokeDashoffset: -500,
+                                duration: 28,
+                                ease: 'none',
+                                repeat: -1,
+                            });
+                        }
+                    }
+                }
             );
         }
-
-        tl.fromTo(['.hero-left-pane', '.hero-right-pane', '.hero-header-bar', '.hero-footer-bar'],
-            { opacity: 0, y: 20 },
-            { opacity: 1, y: 0, duration: 0.8, stagger: 0.1, ease: 'power2.out' },
-            '-=0.8'
-        );
-    }, { scope: sectionRef });
+    }, { scope: sectionRef, dependencies: [isMobile] });
 
     const handleEnterDomain = useCallback(() => {
-        const target = document.getElementById('systems') || document.getElementById('arsenal') || document.getElementById('projects');
+        const target = document.getElementById('security');
         if (target) target.scrollIntoView({ behavior: 'smooth' });
     }, []);
 
@@ -183,21 +180,18 @@ const Hero = () => {
                 {!isMobile ? (
                     <CelestialField overdrive={domainOverdrive} />
                 ) : (
-                    <div className={`absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] transition-all duration-1000 pointer-events-none ${
-                        domainOverdrive
+                    <div className={`absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] transition-all duration-1000 pointer-events-none ${domainOverdrive
                             ? 'from-[#EF4444]/20 via-[#A855F7]/10 to-transparent scale-110'
                             : 'from-[#FFD700]/5 via-transparent to-transparent scale-100'
-                    }`} />
+                        }`} />
                 )}
 
                 {/* Restrained Atmospheric Lighting */}
-                <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full pointer-events-none z-0 transition-all duration-700 ${
-                    isMobile ? 'w-[400px] h-[400px] blur-[100px]' : 'w-[600px] sm:w-[900px] lg:w-[1200px] h-[500px] lg:h-[700px] blur-[160px]'
-                } ${
-                    domainOverdrive 
-                        ? 'bg-gradient-to-r from-[#EF4444]/18 via-[#FFD700]/20 to-[#A855F7]/16 scale-110' 
+                <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full pointer-events-none z-0 transition-all duration-700 ${isMobile ? 'w-[400px] h-[400px] blur-[100px]' : 'w-[600px] sm:w-[900px] lg:w-[1200px] h-[500px] lg:h-[700px] blur-[160px]'
+                    } ${domainOverdrive
+                        ? 'bg-gradient-to-r from-[#EF4444]/18 via-[#FFD700]/20 to-[#A855F7]/16 scale-110'
                         : 'bg-gradient-to-r from-[#A855F7]/10 via-[#FFD700]/10 to-[#EAB308]/08'
-                }`} />
+                    }`} />
 
                 {/* ── 1. TOP HEADER BAR ──────────────────────────────── */}
                 <header className="hero-header-bar relative z-30 w-full px-5 sm:px-10 lg:px-16 pt-5 lg:pt-8 flex items-center justify-between text-xs font-mono tracking-widest text-[#9090A8] uppercase border-b border-white/5 pb-3.5">
@@ -224,7 +218,7 @@ const Hero = () => {
 
                 {/* ── 2. CENTER IMMERSIVE STAGE ──────────────────────── */}
                 <div className="relative z-20 flex-1 w-full max-w-[1700px] mx-auto px-5 sm:px-10 lg:px-16 flex flex-col lg:flex-row items-center justify-between gap-6 lg:gap-8 py-4 lg:py-2">
-                    
+
                     {/* Generative Vector Topological Contour Waves (Desktop/Tablet) */}
                     {!isMobile && (
                         <motion.svg
@@ -264,7 +258,7 @@ const Hero = () => {
                         </div>
 
                         {/* Primary Visual Statement: SYSTEMS */}
-                        <h1 
+                        <h1
                             className="text-5xl sm:text-7xl lg:text-[7.5rem] font-normal text-[#F0EDE8] mb-2 sm:mb-3 tracking-tight leading-[0.9]"
                             style={{ fontFamily: 'Playfair Display, Georgia, serif' }}
                         >
@@ -310,11 +304,10 @@ const Hero = () => {
                             {!isMobile && (
                                 <button
                                     onClick={triggerDomainBurst}
-                                    className={`group inline-flex items-center gap-2 px-4 sm:px-5 py-3 sm:py-3.5 text-[11px] sm:text-xs font-mono uppercase tracking-widest transition-all duration-300 rounded-none cursor-interactive ${
-                                        domainOverdrive
+                                    className={`group inline-flex items-center gap-2 px-4 sm:px-5 py-3 sm:py-3.5 text-[11px] sm:text-xs font-mono uppercase tracking-widest transition-all duration-300 rounded-none cursor-interactive ${domainOverdrive
                                             ? 'bg-[#A855F7]/20 border border-[#A855F7] text-white shadow-[0_0_20px_rgba(168,85,247,0.4)]'
                                             : 'bg-transparent border border-[#A855F7]/35 hover:border-[#A855F7] text-[#A855F7]'
-                                    }`}
+                                        }`}
                                 >
                                     <Zap size={14} className={domainOverdrive ? 'text-[#FFD700] animate-bounce' : 'text-[#A855F7]'} />
                                     <span>{domainOverdrive ? 'OVERCLOCK ACTIVE' : 'OVERCLOCK'}</span>
@@ -338,11 +331,10 @@ const Hero = () => {
                                 src={profileImg}
                                 alt="Kushal Kurapati"
                                 draggable="false"
-                                className={`relative z-10 w-full h-full object-contain object-bottom transition-all duration-700 pointer-events-none select-none ${
-                                    domainOverdrive
+                                className={`relative z-10 w-full h-full object-contain object-bottom transition-all duration-700 pointer-events-none select-none ${domainOverdrive
                                         ? 'filter-none drop-shadow-[0_0_50px_rgba(239,68,68,0.6)] contrast-[1.15]'
                                         : 'filter grayscale contrast-[1.12] brightness-[1.04] hover:filter-none'
-                                }`}
+                                    }`}
                                 style={{
                                     maskImage: 'linear-gradient(to bottom, black 85%, transparent 100%)',
                                     WebkitMaskImage: 'linear-gradient(to bottom, black 85%, transparent 100%)',
@@ -358,21 +350,19 @@ const Hero = () => {
                                 initial={{ opacity: 0, scale: 0.8 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 transition={{ duration: 0.5 }}
-                                className={`absolute top-2 sm:top-4 right-1 sm:right-4 z-40 p-2 sm:p-2.5 rounded-full cursor-interactive border transition-all duration-300 ${
-                                    domainOverdrive
+                                className={`absolute top-2 sm:top-4 right-1 sm:right-4 z-40 p-2 sm:p-2.5 rounded-full cursor-interactive border transition-all duration-300 ${domainOverdrive
                                         ? 'bg-[#EF4444]/20 border-[#EF4444] shadow-[0_0_25px_rgba(239,68,68,0.7)]'
                                         : 'bg-black/50 hover:bg-[#FFD700]/15 border-white/15 hover:border-[#FFD700]/60 shadow-[0_0_15px_rgba(0,0,0,0.5)]'
-                                }`}
+                                    }`}
                                 title="Toggle Domain Overclock (月)"
                                 aria-label="Toggle Domain Overclock"
                             >
                                 <svg
                                     viewBox="0 0 24 24"
-                                    className={`w-5 h-5 sm:w-7 sm:h-7 transition-all duration-500 -rotate-12 ${
-                                        domainOverdrive
+                                    className={`w-5 h-5 sm:w-7 sm:h-7 transition-all duration-500 -rotate-12 ${domainOverdrive
                                             ? 'text-[#EF4444] drop-shadow-[0_0_20px_rgba(239,68,68,0.95)]'
                                             : 'text-[#FFD700] drop-shadow-[0_0_12px_rgba(255,215,0,0.6)]'
-                                    }`}
+                                        }`}
                                     fill="currentColor"
                                 >
                                     <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
@@ -380,7 +370,7 @@ const Hero = () => {
                             </motion.button>
 
                             {/* Handwritten Signature Script */}
-                            <div 
+                            <div
                                 className="absolute bottom-2 sm:bottom-4 -right-2 sm:-right-6 z-30 text-[#9090A8]/50 text-xl sm:text-3xl font-normal rotate-[-8deg] pointer-events-none select-none"
                                 style={{ fontFamily: 'Caveat, cursive' }}
                             >
@@ -406,19 +396,19 @@ const Hero = () => {
 
                         {/* Organic Handwritten Contrast Elements */}
                         <div className="space-y-0 my-1 select-none">
-                            <div 
+                            <div
                                 className="text-6xl font-bold text-[#FFD700] leading-[0.95]"
                                 style={{ fontFamily: 'Caveat, cursive' }}
                             >
                                 art.
                             </div>
-                            <div 
+                            <div
                                 className="text-6xl font-bold text-[#F0EDE8] leading-[0.95]"
                                 style={{ fontFamily: 'Caveat, cursive' }}
                             >
                                 cook.
                             </div>
-                            <div 
+                            <div
                                 className="text-6xl font-bold text-[#A855F7] leading-[0.95]"
                                 style={{ fontFamily: 'Caveat, cursive' }}
                             >
