@@ -30,7 +30,7 @@ export default function SpatialRift({
       scrollTrigger: {
         trigger: riftRef.current,
         start: 'top 85%',
-        end: 'bottom 40%',
+        end: 'bottom 35%',
         toggleActions: 'play none none reverse',
       },
     });
@@ -39,24 +39,24 @@ export default function SpatialRift({
     tl.fromTo(
       flashRef.current,
       { opacity: 0, scaleX: 0 },
-      { opacity: 0.8, scaleX: 1, duration: 0.15, ease: 'power4.out' }
+      { opacity: 0.9, scaleX: 1, duration: 0.25, ease: 'power4.out' }
     )
-    .to(flashRef.current, { opacity: 0, duration: 0.4, ease: 'power2.out' })
+    .to(flashRef.current, { opacity: 0, duration: 0.6, ease: 'power2.out' })
 
-    // 2. Spatial slash slice across
+    // 2. Spatial dimensional slash slice across (Slow, dramatic cut)
     .fromTo(
       slashRef.current,
       { scaleX: 0, opacity: 0 },
-      { scaleX: 1, opacity: 1, duration: 0.7, ease: 'expo.out' },
-      '-=0.45'
+      { scaleX: 1, opacity: 1, duration: 1.1, ease: 'expo.out' },
+      '-=0.5'
     )
 
-    // 3. Reveal floating domain glyph
+    // 3. Floating domain glyph stamp impact
     .fromTo(
       textRef.current,
-      { opacity: 0, scale: 0.8, y: 10 },
-      { opacity: 1, scale: 1, y: 0, duration: 0.5, ease: 'back.out(1.7)' },
-      '-=0.3'
+      { opacity: 0, scale: 2.2, y: -8 },
+      { opacity: 1, scale: 1, y: 0, duration: 0.7, ease: 'back.out(2.2)' },
+      '-=0.4'
     );
   }, { scope: riftRef, dependencies: [isMobile] });
 

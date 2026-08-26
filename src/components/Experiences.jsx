@@ -1,6 +1,8 @@
 import React, { useRef, useEffect, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { motion } from 'framer-motion';
+import useIsMobile from '../hooks/useIsMobile';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -143,7 +145,7 @@ const TimelineTrack = ({ activeIndex, total }) => (
 // ── Single Career Frame ────────────────────────────────────────
 const CareerFrame = ({ data }) => (
     <div
-        className="relative w-screen h-full flex-shrink-0 flex items-center justify-center overflow-hidden"
+        className="career-frame relative w-screen h-full flex-shrink-0 flex items-center justify-center overflow-hidden"
         style={{ minWidth: '100vw' }}
     >
         {/* ── Manga speed lines — radiating from left ── */}
@@ -164,7 +166,7 @@ const CareerFrame = ({ data }) => (
 
         {/* ── Massive Ghost Year — bottom-left anchor ── */}
         <div
-            className="absolute bottom-0 left-0 leading-none select-none pointer-events-none"
+            className="career-ghost-year absolute bottom-0 left-0 leading-none select-none pointer-events-none"
             aria-hidden="true"
             style={{
                 fontFamily: 'var(--font-display)',
@@ -204,7 +206,7 @@ const CareerFrame = ({ data }) => (
         <div className="relative z-10 w-full max-w-6xl mx-auto px-6 md:px-10 flex flex-col md:flex-row items-start md:items-center justify-center gap-6 md:gap-0 h-full pt-20 md:pt-0">
 
             {/* LEFT — Cinematic Year Display */}
-            <div className="flex flex-col justify-center w-full md:w-[42%] pr-0 md:pr-10 shrink-0">
+            <div className="career-year-pane flex flex-col justify-center w-full md:w-[42%] pr-0 md:pr-10 shrink-0">
                 {/* Status dot + label */}
                 <div className="flex items-center gap-2.5 mb-6">
                     <span
@@ -245,14 +247,14 @@ const CareerFrame = ({ data }) => (
 
             {/* CENTER — Vertical divider (hidden on mobile) */}
             <div
-                className="hidden md:block self-stretch w-px shrink-0 my-16"
+                className="career-divider hidden md:block self-stretch w-px shrink-0 my-16 origin-center"
                 style={{
                     background: `linear-gradient(to bottom, transparent, ${data.accent}40, ${data.accent}20, transparent)`,
                 }}
             />
 
             {/* RIGHT — Content */}
-            <div className="flex flex-col justify-center pl-0 md:pl-10 flex-1 min-w-0">
+            <div className="career-content flex flex-col justify-center pl-0 md:pl-10 flex-1 min-w-0">
                 {/* Role title */}
                 <h2
                     className="mb-2 leading-none"
@@ -288,7 +290,7 @@ const CareerFrame = ({ data }) => (
                 {/* Bullets */}
                 <ul className="space-y-4">
                     {data.bullets.map((bullet, i) => (
-                        <li key={i} className="flex items-start gap-3">
+                        <li key={i} className="career-bullet flex items-start gap-3">
                             <span
                                 className="mt-1 text-xs shrink-0"
                                 style={{ fontFamily: 'var(--font-mono)', color: data.accent, opacity: 0.6 }}
@@ -314,8 +316,10 @@ const CertsExperience = () => {
     const triggerRef  = useRef(null);
     const tapeRef     = useRef(null);
     const [activeIdx, setActiveIdx] = useState(0);
+    const isMobile = useIsMobile();
 
     useEffect(() => {
+        if (isMobile) return;
         const totalFrames = CAREER_FRAMES.length;
         const scrollLen   = totalFrames * 1000;
 
@@ -340,10 +344,133 @@ const CertsExperience = () => {
                     },
                 }
             );
+
+            // Aristide Benoist Frame Entrance Choreography linked to horizontal scrub
+            const frames = gsap.utils.toArray('.career-frame');
+            frames.forEach((frame, i) => {
+                const ghostYear = frame.querySelector('.career-ghost-year');
+                const content = frame.querySelector('.career-content');
+                const divider = frame.querySelector('.career-divider');
+                const bullets = frame.querySelectorAll('.career-bullet');
+
+                if (i > 0) {
+                    if (ghostYear) {
+                        gsap.fromTo(ghostYear,
+                            { scale: 0.8, opacity: 0 },
+                            {
+                                scale: 1,
+                                opacity: 1,
+                                ease: 'power2.out',
+                                scrollTrigger: {
+                                    trigger: frame,
+                                    containerAnimation: tween,
+                                    start: 'left 80%',
+                                    end: 'left 30%',
+                                    scrub: true,
+                                }
+                            }
+                        );
+                    }
+
+                    if (divider) {
+                        gsap.fromTo(divider,
+                            { scaleY: 0 },
+                            {
+                                scaleY: 1,
+                                ease: 'power2.out',
+                                scrollTrigger: {
+                                    trigger: frame,
+                                    containerAnimation: tween,
+                                    start: 'left 70%',
+                                    end: 'left 40%',
+                                    scrub: true,
+                                }
+                            }
+                        );
+                    }
+
+                    if (content) {
+                        gsap.fromTo(content,
+                            { x: 60, opacity: 0 },
+                            {
+                                x: 0,
+                                opacity: 1,
+                                ease: 'power3.out',
+                                scrollTrigger: {
+                                    trigger: frame,
+                                    containerAnimation: tween,
+                                    start: 'left 75%',
+                                    end: 'left 35%',
+                                    scrub: true,
+                                }
+                            }
+                        );
+                    }
+                }
+            });
         });
 
         return () => ctx.revert();
-    }, []);
+    }, [isMobile]);
+
+    if (isMobile) {
+        return (
+            <section id="experience" className="relative bg-[#030305] flex flex-col pt-24 pb-24 overflow-hidden">
+                <div className="absolute inset-0 bg-speed-lines opacity-60 pointer-events-none" />
+                <div className="absolute inset-0 bg-pattern-dots opacity-30 pointer-events-none" />
+                
+                <div className="w-full px-6 mb-16 relative z-20">
+                    <div className="flex items-center gap-2 text-[#FFD700] text-xs tracking-[0.2em] opacity-80 mb-2">
+                        <span>CAREER TRAJECTORY</span>
+                        <span className="w-12 h-[1px] bg-[#FFD700]/50" />
+                    </div>
+                </div>
+
+                <div className="relative z-20 w-full px-6">
+                    {/* Vertical Glowing Track */}
+                    <div className="absolute left-[41px] top-4 bottom-0 w-[2px] bg-gradient-to-b from-[#FFD700]/40 via-[#FFD700]/10 to-transparent z-10" />
+
+                    <div className="flex flex-col gap-16">
+                        {CAREER_FRAMES.map((frame, i) => (
+                            <motion.div
+                                key={frame.frame}
+                                initial={{ opacity: 0, y: 30 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true, margin: "-100px" }}
+                                transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
+                                className="relative flex flex-col pl-14"
+                            >
+                                {/* Timeline Node (Dot) */}
+                                <div 
+                                    className="absolute left-[17px] top-[12px] -translate-x-1/2 w-[10px] h-[10px] rounded-full bg-[#030305] border-[2px] z-20" 
+                                    style={{ borderColor: frame.statusColor, boxShadow: `0 0 12px ${frame.statusColor}60` }} 
+                                />
+
+                                <div className="flex items-center gap-2.5 mb-2">
+                                    <span className="text-[10px] tracking-[0.35em] uppercase" style={{ fontFamily: 'var(--font-mono)', color: frame.statusColor }}>
+                                        {frame.status}
+                                    </span>
+                                </div>
+                                <div className="leading-none mb-3" style={{ fontFamily: 'var(--font-display)', fontSize: '3.8rem', color: '#FFFFFF', textShadow: `0 0 40px rgba(255,215,0,0.1)` }}>
+                                    {frame.year}
+                                </div>
+                                <h3 className="text-2xl font-bold text-white leading-tight mt-1 mb-2">{frame.role}</h3>
+                                <p className="text-sm font-semibold mb-6 tracking-wide" style={{ color: frame.accent }}>@ {frame.org}</p>
+                                <ul className="space-y-4">
+                                    {frame.bullets.map((bullet, idx) => (
+                                        <li key={idx} className="flex items-start gap-3 text-sm text-white/75 leading-relaxed">
+                                            <span className="mt-1 shrink-0 text-[10px]" style={{ color: frame.accent }}>▸</span>
+                                            <span>{bullet}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </motion.div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+        );
+    }
 
     return (
         <section
@@ -404,6 +531,15 @@ const CertsExperience = () => {
                     </span>
                     <div className="w-px h-12 bg-gradient-to-b from-[#FFD700]/30 to-transparent" />
                 </div>
+
+                {/* Cinematic Horizontal Scrub Progress Bar (Desktop) */}
+                <div 
+                    className="absolute bottom-0 left-0 h-[2px] bg-gradient-to-r from-[#FFD700] via-[#F59E0B] to-[#A855F7] z-40 transition-all duration-300 pointer-events-none"
+                    style={{ 
+                        width: `${((activeIdx + 1) / CAREER_FRAMES.length) * 100}%`,
+                        boxShadow: '0 0 12px rgba(255,215,0,0.7)'
+                    }} 
+                />
             </div>
         </section>
     );

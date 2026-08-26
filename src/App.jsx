@@ -26,23 +26,32 @@ function App() {
     }, 100);
   }, []);
 
-  // ── Military Crosshair Cursor Logic ─────────────────────────
+  // ── Hybrid Cursor Logic ────────────────────────────────────
   useEffect(() => {
-    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    // Strictly disable on touch devices or fine pointer absent
+    const isTouchDevice =
+      'ontouchstart' in window ||
+      navigator.maxTouchPoints > 0 ||
+      window.matchMedia('(pointer: coarse)').matches;
     if (isTouchDevice) return;
 
     const cursor = cursorRef.current;
     if (!cursor || isLoading) return;
 
-    // Smooth position via rAF — GPU-accelerated
+    let hasMoved = false;
     let rafId;
+
     const moveCursor = (e) => {
+      if (!hasMoved) {
+        hasMoved = true;
+        cursor.style.opacity = '1';
+        cursor.classList.remove('opacity-0');
+      }
       rafId = requestAnimationFrame(() => {
         cursor.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
       });
     };
 
-    // Lock state — hover over interactive elements
     const handleMouseOver = (e) => {
       const target = e.target.closest('a, button, .cursor-interactive, input, textarea, [role="button"]');
       if (target) cursor.classList.add('cursor-locked');
@@ -59,9 +68,16 @@ function App() {
       cursor.classList.remove('cursor-clicking');
     };
 
-    // Visibility when cursor leaves/enters window
-    const handleMouseLeave = () => cursor.classList.add('opacity-0');
-    const handleMouseEnter = () => cursor.classList.remove('opacity-0');
+    const handleMouseLeave = () => {
+      cursor.style.opacity = '0';
+      cursor.classList.add('opacity-0');
+    };
+    const handleMouseEnter = () => {
+      if (hasMoved) {
+        cursor.style.opacity = '1';
+        cursor.classList.remove('opacity-0');
+      }
+    };
 
     window.addEventListener('mousemove',    moveCursor,       { passive: true });
     window.addEventListener('mouseover',    handleMouseOver);
@@ -89,7 +105,8 @@ function App() {
       {/* ── Tux Penguin & DuckChain Hybrid Cursor ─────────────── */}
       <div
         ref={cursorRef}
-        className="cursor-hybrid hidden md:flex transition-opacity duration-200"
+        style={{ opacity: 0 }}
+        className="cursor-hybrid opacity-0 hidden md:flex transition-opacity duration-200 pointer-events-none"
         aria-hidden="true"
       >
         {/* Normal state: Linux Tux Penguin */}
