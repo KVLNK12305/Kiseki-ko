@@ -183,7 +183,11 @@ const Hero = () => {
                 {!isMobile ? (
                     <CelestialField overdrive={domainOverdrive} />
                 ) : (
-                    <div className="absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#FFD700]/5 via-transparent to-transparent pointer-events-none" />
+                    <div className={`absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] transition-all duration-1000 pointer-events-none ${
+                        domainOverdrive
+                            ? 'from-[#EF4444]/20 via-[#A855F7]/10 to-transparent scale-110'
+                            : 'from-[#FFD700]/5 via-transparent to-transparent scale-100'
+                    }`} />
                 )}
 
                 {/* Restrained Atmospheric Lighting */}
@@ -336,7 +340,7 @@ const Hero = () => {
                                 draggable="false"
                                 className={`relative z-10 w-full h-full object-contain object-bottom transition-all duration-700 pointer-events-none select-none ${
                                     domainOverdrive
-                                        ? 'filter-none drop-shadow-[0_0_40px_rgba(255,215,0,0.7)] contrast-[1.15]'
+                                        ? 'filter-none drop-shadow-[0_0_50px_rgba(239,68,68,0.6)] contrast-[1.15]'
                                         : 'filter grayscale contrast-[1.12] brightness-[1.04] hover:filter-none'
                                 }`}
                                 style={{
