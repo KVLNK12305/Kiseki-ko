@@ -99,24 +99,31 @@ const ResearchCard = ({ item }) => {
             rel="noopener noreferrer"
             className="research-card block group relative rounded-2xl overflow-hidden transition-all duration-400 cursor-interactive"
             style={{
-                // Editorial "paper" aesthetic — light card on dark bg
-                background: 'linear-gradient(135deg, #F5F0E8 0%, #EDE8DE 100%)',
-                border: '1px solid rgba(245,240,232,0.15)',
+                background: 'linear-gradient(135deg, #0D0D14 0%, #0A0A10 100%)',
+                border: `1px solid rgba(255,255,255,0.08)`,
+                borderLeft: `4px solid ${item.iconColor}`,
+                boxShadow: isPublished 
+                    ? '0 10px 40px rgba(0,0,0,0.5), 0 0 30px rgba(255,215,0,0.08)' 
+                    : '0 10px 40px rgba(0,0,0,0.5)',
             }}
             onMouseEnter={e => {
                 e.currentTarget.style.transform = 'translateY(-4px)';
-                e.currentTarget.style.boxShadow = '0 20px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,215,0,0.2)';
+                e.currentTarget.style.boxShadow = `0 20px 60px rgba(0,0,0,0.7), 0 0 40px ${item.iconColor}33`;
+                e.currentTarget.style.borderColor = `${item.iconColor}66`;
             }}
             onMouseLeave={e => {
                 e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.2)';
+                e.currentTarget.style.boxShadow = isPublished 
+                    ? '0 10px 40px rgba(0,0,0,0.5), 0 0 30px rgba(255,215,0,0.08)' 
+                    : '0 10px 40px rgba(0,0,0,0.5)';
+                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
             }}
         >
-            {/* Paper texture overlay */}
-            <div className="absolute inset-0 bg-pattern-noise opacity-[0.08] pointer-events-none" />
+            {/* Ambient Noise / Grid Texture */}
+            <div className="absolute inset-0 bg-pattern-noise opacity-[0.03] pointer-events-none" />
 
             {/* External link icon */}
-            <div className="absolute top-5 right-5 text-[#030305]/30 group-hover:text-[#030305]/60 transition-colors">
+            <div className="absolute top-5 right-5 text-white/30 group-hover:text-[#FFD700] transition-colors">
                 <ExternalLink size={18} />
             </div>
 
@@ -125,8 +132,8 @@ const ResearchCard = ({ item }) => {
                 <div
                     className="inline-flex items-center justify-center w-12 h-12 rounded-xl mb-6 border"
                     style={{
-                        background: `${item.iconColor}18`,
-                        borderColor: `${item.iconColor}40`,
+                        background: `${item.iconColor}15`,
+                        borderColor: `${item.iconColor}35`,
                     }}
                 >
                     <item.Icon size={22} style={{ color: item.iconColor }} />
@@ -135,37 +142,37 @@ const ResearchCard = ({ item }) => {
                 {/* Status badge */}
                 <div className="flex items-center gap-2 mb-4">
                     <span
-                        className="w-1.5 h-1.5 rounded-full"
-                        style={{ background: isPublished ? '#16a34a' : item.iconColor }}
+                        className="w-2 h-2 rounded-full animate-pulse"
+                        style={{ background: isPublished ? '#4ade80' : item.iconColor }}
                     />
                     <span
                         className="font-mono text-[10px] tracking-[0.3em] uppercase font-bold"
-                        style={{ color: isPublished ? '#15803d' : '#7c3aed' }}
+                        style={{ color: isPublished ? '#4ade80' : '#c084fc' }}
                     >
                         {item.status}
                     </span>
-                    <span className="font-mono text-[10px] text-[#030305]/30">
+                    <span className="font-mono text-[10px] text-white/40">
                         · {item.statusDate}
                     </span>
                 </div>
 
                 {/* Title */}
                 <h3
-                    className="text-2xl font-bold mb-2 leading-tight text-[#0a0a0f] group-hover:text-[#1a0a3f] transition-colors"
+                    className="text-2xl font-bold mb-2 leading-tight text-white group-hover:text-[#FFD700] transition-colors"
                     style={{ fontFamily: 'Rajdhani, system-ui, sans-serif' }}
                 >
                     {item.title}
                 </h3>
 
                 {/* Topic */}
-                <p className="font-mono text-sm mb-4" style={{ color: item.iconColor === '#FFD700' ? '#92750a' : '#5b21b6' }}>
+                <p className="font-mono text-sm mb-4" style={{ color: item.iconColor }}>
                     {item.topic}
                 </p>
 
                 {/* Abstract quote */}
                 <p
-                    className="text-sm leading-relaxed italic border-l-2 pl-4 text-[#030305]/65"
-                    style={{ borderColor: `${item.iconColor}60` }}
+                    className="text-sm leading-relaxed italic border-l-2 pl-4 text-white/70"
+                    style={{ borderColor: `${item.iconColor}50` }}
                 >
                     {item.desc}
                 </p>
@@ -173,7 +180,7 @@ const ResearchCard = ({ item }) => {
 
             {/* Bottom colored accent */}
             <div
-                className="h-1 w-full"
+                className="h-[2px] w-full opacity-60 group-hover:opacity-100 transition-opacity"
                 style={{ background: `linear-gradient(to right, ${item.iconColor}, transparent)` }}
             />
         </motion.a>

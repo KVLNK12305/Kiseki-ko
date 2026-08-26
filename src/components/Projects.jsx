@@ -81,54 +81,77 @@ const projects = [
 ];
 
 const CLEARANCE_COLORS = {
-    'TOP SECRET':   '#dc2626',
-    'SECRET':       '#ea580c',
+    'TOP SECRET': '#dc2626',
+    'SECRET': '#ea580c',
     'CONFIDENTIAL': '#FFD700',
     'UNCLASSIFIED': '#4ade80',
 };
 
 const TAG_CAT_STYLES = {
-    lang:     { bg: 'rgba(168,85,247,0.12)', border: 'rgba(168,85,247,0.3)', dot: '#c084fc', text: '#e9d5ff' },
-    sys:      { bg: 'rgba(239,68,68,0.12)', border: 'rgba(239,68,68,0.3)', dot: '#f87171', text: '#fca5a5' },
-    net:      { bg: 'rgba(59,130,246,0.12)', border: 'rgba(59,130,246,0.3)', dot: '#60a5fa', text: '#bfdbfe' },
-    web:      { bg: 'rgba(34,197,94,0.12)', border: 'rgba(34,197,94,0.3)', dot: '#4ade80', text: '#bbf7d0' },
-    ui:       { bg: 'rgba(251,146,60,0.12)', border: 'rgba(251,146,60,0.3)', dot: '#fb923c', text: '#fed7aa' },
-    data:     { bg: 'rgba(99,102,241,0.12)', border: 'rgba(99,102,241,0.3)', dot: '#818cf8', text: '#c7d2fe' },
-    viz:      { bg: 'rgba(20,184,166,0.12)', border: 'rgba(20,184,166,0.3)', dot: '#2dd4bf', text: '#99f6e4' },
-    ai:       { bg: 'rgba(217,70,239,0.12)', border: 'rgba(217,70,239,0.3)', dot: '#e879f9', text: '#f5d0fe' },
-    runtime:  { bg: 'rgba(234,179,8,0.12)', border: 'rgba(234,179,8,0.3)', dot: '#facc15', text: '#fef08a' },
+    lang: { bg: 'rgba(168,85,247,0.12)', border: 'rgba(168,85,247,0.3)', dot: '#c084fc', text: '#e9d5ff' },
+    sys: { bg: 'rgba(239,68,68,0.12)', border: 'rgba(239,68,68,0.3)', dot: '#f87171', text: '#fca5a5' },
+    net: { bg: 'rgba(59,130,246,0.12)', border: 'rgba(59,130,246,0.3)', dot: '#60a5fa', text: '#bfdbfe' },
+    web: { bg: 'rgba(34,197,94,0.12)', border: 'rgba(34,197,94,0.3)', dot: '#4ade80', text: '#bbf7d0' },
+    ui: { bg: 'rgba(251,146,60,0.12)', border: 'rgba(251,146,60,0.3)', dot: '#fb923c', text: '#fed7aa' },
+    data: { bg: 'rgba(99,102,241,0.12)', border: 'rgba(99,102,241,0.3)', dot: '#818cf8', text: '#c7d2fe' },
+    viz: { bg: 'rgba(20,184,166,0.12)', border: 'rgba(20,184,166,0.3)', dot: '#2dd4bf', text: '#99f6e4' },
+    ai: { bg: 'rgba(217,70,239,0.12)', border: 'rgba(217,70,239,0.3)', dot: '#e879f9', text: '#f5d0fe' },
+    runtime: { bg: 'rgba(234,179,8,0.12)', border: 'rgba(234,179,8,0.3)', dot: '#facc15', text: '#fef08a' },
     workflow: { bg: 'rgba(16,185,129,0.12)', border: 'rgba(16,185,129,0.3)', dot: '#34d399', text: '#a7f3d0' },
-    api:      { bg: 'rgba(14,165,233,0.12)', border: 'rgba(14,165,233,0.3)', dot: '#38bdf8', text: '#bae6fd' },
-    auth:     { bg: 'rgba(244,114,182,0.12)', border: 'rgba(244,114,182,0.3)', dot: '#f472b6', text: '#fbcfe8' },
-    db:       { bg: 'rgba(251,191,36,0.12)', border: 'rgba(251,191,36,0.3)', dot: '#fbbf24', text: '#fef3c7' },
+    api: { bg: 'rgba(14,165,233,0.12)', border: 'rgba(14,165,233,0.3)', dot: '#38bdf8', text: '#bae6fd' },
+    auth: { bg: 'rgba(244,114,182,0.12)', border: 'rgba(244,114,182,0.3)', dot: '#f472b6', text: '#fbcfe8' },
+    db: { bg: 'rgba(251,191,36,0.12)', border: 'rgba(251,191,36,0.3)', dot: '#fbbf24', text: '#fef3c7' },
 };
 
 // ── Classified Stamp (Desktop View) ───────────────────────────
-const ClassifiedStamp = ({ clearance, revealed }) => (
-    <div
-        className="absolute inset-0 flex items-center justify-center pointer-events-none z-20 transition-all duration-500"
-        style={{
-            opacity: revealed ? 0 : 0.6,
-            transform: revealed ? 'scale(1.1) rotate(-8deg)' : 'scale(1) rotate(-12deg)',
-        }}
-        aria-hidden="true"
-    >
-        <div>
-            <span
-                className="font-mono font-black text-xs tracking-[0.25em] uppercase border px-2.5 py-0.5 rounded backdrop-blur-sm"
+const ClassifiedStamp = ({ clearance, revealed }) => {
+    const letters = clearance.split('');
+    const color = CLEARANCE_COLORS[clearance] || '#dc2626';
+
+    return (
+        <div
+            className="absolute inset-0 flex items-center justify-center pointer-events-none z-20"
+            aria-hidden="true"
+        >
+            <motion.div
+                initial={false}
+                animate={revealed ? { opacity: 0, scale: 1.25 } : { opacity: 0.9, scale: 1 }}
+                transition={{ duration: 0.45, ease: "easeOut" }}
+                className="rotate-[-10deg] flex items-center gap-1 px-4 py-2 border-2 rounded-md backdrop-blur-md shadow-2xl"
                 style={{
-                    color: CLEARANCE_COLORS[clearance] || '#dc2626',
-                    borderColor: (CLEARANCE_COLORS[clearance] || '#dc2626') + '44',
-                    background: 'rgba(0,0,0,0.4)',
-                    textShadow: `0 0 15px ${CLEARANCE_COLORS[clearance] || '#dc2626'}44`,
-                    whiteSpace: 'nowrap',
+                    borderColor: `${color}99`,
+                    backgroundColor: 'rgba(5,5,8,0.75)',
+                    boxShadow: `0 0 35px ${color}44, inset 0 0 20px ${color}22`,
                 }}
             >
-                {clearance}
-            </span>
+                {letters.map((char, i) => (
+                    <motion.span
+                        key={i}
+                        animate={revealed ? {
+                            x: (i - letters.length / 2) * 32,
+                            y: (i % 2 === 0 ? -1 : 1) * 40,
+                            rotate: (i - letters.length / 2) * 22,
+                            opacity: 0,
+                        } : {
+                            x: 0,
+                            y: 0,
+                            rotate: 0,
+                            opacity: 1,
+                        }}
+                        transition={{ duration: 0.45, delay: i * 0.015 }}
+                        className="font-mono font-black text-xs md:text-sm tracking-[0.25em] inline-block"
+                        style={{
+                            color: color,
+                            textShadow: `0 0 16px ${color}`,
+                        }}
+                    >
+                        {char === ' ' ? '\u00A0' : char}
+                    </motion.span>
+                ))}
+            </motion.div>
         </div>
-    </div>
-);
+    );
+};
 
 // ── Demo Panel (Desktop View) ──────────────────────────────────
 const DemoPanel = ({ project, revealed }) => {
@@ -168,7 +191,7 @@ const DemoPanel = ({ project, revealed }) => {
                 {/* Mobile: simple flex column layout */}
                 <div className="flex lg:hidden flex-col gap-8 w-full relative z-20">
                 </div>
-                
+
                 {/* Mock browser header */}
                 <div className="w-full h-8 border-b border-white/[0.06] flex items-center px-4 justify-between bg-[#0a0a0f] shrink-0 z-10 relative">
                     <div className="flex gap-2">
@@ -199,14 +222,17 @@ const DemoPanel = ({ project, revealed }) => {
                                 className="absolute inset-0 cursor-pointer"
                                 onMouseEnter={() => revealed && setExpandedVideo(videoSrc)}
                             >
-                                <video
-                                    src={videoSrc}
-                                    autoPlay
-                                    muted
-                                    loop
-                                    playsInline
-                                    className="absolute inset-0 w-full h-full object-cover"
-                                />
+                                {revealed && (
+                                    <video
+                                        src={videoSrc}
+                                        autoPlay
+                                        muted
+                                        loop
+                                        playsInline
+                                        preload="metadata"
+                                        className="absolute inset-0 w-full h-full object-cover"
+                                    />
+                                )}
                                 <div className="absolute bottom-3 right-3 z-20 px-2.5 py-1 rounded border border-[#FFD700]/40 bg-black/60 text-[10px] font-mono text-[#FFD700] tracking-widest backdrop-blur-sm">
                                     HOVER: EXPAND
                                 </div>
@@ -271,7 +297,7 @@ const DemoPanel = ({ project, revealed }) => {
     );
 };
 
-// ── Project Slide (Desktop View with ElectricBorder) ───────────
+// ── Project Slide (Desktop View with ElectricBorder & 3D Perspective) ───────────
 const ProjectSlide = ({ project }) => {
     const [revealed, setRevealed] = useState(false);
     const clearanceColor = CLEARANCE_COLORS[project.clearance] || '#dc2626';
@@ -279,7 +305,7 @@ const ProjectSlide = ({ project }) => {
     return (
         <div
             className="w-screen h-full flex-shrink-0 flex items-center justify-center p-8 border-r border-white/[0.04] relative"
-            style={{ minWidth: '100vw' }}
+            style={{ minWidth: '100vw', perspective: '1400px' }}
         >
             <span
                 className="absolute top-8 left-10 select-none pointer-events-none"
@@ -296,12 +322,20 @@ const ProjectSlide = ({ project }) => {
             </span>
 
             <div
-                className="max-w-5xl w-full grid grid-cols-1 lg:grid-cols-2 gap-10 items-center"
+                className="max-w-5xl w-full grid grid-cols-1 lg:grid-cols-2 gap-10 items-center transition-all duration-500"
+                style={{ transformStyle: 'preserve-3d' }}
                 onMouseEnter={() => setRevealed(true)}
                 onMouseLeave={() => setRevealed(false)}
             >
-                {/* Dossier Card with ElectricBorder */}
-                <div className="order-2 lg:order-1">
+                {/* Dossier Card with 3D Book-Open Angle */}
+                <motion.div
+                    className="order-2 lg:order-1"
+                    animate={{
+                        rotateY: revealed ? 3.5 : 0,
+                        z: revealed ? 20 : 0,
+                    }}
+                    transition={{ type: "spring", damping: 20, stiffness: 120 }}
+                >
                     <ElectricBorder color="#FFD700">
                         <div className="bg-[#0D0D14] p-8 rounded-xl border border-white/[0.06] relative overflow-hidden group">
                             <div className="flex items-center justify-between mb-6">
@@ -379,11 +413,18 @@ const ProjectSlide = ({ project }) => {
                             </a>
                         </div>
                     </ElectricBorder>
-                </div>
+                </motion.div>
 
-                <div className="order-1 lg:order-2">
+                <motion.div
+                    className="order-1 lg:order-2"
+                    animate={{
+                        rotateY: revealed ? -3.5 : 0,
+                        z: revealed ? 20 : 0,
+                    }}
+                    transition={{ type: "spring", damping: 20, stiffness: 120 }}
+                >
                     <DemoPanel project={project} revealed={revealed} />
-                </div>
+                </motion.div>
             </div>
         </div>
     );
@@ -457,10 +498,10 @@ const MobileBentoCard = ({ project, index, onOpenVideo }) => {
                     })}
                 </div>
 
-                <a 
-                    href={project.link} 
-                    target="_blank" 
-                    rel="noreferrer" 
+                <a
+                    href={project.link}
+                    target="_blank"
+                    rel="noreferrer"
                     onClick={(e) => e.stopPropagation()}
                     className="inline-flex items-center gap-1.5 font-mono text-[9.5px] tracking-[0.2em] uppercase text-white/40 hover:text-[#FFD700] transition-colors duration-300 ml-auto"
                 >
@@ -482,6 +523,7 @@ const Projects = () => {
     const sectionRef = useRef(null);
     const isMobile = useIsMobile();
     const [expandedVideo, setExpandedVideo] = useState(null);
+    const [activeSlide, setActiveSlide] = useState(0);
 
     useEffect(() => {
         if (isMobile) return; // Skip GSAP horizontal scroll pinning on mobile
@@ -500,6 +542,10 @@ const Projects = () => {
                         end: '+=3200',
                         scrub: 2,
                         pin: true,
+                        onUpdate: (self) => {
+                            const idx = Math.round(self.progress * (projects.length - 1));
+                            setActiveSlide(idx);
+                        },
                     },
                 }
             );
@@ -527,10 +573,10 @@ const Projects = () => {
 
                 <div className="bento-grid">
                     {projects.map((project, i) => (
-                        <MobileBentoCard 
-                            key={project.id} 
-                            project={project} 
-                            index={i} 
+                        <MobileBentoCard
+                            key={project.id}
+                            project={project}
+                            index={i}
                             onOpenVideo={(src) => setExpandedVideo(src)}
                         />
                     ))}
@@ -560,6 +606,19 @@ const Projects = () => {
             className="relative overflow-hidden bg-[#08080E]"
         >
             <div className="absolute inset-0 bg-pattern-circuit opacity-40 pointer-events-none" />
+
+            {/* Tactical Live HUD Index Counter (Desktop) */}
+            <div className="absolute bottom-8 right-12 z-30 pointer-events-none flex items-baseline gap-2 font-mono">
+                <span className="text-3xl font-black text-[#FFD700] tracking-wider">
+                    {projects[activeSlide]?.id || '01'}
+                </span>
+                <span className="text-xs text-white/30 tracking-widest">
+                    / {String(projects.length).padStart(2, '0')}
+                </span>
+                <span className="ml-4 text-[10px] tracking-[0.25em] text-[#FFD700]/60 uppercase border-l border-white/10 pl-3">
+                    {projects[activeSlide]?.title}
+                </span>
+            </div>
 
             <div ref={triggerRef}>
                 <div

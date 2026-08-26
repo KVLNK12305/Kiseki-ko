@@ -17,6 +17,7 @@ const VortexCanvas = ({ containerRef }) => {
         let targetX = 0;
         let targetY = 0;
         let isHovering = false;
+        let scrollMultiplier = 1;
 
         const resize = () => {
             w = canvas.width  = canvas.offsetWidth;
@@ -32,16 +33,26 @@ const VortexCanvas = ({ containerRef }) => {
         const handleMouseEnter = () => { isHovering = true; };
         const handleMouseLeave = () => { isHovering = false; mouseX = 0; mouseY = 0; };
 
+        const handleScroll = () => {
+            const rect = canvas.getBoundingClientRect();
+            const windowHeight = window.innerHeight;
+            if (rect.top < windowHeight && rect.bottom > 0) {
+                // Section is in viewport: calculate depth from 0 to 1
+                const progress = Math.min(Math.max((windowHeight - rect.top) / (windowHeight + rect.height), 0), 1);
+                scrollMultiplier = 1 + progress * 3.5;
+            }
+        };
+
         // Ring system
-        const RING_COUNT = 7;
+        const RING_COUNT = 8;
         const rings = Array.from({ length: RING_COUNT }, (_, i) => ({
-            radius:    (i + 1) * (Math.min(window.innerWidth, 600) / (RING_COUNT * 1.5)),
-            baseSpeed: 0.0008 + i * 0.0004,
-            speed:     0.0008 + i * 0.0004,
-            particles: Array.from({ length: 30 + i * 8 }, (_, j) => ({
-                angle: (j / (30 + i * 8)) * Math.PI * 2,
-                size:  Math.random() * 2 + 0.5,
-                alpha: Math.random() * 0.5 + 0.2,
+            radius:    (i + 1) * (Math.min(window.innerWidth, 650) / (RING_COUNT * 1.4)),
+            baseSpeed: 0.0009 + i * 0.00045,
+            speed:     0.0009 + i * 0.00045,
+            particles: Array.from({ length: 35 + i * 10 }, (_, j) => ({
+                angle: (j / (35 + i * 10)) * Math.PI * 2,
+                size:  Math.random() * 2.2 + 0.6,
+                alpha: Math.random() * 0.5 + 0.25,
             })),
             // Gradient from purple (outer) to gold (inner)
             colorT: i / (RING_COUNT - 1), // 0 = outer (purple), 1 = inner (gold)
@@ -62,14 +73,14 @@ const VortexCanvas = ({ containerRef }) => {
 
             // Radial dark gradient background
             const bg = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(w, h) * 0.6);
-            bg.addColorStop(0, 'rgba(10,0,20,0.4)');
+            bg.addColorStop(0, 'rgba(15,0,28,0.5)');
             bg.addColorStop(1, 'rgba(0,0,0,0)');
             ctx.fillStyle = bg;
             ctx.fillRect(0, 0, w, h);
 
             // Draw each ring from outside inward
             [...rings].reverse().forEach((ring, ri) => {
-                const maxRadius = (RING_COUNT) * (Math.min(w, h) / (RING_COUNT * 1.5));
+                const maxRadius = (RING_COUNT) * (Math.min(w, h) / (RING_COUNT * 1.4));
                 const normalizedRadius = ring.radius / maxRadius;
 
                 // Color: lerp from purple → gold
@@ -77,19 +88,20 @@ const VortexCanvas = ({ containerRef }) => {
                 const g = Math.round(lerp(85,  215, ring.colorT));
                 const b = Math.round(lerp(247,   0, ring.colorT));
 
-                // Speed up on hover
-                ring.speed = lerp(ring.speed, isHovering ? ring.baseSpeed * 3 : ring.baseSpeed, 0.05);
+                // Speed up on hover and scroll
+                const targetSpeed = (isHovering ? ring.baseSpeed * 3.5 : ring.baseSpeed) * scrollMultiplier;
+                ring.speed = lerp(ring.speed, targetSpeed, 0.06);
 
                 ring.particles.forEach(p => {
                     p.angle += ring.speed;
                     // Slight wobble
-                    const wobble = Math.sin(p.angle * 3 + t * 0.01) * (ring.radius * 0.04);
+                    const wobble = Math.sin(p.angle * 3 + t * 0.015) * (ring.radius * 0.04);
                     const r2 = ring.radius + wobble;
 
                     const px = cx + Math.cos(p.angle) * r2;
-                    const py = cy + Math.sin(p.angle) * r2 * 0.4; // elliptical (perspective)
+                    const py = cy + Math.sin(p.angle) * r2 * 0.42; // elliptical (perspective)
 
-                    const alpha = p.alpha * (0.3 + normalizedRadius * 0.7);
+                    const alpha = p.alpha * (0.35 + normalizedRadius * 0.65);
 
                     ctx.beginPath();
                     ctx.arc(px, py, p.size, 0, Math.PI * 2);
@@ -99,46 +111,49 @@ const VortexCanvas = ({ containerRef }) => {
 
                 // Ring glow arc
                 ctx.beginPath();
-                ctx.ellipse(cx, cy, ring.radius, ring.radius * 0.4, 0, 0, Math.PI * 2);
-                ctx.strokeStyle = `rgba(${r},${g},${b},${0.04 + normalizedRadius * 0.04})`;
+                ctx.ellipse(cx, cy, ring.radius, ring.radius * 0.42, 0, 0, Math.PI * 2);
+                ctx.strokeStyle = `rgba(${r},${g},${b},${0.05 + normalizedRadius * 0.05})`;
                 ctx.lineWidth = 1;
                 ctx.stroke();
             });
 
             // Central black hole — deep dark circle with subtle glow
-            const glowRadius = Math.min(w, h) * 0.07;
-            const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, glowRadius * 2.5);
+            const glowRadius = Math.min(w, h) * 0.08;
+            const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, glowRadius * 2.8);
             glow.addColorStop(0, 'rgba(0,0,0,1)');
-            glow.addColorStop(0.5, 'rgba(5,0,15,0.9)');
+            glow.addColorStop(0.5, 'rgba(5,0,15,0.95)');
             glow.addColorStop(1, 'rgba(0,0,0,0)');
             ctx.fillStyle = glow;
             ctx.beginPath();
-            ctx.arc(cx, cy, glowRadius * 2.5, 0, Math.PI * 2);
+            ctx.arc(cx, cy, glowRadius * 2.8, 0, Math.PI * 2);
             ctx.fill();
 
             // Inner purple event-horizon glow
-            const eh = ctx.createRadialGradient(cx, cy, 0, cx, cy, glowRadius);
+            const eh = ctx.createRadialGradient(cx, cy, 0, cx, cy, glowRadius * 1.2);
             eh.addColorStop(0,   'rgba(0,0,0,1)');
-            eh.addColorStop(0.7, 'rgba(80,20,140,0.15)');
+            eh.addColorStop(0.7, 'rgba(120,30,200,0.22)');
             eh.addColorStop(1,   'rgba(168,85,247,0)');
             ctx.fillStyle = eh;
             ctx.beginPath();
-            ctx.arc(cx, cy, glowRadius, 0, Math.PI * 2);
+            ctx.arc(cx, cy, glowRadius * 1.2, 0, Math.PI * 2);
             ctx.fill();
 
             animId = requestAnimationFrame(animate);
         };
 
         window.addEventListener('resize', resize);
+        window.addEventListener('scroll', handleScroll, { passive: true });
         canvas.addEventListener('mousemove', handleMouseMove);
         canvas.addEventListener('mouseenter', handleMouseEnter);
         canvas.addEventListener('mouseleave', handleMouseLeave);
         
         resize();
+        handleScroll();
         animate();
 
         return () => {
             window.removeEventListener('resize', resize);
+            window.removeEventListener('scroll', handleScroll);
             if (canvas) {
                 canvas.removeEventListener('mousemove', handleMouseMove);
                 canvas.removeEventListener('mouseenter', handleMouseEnter);
@@ -268,40 +283,45 @@ const Climax = () => {
                     CURRENTLY ACCEPTING NEW MISSIONS
                 </p>
 
-                {/* CTA */}
-                <a
-                    href="mailto:kurapatikushalnarasimha95@gmail.com"
-                    className="group relative inline-flex items-center gap-3 px-10 py-4 overflow-hidden cursor-interactive"
-                    style={{
-                        border: '1px solid rgba(255,215,0,0.35)',
-                        color: '#FFD700',
-                        fontFamily: 'JetBrains Mono, monospace',
-                    }}
-                >
-                    {/* Hover fill */}
-                    <div
-                        className="absolute inset-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300"
-                        style={{ background: 'rgba(255,215,0,0.08)' }}
-                    />
-                    {/* Pulsing outer glow ring */}
-                    <div
-                        className="absolute inset-0 animate-glow-pulse pointer-events-none"
-                        style={{ borderRadius: 0 }}
-                    />
-                    <span className="relative z-10 text-xs tracking-[0.35em] uppercase font-bold">
-                        [ INITIATE CONTACT ]
-                    </span>
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth={2}
-                        stroke="currentColor"
-                        className="relative z-10 w-4 h-4 group-hover:translate-x-1 transition-transform"
+                {/* CTA with Concentric Gravitational Wave Ripples */}
+                <div className="relative inline-flex items-center justify-center">
+                    {/* Concentric gravitational pulses (Desktop) */}
+                    {!isMobile && (
+                        <>
+                            <div className="absolute -inset-4 rounded-xl border border-[#FFD700]/20 animate-ping opacity-30 pointer-events-none" style={{ animationDuration: '3s' }} />
+                            <div className="absolute -inset-8 rounded-2xl border border-[#A855F7]/15 animate-ping opacity-20 pointer-events-none" style={{ animationDuration: '4s', animationDelay: '1s' }} />
+                        </>
+                    )}
+
+                    <a
+                        href="mailto:kurapatikushalnarasimha95@gmail.com"
+                        className="group relative inline-flex items-center gap-3 px-12 py-5 overflow-hidden cursor-interactive bg-black/60 backdrop-blur-md transition-all duration-300 hover:scale-105"
+                        style={{
+                            border: '1px solid rgba(255,215,0,0.5)',
+                            color: '#FFD700',
+                            fontFamily: 'JetBrains Mono, monospace',
+                            boxShadow: '0 0 30px rgba(255,215,0,0.15)',
+                        }}
                     >
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-                    </svg>
-                </a>
+                        {/* Hover fill */}
+                        <div
+                            className="absolute inset-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300 bg-gradient-to-r from-[#FFD700]/15 via-[#A855F7]/15 to-[#FFD700]/15"
+                        />
+                        <span className="relative z-10 text-xs sm:text-sm tracking-[0.4em] uppercase font-bold">
+                            [ INITIATE CONTACT ]
+                        </span>
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={2}
+                            stroke="currentColor"
+                            className="relative z-10 w-4 h-4 group-hover:translate-x-1.5 transition-transform"
+                        >
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                        </svg>
+                    </a>
+                </div>
 
                 {/* Spacer note */}
                 <p className="mt-8 font-mono text-[10px] text-white/15 tracking-wider">
