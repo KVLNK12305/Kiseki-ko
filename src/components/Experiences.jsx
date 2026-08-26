@@ -1,6 +1,8 @@
 import React, { useRef, useEffect, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { motion } from 'framer-motion';
+import useIsMobile from '../hooks/useIsMobile';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -314,8 +316,10 @@ const CertsExperience = () => {
     const triggerRef  = useRef(null);
     const tapeRef     = useRef(null);
     const [activeIdx, setActiveIdx] = useState(0);
+    const isMobile = useIsMobile();
 
     useEffect(() => {
+        if (isMobile) return;
         const totalFrames = CAREER_FRAMES.length;
         const scrollLen   = totalFrames * 1000;
 
@@ -343,7 +347,66 @@ const CertsExperience = () => {
         });
 
         return () => ctx.revert();
-    }, []);
+    }, [isMobile]);
+
+    if (isMobile) {
+        return (
+            <section id="experience" className="relative bg-[#030305] flex flex-col pt-24 pb-24 overflow-hidden">
+                <div className="absolute inset-0 bg-speed-lines opacity-60 pointer-events-none" />
+                <div className="absolute inset-0 bg-pattern-dots opacity-30 pointer-events-none" />
+                
+                <div className="w-full px-6 mb-16 relative z-20">
+                    <div className="flex items-center gap-2 text-[#FFD700] text-xs tracking-[0.2em] opacity-80 mb-2">
+                        <span>CAREER TRAJECTORY</span>
+                        <span className="w-12 h-[1px] bg-[#FFD700]/50" />
+                    </div>
+                </div>
+
+                <div className="relative z-20 w-full px-6">
+                    {/* Vertical Glowing Track */}
+                    <div className="absolute left-[41px] top-4 bottom-0 w-[2px] bg-gradient-to-b from-[#FFD700]/40 via-[#FFD700]/10 to-transparent z-10" />
+
+                    <div className="flex flex-col gap-16">
+                        {CAREER_FRAMES.map((frame, i) => (
+                            <motion.div
+                                key={frame.frame}
+                                initial={{ opacity: 0, y: 30 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true, margin: "-100px" }}
+                                transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
+                                className="relative flex flex-col pl-14"
+                            >
+                                {/* Timeline Node (Dot) */}
+                                <div 
+                                    className="absolute left-[17px] top-[12px] -translate-x-1/2 w-[10px] h-[10px] rounded-full bg-[#030305] border-[2px] z-20" 
+                                    style={{ borderColor: frame.statusColor, boxShadow: `0 0 12px ${frame.statusColor}60` }} 
+                                />
+
+                                <div className="flex items-center gap-2.5 mb-2">
+                                    <span className="text-[10px] tracking-[0.35em] uppercase" style={{ fontFamily: 'var(--font-mono)', color: frame.statusColor }}>
+                                        {frame.status}
+                                    </span>
+                                </div>
+                                <div className="leading-none mb-3" style={{ fontFamily: 'var(--font-display)', fontSize: '3.8rem', color: '#FFFFFF', textShadow: `0 0 40px rgba(255,215,0,0.1)` }}>
+                                    {frame.year}
+                                </div>
+                                <h3 className="text-2xl font-bold text-white leading-tight mt-1 mb-2">{frame.role}</h3>
+                                <p className="text-sm font-semibold mb-6 tracking-wide" style={{ color: frame.accent }}>@ {frame.org}</p>
+                                <ul className="space-y-4">
+                                    {frame.bullets.map((bullet, idx) => (
+                                        <li key={idx} className="flex items-start gap-3 text-sm text-white/75 leading-relaxed">
+                                            <span className="mt-1 shrink-0 text-[10px]" style={{ color: frame.accent }}>▸</span>
+                                            <span>{bullet}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </motion.div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+        );
+    }
 
     return (
         <section

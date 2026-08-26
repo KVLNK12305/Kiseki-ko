@@ -2,8 +2,10 @@ import React, { useRef, useState } from 'react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { motion } from 'framer-motion';
 import { Award, BookOpen, ExternalLink, ScrollText, X, BadgeCheck } from 'lucide-react';
 import CertCard from './CertCard';
+import useIsMobile from '../hooks/useIsMobile';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -87,11 +89,15 @@ const ResearchCard = ({ item }) => {
     const isPublished = item.status === 'Published';
 
     return (
-        <a
+        <motion.a
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
             href={item.link}
             target="_blank"
             rel="noopener noreferrer"
-            className="research-card block group relative rounded-2xl overflow-hidden transition-all duration-400 cursor-interactive opacity-0"
+            className="research-card block group relative rounded-2xl overflow-hidden transition-all duration-400 cursor-interactive"
             style={{
                 // Editorial "paper" aesthetic — light card on dark bg
                 background: 'linear-gradient(135deg, #F5F0E8 0%, #EDE8DE 100%)',
@@ -170,7 +176,7 @@ const ResearchCard = ({ item }) => {
                 className="h-1 w-full"
                 style={{ background: `linear-gradient(to right, ${item.iconColor}, transparent)` }}
             />
-        </a>
+        </motion.a>
     );
 };
 
@@ -179,25 +185,11 @@ const Honors_n_certs = () => {
     const containerRef    = useRef(null);
     const marqueeInnerRef = useRef(null);
     const [selectedCert, setSelectedCert] = useState(null);
+    const isMobile = useIsMobile();
 
     useGSAP(() => {
-        // Section entrance
-        const tl = gsap.timeline({
-            scrollTrigger: {
-                trigger: containerRef.current,
-                start: 'top 90%',
-            }
-        });
-
-        tl.fromTo('.hon-header',
-            { y: 30, autoAlpha: 0 },
-            { y: 0, autoAlpha: 1, duration: 0.8, ease: 'power3.out' }
-        ).fromTo('.research-card',
-            { y: 50, autoAlpha: 0 },
-            { y: 0, autoAlpha: 1, duration: 0.8, stagger: 0.2, ease: 'power3.out', clearProps: 'transform' },
-            '-=0.4'
-        );
-
+        if (isMobile) return;
+        
         // Marquee
         const inner = marqueeInnerRef.current;
         if (inner) {
@@ -226,7 +218,13 @@ const Honors_n_certs = () => {
             <div className="container mx-auto max-w-6xl px-6 relative z-10">
 
                 {/* ── Section Header ─── */}
-                <div className="hon-header flex items-end gap-6 mb-20 opacity-0">
+                <motion.div 
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-50px" }}
+                    transition={{ duration: 0.6, ease: "easeOut" }}
+                    className="hon-header flex items-end gap-6 mb-20"
+                >
                     {/* Watermark number — Font_1.otf */}
                     <div
                         className="hidden md:block select-none pointer-events-none leading-none"
@@ -252,7 +250,7 @@ const Honors_n_certs = () => {
                             Honors &amp; Research
                         </h2>
                     </div>
-                </div>
+                </motion.div>
 
                 {/* ── Research Grid ─── */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-28">
@@ -263,7 +261,13 @@ const Honors_n_certs = () => {
 
                 {/* ── Certifications Marquee ─── */}
                 <div className="relative">
-                    <div className="hon-header text-center mb-10 opacity-0">
+                    <motion.div 
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, margin: "-50px" }}
+                        transition={{ duration: 0.6, ease: "easeOut" }}
+                        className="hon-header text-center mb-10"
+                    >
                         <h3
                             className="font-mono text-xs tracking-[0.5em] text-[#FFD700]/60 uppercase flex items-center justify-center gap-4"
                         >
@@ -271,16 +275,18 @@ const Honors_n_certs = () => {
                             CERTIFICATIONS
                             <span className="h-px w-10 bg-[#FFD700]/25" />
                         </h3>
-                    </div>
+                    </motion.div>
 
                     {/* Edge fades */}
                     <div className="absolute left-0 top-0 bottom-0 w-24 z-20 bg-gradient-to-r from-[#030305] to-transparent pointer-events-none" />
                     <div className="absolute right-0 top-0 bottom-0 w-24 z-20 bg-gradient-to-l from-[#030305] to-transparent pointer-events-none" />
 
-                    <div className="flex overflow-hidden py-4">
-                        <div ref={marqueeInnerRef} className="flex w-max">
-                            {[...CERTIFICATES, ...CERTIFICATES].map((cert, i) => (
-                                <CertCard key={`${cert.id}-${i}`} cert={cert} onClick={setSelectedCert} />
+                    <div className={`flex py-4 ${isMobile ? 'overflow-x-auto snap-x snap-mandatory pb-8' : 'overflow-hidden'}`}>
+                        <div ref={isMobile ? null : marqueeInnerRef} className="flex w-max gap-4 px-4">
+                            {(isMobile ? CERTIFICATES : [...CERTIFICATES, ...CERTIFICATES]).map((cert, i) => (
+                                <div key={`${cert.id}-${i}`} className={isMobile ? 'snap-center shrink-0 w-[85vw]' : ''}>
+                                    <CertCard cert={cert} onClick={setSelectedCert} />
+                                </div>
                             ))}
                         </div>
                     </div>
@@ -290,7 +296,7 @@ const Honors_n_certs = () => {
             {/* ── Certificate Modal ─── */}
             {selectedCert && (
                 <div
-                    className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+                    className={`fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/80 ${isMobile ? '' : 'backdrop-blur-sm'}`}
                     onClick={() => setSelectedCert(null)}
                 >
                     <div

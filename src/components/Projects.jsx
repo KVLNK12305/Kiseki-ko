@@ -165,6 +165,10 @@ const DemoPanel = ({ project, revealed }) => {
             >
                 <ClassifiedStamp clearance={project.clearance} revealed={revealed} />
 
+                {/* Mobile: simple flex column layout */}
+                <div className="flex lg:hidden flex-col gap-8 w-full relative z-20">
+                </div>
+                
                 {/* Mock browser header */}
                 <div className="w-full h-8 border-b border-white/[0.06] flex items-center px-4 justify-between bg-[#0a0a0f] shrink-0 z-10 relative">
                     <div className="flex gap-2">
@@ -413,7 +417,7 @@ const MobileBentoCard = ({ project, index, onOpenVideo }) => {
                     <span className="font-mono text-[9px] tracking-[0.15em] uppercase" style={{ color: clearanceColor }}>
                         {project.clearance}
                     </span>
-                    <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: clearanceColor }} />
+                    <span className="w-1.5 h-1.5 rounded-full" style={{ background: clearanceColor }} />
                 </div>
             </div>
 
@@ -439,7 +443,7 @@ const MobileBentoCard = ({ project, index, onOpenVideo }) => {
                         return (
                             <span
                                 key={tag.name}
-                                className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-mono font-medium rounded-md border backdrop-blur-md"
+                                className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-mono font-medium rounded-md border"
                                 style={{
                                     background: style.bg,
                                     borderColor: style.border,
@@ -535,7 +539,7 @@ const Projects = () => {
                 {expandedVideo && (
                     createPortal(
                         <div
-                            className="fixed inset-0 z-[200] bg-black/90 backdrop-blur-md flex items-center justify-center p-4 cursor-pointer"
+                            className="fixed inset-0 z-[200] bg-black/95 flex items-center justify-center p-4 cursor-pointer"
                             onClick={() => setExpandedVideo(null)}
                         >
                             <div className="relative w-full h-auto aspect-video rounded-xl overflow-hidden border border-[#FFD700]/40 bg-black">
