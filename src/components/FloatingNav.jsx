@@ -108,6 +108,8 @@ const SocialItem = ({ item }) => {
 // ── Main FloatingNav ──────────────────────────────────────────
 const FloatingNav = ({ lenis }) => {
     const [activeSection, setActiveSection] = useState('home');
+    const [scrollProgress, setScrollProgress] = useState(0);
+    const [isNavVisible, setIsNavVisible] = useState(false);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -120,6 +122,19 @@ const FloatingNav = ({ lenis }) => {
                 }
             }
             setActiveSection(current);
+
+            // Show nav only when scrolled past a portion of the hero (e.g. 50vh)
+            if (window.scrollY > window.innerHeight * 0.5) {
+                setIsNavVisible(true);
+            } else {
+                setIsNavVisible(false);
+            }
+
+            // Compute global page scroll percentage
+            const totalScroll = document.documentElement.scrollHeight - window.innerHeight;
+            if (totalScroll > 0) {
+                setScrollProgress((window.scrollY / totalScroll) * 100);
+            }
         };
         handleScroll();
         window.addEventListener('scroll', handleScroll, { passive: true });
@@ -140,66 +155,71 @@ const FloatingNav = ({ lenis }) => {
     };
 
     return (
-        <>
-            {/* ── DESKTOP: Vertical Sidebar ──────────────────────────── */}
-            <motion.aside
-                className="hidden md:flex fixed left-0 top-0 h-screen z-[100] flex-col items-center justify-between py-8 w-16
-                           border-r border-white/[0.04] bg-[#030305]/80 backdrop-blur-xl"
-                initial={{ x: -80, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: 2.6, duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
-            >
-                {/* Top spacer — no monogram */}
-                <div className="w-6 h-[1px] bg-[#FFD700]/15 rounded-full" />
+        <AnimatePresence>
+            {isNavVisible && (
+                <>
+                    {/* ── DESKTOP: Vertical Sidebar ──────────────────────── */}
+                    <motion.aside
+                        className="hidden md:flex fixed left-0 top-0 h-screen z-[100] flex-col items-center justify-between py-8 w-16
+                                   border-r border-white/[0.04] bg-[#030305]/85 backdrop-blur-xl"
+                        initial={{ x: -80, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        exit={{ x: -80, opacity: 0 }}
+                        transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
+                    >
 
-                {/* Nav Items */}
-                <nav className="flex flex-col items-center gap-2">
-                    {NAV_CONFIG.map((item) => (
-                        <NavItem
-                            key={item.targetId}
-                            item={item}
-                            isActive={activeSection === item.targetId}
-                            onClick={() => scrollTo(item.targetId)}
-                        />
-                    ))}
-                </nav>
+                        {/* Top spacer — no monogram */}
+                        <div className="w-6 h-[1px] bg-[#FFD700]/15 rounded-full" />
 
-                {/* Socials + bottom line */}
-                <div className="flex flex-col items-center gap-3">
-                    {SOCIALS.map((s) => <SocialItem key={s.label} item={s} />)}
-                    {/* Decorative vertical line */}
-                    <div className="w-[1px] h-12 bg-gradient-to-b from-white/10 to-transparent mt-2" />
-                </div>
-            </motion.aside>
+                        {/* Nav Items */}
+                        <nav className="flex flex-col items-center gap-2">
+                            {NAV_CONFIG.map((item) => (
+                                <NavItem
+                                    key={item.targetId}
+                                    item={item}
+                                    isActive={activeSection === item.targetId}
+                                    onClick={() => scrollTo(item.targetId)}
+                                />
+                            ))}
+                        </nav>
 
-            {/* ── MOBILE: Bottom Floating Pill ───────────────────────── */}
-            <motion.div
-                className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] pointer-events-none"
-                initial={{ y: 100, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 2.5, type: 'spring', stiffness: 240, damping: 22 }}
-            >
-                <div className="flex items-center gap-1 px-3 py-2.5 bg-[#0d0d12]/90 backdrop-blur-xl border border-white/10 rounded-full shadow-2xl pointer-events-auto"
-                     style={{ boxShadow: '0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,215,0,0.05)' }}>
-                    {NAV_CONFIG.map((item) => (
-                        <button
-                            key={item.targetId}
-                            onClick={() => scrollTo(item.targetId)}
-                            aria-label={item.label}
-                            className={`
-                                w-9 h-9 flex items-center justify-center rounded-full transition-all duration-300
-                                ${activeSection === item.targetId
-                                    ? 'bg-[#FFD700] text-black shadow-[0_0_15px_rgba(255,215,0,0.4)]'
-                                    : 'text-white/40 hover:text-white/80'
-                                }
-                            `}
-                        >
-                            <item.Icon size={14} strokeWidth={activeSection === item.targetId ? 2.5 : 1.5} />
-                        </button>
-                    ))}
-                </div>
-            </motion.div>
-        </>
+                        {/* Socials */}
+                        <div className="flex flex-col items-center gap-3">
+                            {SOCIALS.map((s) => <SocialItem key={s.label} item={s} />)}
+                        </div>
+                    </motion.aside>
+
+                    {/* ── MOBILE: Bottom Floating Pill ───────────────────────── */}
+                    <motion.div
+                        className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] pointer-events-none"
+                        initial={{ y: 100, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        exit={{ y: 100, opacity: 0 }}
+                        transition={{ type: 'spring', stiffness: 240, damping: 22 }}
+                    >
+                        <div className="flex items-center gap-1 px-3 py-2.5 bg-[#0d0d12]/90 backdrop-blur-xl border border-white/10 rounded-full shadow-2xl pointer-events-auto"
+                             style={{ boxShadow: '0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,215,0,0.05)' }}>
+                            {NAV_CONFIG.map((item) => (
+                                <button
+                                    key={item.targetId}
+                                    onClick={() => scrollTo(item.targetId)}
+                                    aria-label={item.label}
+                                    className={`
+                                        w-9 h-9 flex items-center justify-center rounded-full transition-all duration-300
+                                        ${activeSection === item.targetId
+                                            ? 'bg-[#FFD700] text-black shadow-[0_0_15px_rgba(255,215,0,0.4)]'
+                                            : 'text-white/40 hover:text-white/80'
+                                        }
+                                    `}
+                                >
+                                    <item.Icon size={14} strokeWidth={activeSection === item.targetId ? 2.5 : 1.5} />
+                                </button>
+                            ))}
+                        </div>
+                    </motion.div>
+                </>
+            )}
+        </AnimatePresence>
     );
 };
 
