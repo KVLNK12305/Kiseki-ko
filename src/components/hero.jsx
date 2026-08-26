@@ -146,13 +146,17 @@ const Hero = () => {
             { clipPath: 'polygon(0 49%, 100% 49%, 100% 51%, 0 51%)' },
             { clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)', duration: 1.1, ease: 'expo.inOut' },
             '-=0.35'
-        )
-        .fromTo('.editorial-line',
-            { strokeDashoffset: 500 },
-            { strokeDashoffset: 0, duration: 1.4, stagger: 0.05, ease: 'power2.out' },
-            '-=0.6'
-        )
-        .fromTo(['.hero-left-pane', '.hero-right-pane', '.hero-header-bar', '.hero-footer-bar'],
+        );
+
+        if (contourSvgRef.current) {
+            tl.fromTo('.editorial-line',
+                { strokeDashoffset: 500 },
+                { strokeDashoffset: 0, duration: 1.4, stagger: 0.05, ease: 'power2.out' },
+                '-=0.6'
+            );
+        }
+
+        tl.fromTo(['.hero-left-pane', '.hero-right-pane', '.hero-header-bar', '.hero-footer-bar'],
             { opacity: 0, y: 20 },
             { opacity: 1, y: 0, duration: 0.8, stagger: 0.1, ease: 'power2.out' },
             '-=0.8'
@@ -176,10 +180,16 @@ const Hero = () => {
             <div ref={flashRef} className="absolute inset-0 z-[60] bg-white pointer-events-none opacity-0" />
 
             <div ref={slashRef} className="relative w-full h-full flex flex-col justify-between flex-1">
-                <CelestialField overdrive={domainOverdrive} />
+                {!isMobile ? (
+                    <CelestialField overdrive={domainOverdrive} />
+                ) : (
+                    <div className="absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#FFD700]/5 via-transparent to-transparent pointer-events-none" />
+                )}
 
                 {/* Restrained Atmospheric Lighting */}
-                <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] sm:w-[900px] lg:w-[1200px] h-[500px] lg:h-[700px] rounded-full blur-[160px] pointer-events-none z-0 transition-all duration-700 ${
+                <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full pointer-events-none z-0 transition-all duration-700 ${
+                    isMobile ? 'w-[400px] h-[400px] blur-[100px]' : 'w-[600px] sm:w-[900px] lg:w-[1200px] h-[500px] lg:h-[700px] blur-[160px]'
+                } ${
                     domainOverdrive 
                         ? 'bg-gradient-to-r from-[#EF4444]/18 via-[#FFD700]/20 to-[#A855F7]/16 scale-110' 
                         : 'bg-gradient-to-r from-[#A855F7]/10 via-[#FFD700]/10 to-[#EAB308]/08'
@@ -212,26 +222,28 @@ const Hero = () => {
                 <div className="relative z-20 flex-1 w-full max-w-[1700px] mx-auto px-5 sm:px-10 lg:px-16 flex flex-col lg:flex-row items-center justify-between gap-6 lg:gap-8 py-4 lg:py-2">
                     
                     {/* Generative Vector Topological Contour Waves (Desktop/Tablet) */}
-                    <motion.svg
-                        ref={contourSvgRef}
-                        style={{ x: isMobile ? 0 : linesX }}
-                        className="absolute inset-0 w-full h-full pointer-events-none opacity-20 lg:opacity-30 z-0 overflow-visible"
-                        viewBox="0 0 1200 800"
-                        fill="none"
-                    >
-                        {[0, 35, 70, 105, 140, 175, 210].map((offset, i) => (
-                            <path
-                                key={i}
-                                className="editorial-line"
-                                d={`M ${220 + offset * 1.3} 0 C ${380 + offset} 220, ${480 + offset} 480, ${720 + offset * 1.1} 800`}
-                                stroke={domainOverdrive ? '#EF4444' : '#FFD700'}
-                                strokeWidth={domainOverdrive ? '1.5' : '1'}
-                                strokeOpacity={domainOverdrive ? 0.8 - i * 0.08 : 0.6 - i * 0.07}
-                                strokeDasharray="500"
-                                strokeDashoffset="0"
-                            />
-                        ))}
-                    </motion.svg>
+                    {!isMobile && (
+                        <motion.svg
+                            ref={contourSvgRef}
+                            style={{ x: isMobile ? 0 : linesX }}
+                            className="absolute inset-0 w-full h-full pointer-events-none opacity-20 lg:opacity-30 z-0 overflow-visible"
+                            viewBox="0 0 1200 800"
+                            fill="none"
+                        >
+                            {[0, 35, 70, 105, 140, 175, 210].map((offset, i) => (
+                                <path
+                                    key={i}
+                                    className="editorial-line"
+                                    d={`M ${220 + offset * 1.3} 0 C ${380 + offset} 220, ${480 + offset} 480, ${720 + offset * 1.1} 800`}
+                                    stroke={domainOverdrive ? '#EF4444' : '#FFD700'}
+                                    strokeWidth={domainOverdrive ? '1.5' : '1'}
+                                    strokeOpacity={domainOverdrive ? 0.8 - i * 0.08 : 0.6 - i * 0.07}
+                                    strokeDasharray="500"
+                                    strokeDashoffset="0"
+                                />
+                            ))}
+                        </motion.svg>
+                    )}
 
                     {/* ── LEFT COLUMN: SYSTEMS & CORE CODENAME ──────── */}
                     <motion.div
@@ -291,22 +303,24 @@ const Hero = () => {
                                 <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
                             </button>
 
-                            <button
-                                onClick={triggerDomainBurst}
-                                className={`group inline-flex items-center gap-2 px-4 sm:px-5 py-3 sm:py-3.5 text-[11px] sm:text-xs font-mono uppercase tracking-widest transition-all duration-300 rounded-none cursor-interactive ${
-                                    domainOverdrive
-                                        ? 'bg-[#A855F7]/20 border border-[#A855F7] text-white shadow-[0_0_20px_rgba(168,85,247,0.4)]'
-                                        : 'bg-transparent border border-[#A855F7]/35 hover:border-[#A855F7] text-[#A855F7]'
-                                }`}
-                            >
-                                <Zap size={14} className={domainOverdrive ? 'text-[#FFD700] animate-bounce' : 'text-[#A855F7]'} />
-                                <span>{domainOverdrive ? 'OVERCLOCK ACTIVE' : 'OVERCLOCK'}</span>
-                            </button>
+                            {!isMobile && (
+                                <button
+                                    onClick={triggerDomainBurst}
+                                    className={`group inline-flex items-center gap-2 px-4 sm:px-5 py-3 sm:py-3.5 text-[11px] sm:text-xs font-mono uppercase tracking-widest transition-all duration-300 rounded-none cursor-interactive ${
+                                        domainOverdrive
+                                            ? 'bg-[#A855F7]/20 border border-[#A855F7] text-white shadow-[0_0_20px_rgba(168,85,247,0.4)]'
+                                            : 'bg-transparent border border-[#A855F7]/35 hover:border-[#A855F7] text-[#A855F7]'
+                                    }`}
+                                >
+                                    <Zap size={14} className={domainOverdrive ? 'text-[#FFD700] animate-bounce' : 'text-[#A855F7]'} />
+                                    <span>{domainOverdrive ? 'OVERCLOCK ACTIVE' : 'OVERCLOCK'}</span>
+                                </button>
+                            )}
                         </div>
                     </motion.div>
 
                     {/* ── CENTER: OPERATOR IDENTITY PORTRAIT ────────── */}
-                    <div className="relative z-20 flex-1 flex items-end justify-center w-full h-[45vh] sm:h-[60vh] lg:h-[78vh] max-h-[780px]">
+                    <div className="relative z-20 flex-1 flex items-end justify-center w-full h-[40vh] sm:h-[60vh] lg:h-[78vh] max-h-[780px]">
                         {/* Portrait Image Wrapper */}
                         <motion.div
                             style={{

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { Network, Radar, Bug, Waypoints, LineChart } from 'lucide-react';
+import useIsMobile from '../hooks/useIsMobile';
 
 import tableauImg from './images/tableau-software (1).png';
 import osintImg from './images/osint.png';
@@ -89,6 +90,7 @@ const CATEGORIES = [
 ];
 
 const Arsenal = () => {
+  const isMobile = useIsMobile();
   const [activeCategory, setActiveCategory] = useState('all');
   const [hoveredNode, setHoveredNode] = useState(null);
 
@@ -101,6 +103,7 @@ const Arsenal = () => {
   const displayY = useTransform(mouseY, (val) => val.toFixed(2));
 
   useEffect(() => {
+    if (isMobile) return;
     const handleMouseMove = (e) => {
       // Direct MotionValue updates do not trigger React renders
       mouseX.set((e.clientX / window.innerWidth - 0.5) * 20);
@@ -108,7 +111,7 @@ const Arsenal = () => {
     };
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, [mouseX, mouseY]);
+  }, [mouseX, mouseY, isMobile]);
 
   const isNodeActive = (node) => activeCategory === 'all' || node.category === activeCategory;
 
@@ -157,7 +160,7 @@ const Arsenal = () => {
         </div>
 
         {/* CONSTELLATION MAP */}
-        <div className="flex-1 relative min-h-[800px] border border-white/5 rounded-3xl bg-black/40 backdrop-blur-md overflow-hidden">
+        <div className={`flex-1 relative min-h-[800px] border border-white/5 rounded-3xl bg-black/40 overflow-hidden ${isMobile ? '' : 'backdrop-blur-md'}`}>
           
           {/* ADVANCED TELEMETRY HUD */}
           <AnimatePresence>
@@ -166,7 +169,7 @@ const Arsenal = () => {
                 initial={{ opacity: 0, x: 20, scale: 0.95 }}
                 animate={{ opacity: 1, x: 0, scale: 1 }}
                 exit={{ opacity: 0, x: 20, scale: 0.95 }}
-                className="absolute top-4 left-4 right-4 md:left-auto md:top-8 md:right-8 z-30 md:w-72 bg-[#0a0a0c]/90 border border-[#FFD700]/40 p-5 rounded-lg backdrop-blur-xl shadow-2xl"
+                className={`absolute top-4 left-4 right-4 md:left-auto md:top-8 md:right-8 z-30 md:w-72 bg-[#0a0a0c]/90 border border-[#FFD700]/40 p-5 rounded-lg shadow-2xl ${isMobile ? '' : 'backdrop-blur-xl'}`}
               >
                 <div className="flex items-center justify-between mb-3 pb-2 border-b border-[#FFD700]/20">
                   <span className="text-[10px] text-[#FFD700] tracking-widest">DIAGNOSTIC_PANEL</span>

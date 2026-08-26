@@ -185,7 +185,7 @@ const Climax = () => {
         >
             {/* ── Vortex layer ─── */}
             <div className="absolute inset-0 z-0">
-                {prefersReducedMotion ? (
+                {prefersReducedMotion || isMobile ? (
                     <StaticVortex />
                 ) : (
                     <>

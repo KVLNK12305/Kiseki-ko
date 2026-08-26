@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
+import useIsMobile from '../hooks/useIsMobile';
 
 // ── Boot Log Lines ─────────────────────────────────────────────
 const BOOT_LINES = [
@@ -15,6 +16,13 @@ const BOOT_LINES = [
     { status: 'OK',   text: 'audio.codec.initialized' },
     { status: 'OK',   text: 'sys.firewall.hardened' },
     { status: 'OK',   text: 'portfolio.v4.compiled' },
+    { status: 'OK',   text: 'all_systems.nominal' },
+];
+
+const MOBILE_BOOT_LINES = [
+    { status: 'OK',   text: 'kernel.modules.loaded' },
+    { status: 'OK',   text: 'net.signal.acquired' },
+    { status: 'OK',   text: 'sys.firewall.hardened' },
     { status: 'OK',   text: 'all_systems.nominal' },
 ];
 
@@ -112,6 +120,7 @@ const Preloader = ({ onComplete }) => {
     const counterRef   = useRef(null);
     const logRef       = useRef(null);
     const flashRef     = useRef(null);
+    const isMobile     = useIsMobile();
 
     const [visibleLines, setVisibleLines] = useState([]);
     const [percentage, setPercentage]     = useState(0);
@@ -153,7 +162,7 @@ const Preloader = ({ onComplete }) => {
           // Stagger each letter
           .fromTo(
               nameRef.current.querySelectorAll('.pl-letter'),
-              { opacity: 0, filter: 'blur(6px)' },
+              isMobile ? { opacity: 0 } : { opacity: 0, filter: 'blur(6px)' },
               {
                   opacity: 1,
                   filter: 'blur(0px)',
@@ -176,7 +185,7 @@ const Preloader = ({ onComplete }) => {
         const counterObj = { val: 0 };
         gsap.to(counterObj, {
             val: 100,
-            duration: 2.6,
+            duration: isMobile ? 1.4 : 2.6,
             ease: 'power2.inOut',
             onUpdate: () => {
                 setPercentage(Math.round(counterObj.val));
@@ -184,8 +193,11 @@ const Preloader = ({ onComplete }) => {
         });
 
         // Boot log lines — stagger them in
-        BOOT_LINES.forEach((line, i) => {
-            const delay = 0.2 + i * (2.2 / BOOT_LINES.length);
+        const activeLines = isMobile ? MOBILE_BOOT_LINES : BOOT_LINES;
+        const totalDuration = isMobile ? 1.0 : 2.2;
+        
+        activeLines.forEach((line, i) => {
+            const delay = 0.2 + i * (totalDuration / activeLines.length);
             gsap.delayedCall(delay, () => {
                 setVisibleLines(prev => [...prev, line]);
             });
@@ -204,11 +216,15 @@ const Preloader = ({ onComplete }) => {
             className="fixed inset-0 z-[200] bg-[#030305] flex flex-col items-center justify-center overflow-hidden"
         >
             {/* Particle canvas */}
-            <canvas
-                ref={canvasRef}
-                className="absolute inset-0 pointer-events-none"
-            />
-            <ParticleField canvasRef={canvasRef} />
+            {!isMobile && (
+                <>
+                    <canvas
+                        ref={canvasRef}
+                        className="absolute inset-0 pointer-events-none"
+                    />
+                    <ParticleField canvasRef={canvasRef} />
+                </>
+            )}
 
             {/* Radial vignette */}
             <div
