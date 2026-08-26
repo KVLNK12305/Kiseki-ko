@@ -134,8 +134,10 @@
     color: #000;
   }
 
-  @media (hover: none) {
-    html { cursor: auto; }
+  @media (hover: none), (pointer: coarse) {
+    html, body, *, *::before, *::after {
+      cursor: auto !important;
+    }
   }
 }
 
@@ -156,6 +158,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+@media (hover: none), (pointer: coarse), (max-width: 767px) {
+  .cursor-hybrid {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+  }
 }
 
 .cursor-tux, .cursor-duck {
