@@ -403,7 +403,7 @@
 .bento-grid {
   display: grid;
   grid-template-columns: repeat(1, minmax(0, 1fr));
-  gap: 1.5rem;
+  gap: 2rem;
 }
 
 @media (min-width: 768px) {
@@ -606,5 +606,34 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+/* ============================================================
+   9. MOBILE PERFORMANCE OVERRIDES (Minimalism Directive)
+   ============================================================ */
+@media (max-width: 767px), (pointer: coarse) {
+  /* Kill all backdrop-blur — major GPU composite cost */
+  [class*="backdrop-blur"],
+  .backdrop-blur-sm, .backdrop-blur-md, .backdrop-blur-lg {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  /* Prevent will-change layer promotion spam */
+  * {
+    will-change: auto !important;
+  }
+
+  /* Cap animation durations — no long spring settling */
+  @media (prefers-reduced-motion: no-preference) {
+    *, *::before, *::after {
+      animation-duration: 0.4s !important;
+    }
+  }
+
+  /* Kill animate-pulse on mobile — saves repaint cycles */
+  .animate-pulse {
+    animation: none !important;
   }
 }
