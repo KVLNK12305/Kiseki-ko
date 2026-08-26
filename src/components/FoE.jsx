@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { Network, Radar, Bug, Waypoints, LineChart } from 'lucide-react';
@@ -91,8 +91,10 @@ const CATEGORIES = [
 
 const Arsenal = () => {
   const isMobile = useIsMobile();
+  const mapRef = useRef(null);
   const [activeCategory, setActiveCategory] = useState('all');
   const [hoveredNode, setHoveredNode] = useState(null);
+  const [scanComplete, setScanComplete] = useState(false);
 
   // OPTIMIZATION: Use MotionValues to avoid "Maximum update depth" re-render loops
   const mouseX = useMotionValue(0);
@@ -105,7 +107,6 @@ const Arsenal = () => {
   useEffect(() => {
     if (isMobile) return;
     const handleMouseMove = (e) => {
-      // Direct MotionValue updates do not trigger React renders
       mouseX.set((e.clientX / window.innerWidth - 0.5) * 20);
       mouseY.set((e.clientY / window.innerHeight - 0.5) * 20);
     };
@@ -131,7 +132,9 @@ const Arsenal = () => {
           <div className="flex items-center gap-2 text-[#FFD700] text-xs tracking-[0.2em] opacity-80">
             <span>SYSTEM INVENTORY</span>
             <span className="w-12 h-[1px] bg-[#FFD700]/50" />
-            <span>STATUS: ACTIVE</span>
+            <span className={scanComplete ? "text-emerald-400 font-bold" : "text-[#FFD700]"}>
+              {scanComplete ? "STATUS: 18 ASSETS INDEXED" : "STATUS: RADAR SCANNING"}
+            </span>
           </div>
           <h2 className="text-5xl md:text-7xl font-bold tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-gray-500">
             TECH ARSENAL
@@ -160,7 +163,25 @@ const Arsenal = () => {
         </div>
 
         {/* CONSTELLATION MAP */}
-        <div className={`flex-1 relative min-h-[800px] border border-white/5 rounded-3xl bg-black/40 overflow-hidden ${isMobile ? '' : 'backdrop-blur-md'}`}>
+        <div 
+          ref={mapRef}
+          className={`flex-1 relative min-h-[800px] border border-white/5 rounded-3xl bg-black/40 overflow-hidden ${isMobile ? '' : 'backdrop-blur-md'}`}
+        >
+          {/* Lusion Radar Pulse Sweep Ring (Desktop) */}
+          {!isMobile && (
+            <motion.div
+              initial={{ scale: 0, opacity: 0.8 }}
+              whileInView={{ scale: 3.2, opacity: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 1.8, ease: "easeOut" }}
+              onAnimationComplete={() => setScanComplete(true)}
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full border border-[#FFD700]/40 pointer-events-none z-0"
+              style={{
+                boxShadow: "0 0 60px rgba(255,215,0,0.2), inset 0 0 40px rgba(168,85,247,0.15)",
+                background: "radial-gradient(circle, rgba(255,215,0,0.06) 0%, transparent 70%)"
+              }}
+            />
+          )}
           
           {/* ADVANCED TELEMETRY HUD */}
           <AnimatePresence>
@@ -200,9 +221,10 @@ const Arsenal = () => {
                   {[...Array(12)].map((_, i) => (
                     <motion.div
                       key={i}
-                      animate={{ height: ['20%', '100%', '40%'] }}
-                      transition={{ duration: 0.5 + Math.random(), repeat: Infinity, ease: "linear", delay: i * 0.05 }}
-                      className="flex-1 bg-[#FFD700] rounded-t-sm"
+                      animate={{ scaleY: [0.2, 1, 0.35, 0.8, 0.2] }}
+                      transition={{ duration: 0.8 + (i * 0.08), repeat: Infinity, ease: "easeInOut" }}
+                      style={{ originY: 1 }}
+                      className="flex-1 h-full bg-[#FFD700] rounded-t-sm"
                     />
                   ))}
                 </div>
@@ -220,14 +242,31 @@ const Arsenal = () => {
               const isHighlighted = hoveredNode && (hoveredNode.id === startId || hoveredNode.id === endId);
 
               return (
-                <motion.line
-                  key={i}
-                  x1={`${startNode.x}%`} y1={`${startNode.y}%`}
-                  x2={`${endNode.x}%`} y2={`${endNode.y}%`}
-                  stroke={isHighlighted ? '#FFD700' : '#ffffff'}
-                  strokeWidth={isHighlighted ? 1.5 : 0.5}
-                  strokeOpacity={isHighlighted ? 0.8 : 0.1}
-                />
+                <g key={i}>
+                  {/* Base connection line with initial draw-in */}
+                  <motion.line
+                    x1={`${startNode.x}%`} y1={`${startNode.y}%`}
+                    x2={`${endNode.x}%`} y2={`${endNode.y}%`}
+                    initial={!isMobile ? { pathLength: 0, opacity: 0 } : false}
+                    whileInView={!isMobile ? { pathLength: 1, opacity: isHighlighted ? 0.9 : 0.12 } : false}
+                    viewport={{ once: true }}
+                    transition={{ duration: 1.2, delay: 0.4 + (i * 0.03), ease: "easeOut" }}
+                    stroke={isHighlighted ? '#FFD700' : '#ffffff'}
+                    strokeWidth={isHighlighted ? 2 : 0.6}
+                  />
+
+                  {/* Active Data Packet Stream Pulse on Hover */}
+                  {isHighlighted && (
+                    <line
+                      x1={`${startNode.x}%`} y1={`${startNode.y}%`}
+                      x2={`${endNode.x}%`} y2={`${endNode.y}%`}
+                      stroke="#FFD700"
+                      strokeWidth={2}
+                      strokeDasharray="6 12"
+                      style={{ filter: "drop-shadow(0 0 6px rgba(255,215,0,0.8))" }}
+                    />
+                  )}
+                </g>
               );
             })}
           </svg>
@@ -237,6 +276,8 @@ const Arsenal = () => {
             {TECH_NODES.map((node) => {
               const isActive = isNodeActive(node);
               const isHovered = hoveredNode?.id === node.id;
+              const distFromCenter = Math.hypot(node.x - 50, node.y - 50);
+              const entranceDelay = 0.2 + (distFromCenter / 50) * 0.5;
 
               return (
                 <motion.div
@@ -245,10 +286,19 @@ const Arsenal = () => {
                     ${!isActive ? 'opacity-10 grayscale pointer-events-none' : 'opacity-100'}
                   `}
                   style={{ left: `${node.x}%`, top: `${node.y}%` }}
+                  initial={!isMobile ? { scale: 0, opacity: 0 } : false}
+                  whileInView={!isMobile ? { scale: 1, opacity: 1 } : false}
+                  viewport={{ once: true, margin: "-50px" }}
                   animate={{
+                    scale: 1,
+                    opacity: 1,
                     y: isHovered ? [`${node.y}%`] : [`${node.y}%`, `${node.y - 1}%`, `${node.y}%`],
                   }}
-                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                  transition={{ 
+                    scale: { delay: entranceDelay, type: "spring", damping: 16, stiffness: 120 },
+                    opacity: { delay: entranceDelay, duration: 0.4 },
+                    y: { duration: 4, repeat: Infinity, ease: "easeInOut" }
+                  }}
                   onMouseEnter={() => setHoveredNode(node)}
                   onMouseLeave={() => setHoveredNode(null)}
                 >
