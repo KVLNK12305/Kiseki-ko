@@ -1,0 +1,118 @@
+import { Key, Shield, Cpu, Network, Radio, Terminal } from 'lucide-react';
+
+export const OBSESSIONS = [
+    {
+        id: 'identity',
+        num: '01',
+        title: 'Identity',
+        icon: Key,
+        question: 'Who are you? What are you allowed to do? And who decided that?',
+        thesis: 'Cloud IAM trust boundaries · Non-human service credentials · Privilege drift',
+        description:
+            "In modern infrastructure, the most dangerous account isn't a person. It's the thing nobody remembered had permission. Exploring how automated service accounts, IAM trust policies, and Zero Trust primitives intersect.",
+        accent: '#FFD700',
+        accentGlow: 'rgba(255, 215, 0, 0.3)',
+        tag: 'PERMISSIONS & TRUST',
+        telemetry: {
+            vector: 'IAM Trust Hierarchy',
+            reach: 'Observed vs Potential',
+            boundary: 'Zero Trust Enforced',
+        },
+        visualType: 'identity',
+    },
+    {
+        id: 'attack-surface',
+        num: '02',
+        title: 'Attack Surface',
+        icon: Radio,
+        question: 'If something gets compromised, where can it actually go?',
+        thesis: 'Blast-radius modeling · Lateral movement · Residual cloud risk',
+        description:
+            "A security boundary isn't really a boundary until you know what happens when someone tries to cross it. Modeling AWS cloud identity relationships to analyze potential access, observed activity, and hidden residual exposure.",
+        accent: '#EF4444',
+        accentGlow: 'rgba(239, 68, 68, 0.3)',
+        tag: 'BLAST-RADIUS & REACH',
+        telemetry: {
+            vector: 'Blast-Radius Graph',
+            reach: 'Multi-Account Hop',
+            boundary: 'Least-Privilege Audit',
+        },
+        visualType: 'radar',
+    },
+    {
+        id: 'systems',
+        num: '03',
+        title: 'Systems',
+        icon: Cpu,
+        question: "What's actually happening underneath the abstraction?",
+        thesis: 'Low-level determinism · Bare-metal memory · Concurrency runtimes',
+        description:
+            "An API isn't just an endpoint. A database isn't just a place to store data. Peeling back the runtime abstraction layers until the hardware mechanics, cache lines, and memory layouts are completely understood.",
+        accent: '#38BDF8',
+        accentGlow: 'rgba(56, 189, 248, 0.3)',
+        tag: 'BARE-METAL MECHANICS',
+        telemetry: {
+            vector: 'Memory Determinism',
+            reach: 'Zero-Cost Runtimes',
+            boundary: 'Cache-Line Coherence',
+        },
+        visualType: 'memory',
+    },
+    {
+        id: 'linux',
+        num: '04',
+        title: 'Linux',
+        icon: Terminal,
+        question: "If it works, great. If it doesn't, I want to know why.",
+        thesis: 'Kernel traces · eBPF telemetry · Network namespaces · Daemons',
+        description:
+            "If there's an abstraction in front of me, I want to know what's underneath it. Debugging system calls, socket snapshots, and authentication logs at 2 AM on Arch Linux until the root cause is crystal clear.",
+        accent: '#A855F7',
+        accentGlow: 'rgba(168, 85, 247, 0.3)',
+        tag: 'KERNEL & DAEMONS',
+        telemetry: {
+            vector: 'eBPF Probe Hooks',
+            reach: 'Kernel Ring Buffer',
+            boundary: 'cgroups & Namespaces',
+        },
+        visualType: 'terminal',
+    },
+    {
+        id: 'architecture',
+        num: '05',
+        title: 'Architecture',
+        icon: Network,
+        question: 'Where should this component live? What happens when it fails?',
+        thesis: 'Fault-tolerant boundaries · Event streams · Failure containment',
+        description:
+            'Making something work for one person is easy. Making it work when everyone is doing something at once is where things get interesting. Designing distributed state machines that fail gracefully and recover deterministically.',
+        accent: '#10B981',
+        accentGlow: 'rgba(16, 185, 129, 0.3)',
+        tag: 'RESILIENCE & SCALE',
+        telemetry: {
+            vector: 'Distributed Meshes',
+            reach: 'Sub-frame Fallback',
+            boundary: 'Partition Resilient',
+        },
+        visualType: 'mesh',
+    },
+    {
+        id: 'security',
+        num: '06',
+        title: 'Security',
+        icon: Shield,
+        question: "A system isn't secure because nothing broke yet. It's secure when you know how it breaks.",
+        thesis: 'Offensive dissection · Packet capture · Reverse engineering',
+        description:
+            'Build something, break it, trace the failure, understand the mechanism, fix it, and then try to break it again. Dissecting live packets with Wireshark and decompiling binaries with Ghidra to harden defenses against real-world adversaries.',
+        accent: '#F59E0B',
+        accentGlow: 'rgba(245, 158, 11, 0.3)',
+        tag: 'DEFENSIVE HARDENING',
+        telemetry: {
+            vector: 'Packet Dissection',
+            reach: 'Binary RE Decompile',
+            boundary: 'Hardened Perimeter',
+        },
+        visualType: 'shield',
+    },
+];
