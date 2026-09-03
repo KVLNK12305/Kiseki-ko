@@ -220,7 +220,7 @@ const Honors_n_certs = () => {
             <div className="absolute inset-0 bg-pattern-dots opacity-50 pointer-events-none" />
 
             {/* Top separator */}
-            <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#FFD700]/15 to-transparent" />
+            <div className="absolute top-0 left-0 w-full h-px bg-white/10" />
 
             <div className="container mx-auto max-w-6xl px-6 relative z-10">
 

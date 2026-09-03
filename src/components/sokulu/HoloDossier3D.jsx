@@ -111,7 +111,7 @@ export default function HoloDossier3D({ imageUrl }) {
               onClick={() => setActiveTab('portrait')}
               className={`px-2.5 py-1 rounded-md transition-all ${
                 activeTab === 'portrait'
-                  ? 'bg-gradient-to-r from-[#A855F7] to-[#7E22CE] text-white font-bold shadow'
+                  ? 'bg-[#A855F7] text-white font-bold shadow'
                   : 'text-white/50 hover:text-white'
               }`}
             >
@@ -121,7 +121,7 @@ export default function HoloDossier3D({ imageUrl }) {
               onClick={() => setActiveTab('specs')}
               className={`px-2.5 py-1 rounded-md transition-all ${
                 activeTab === 'specs'
-                  ? 'bg-gradient-to-r from-[#FFD700] to-[#EAB308] text-black font-bold shadow'
+                  ? 'bg-[#FFD700] text-black font-bold shadow'
                   : 'text-white/50 hover:text-white'
               }`}
             >
@@ -131,7 +131,7 @@ export default function HoloDossier3D({ imageUrl }) {
               onClick={() => setActiveTab('holo')}
               className={`px-2.5 py-1 rounded-md transition-all ${
                 activeTab === 'holo'
-                  ? 'bg-gradient-to-r from-[#3B82F6] to-[#2563EB] text-white font-bold shadow'
+                  ? 'bg-[#3B82F6] text-white font-bold shadow'
                   : 'text-white/50 hover:text-white'
               }`}
             >
@@ -276,7 +276,7 @@ export default function HoloDossier3D({ imageUrl }) {
                       ease: 'easeInOut',
                       delay: i * 0.05,
                     }}
-                    className="w-1 bg-gradient-to-t from-[#A855F7] to-[#FFD700] rounded-full"
+                    className="w-1 bg-[#FFD700] rounded-full"
                   />
                 ))}
               </div>

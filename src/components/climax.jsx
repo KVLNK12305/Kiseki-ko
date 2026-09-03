@@ -232,22 +232,20 @@ const Climax = () => {
 
             {/* ── Content ─── */}
             <div className="relative z-10 text-center px-6 max-w-2xl mx-auto">
-                {/* Mono label */}
-                <p
-                    className="font-mono text-[10px] tracking-[0.5em] text-[#A855F7]/60 uppercase mb-6"
-                    style={{ fontFamily: 'JetBrains Mono, monospace' }}
-                >
-                    06 &nbsp;·&nbsp; WHAT'S NEXT
-                </p>
+                {/* Terminal prompt badge */}
+                <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#FFD700]/10 border border-[#FFD700]/25 text-[10px] font-mono text-[#FFD700] uppercase tracking-[0.25em] mb-5">
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#FFD700] animate-pulse" />
+                    <span>exit 0; // UNLESS SOMETHING BREAKS FIRST</span>
+                </div>
 
-                {/* Main heading — Playfair italic */}
+                {/* Main heading */}
                 <h2
                     className="text-5xl sm:text-6xl md:text-7xl font-bold italic text-white mb-4 leading-[1.05]"
                     style={{ fontFamily: 'Bebas Neue, sans-serif' }}
                 >
                     <DecryptedText
                         text="Let's build something"
-                        speed={50}
+                        speed={45}
                         animateOn="view"
                         revealDirection="center"
                         className="text-white"
@@ -264,9 +262,9 @@ const Climax = () => {
                         }}
                     >
                         <DecryptedText
-                            text="that matters."
-                            speed={50}
-                            delay={800}
+                            text="that won't break easily."
+                            speed={45}
+                            delay={700}
                             animateOn="view"
                             revealDirection="center"
                             className="text-transparent"
@@ -277,10 +275,10 @@ const Climax = () => {
 
                 {/* Sub-text */}
                 <p
-                    className="font-mono text-[11px] text-white/30 tracking-[0.35em] uppercase mb-12"
+                    className="font-mono text-[11px] text-white/40 tracking-[0.3em] uppercase mb-10"
                     style={{ fontFamily: 'JetBrains Mono, monospace' }}
                 >
-                    CURRENTLY ACCEPTING NEW MISSIONS
+                    CURRENTLY EXPLORING CLOUD SECURITY, IDENTITY ARCHITECTURE & RESILIENT SYSTEMS
                 </p>
 
                 {/* CTA with Concentric Gravitational Wave Ripples */}
@@ -305,7 +303,7 @@ const Climax = () => {
                     >
                         {/* Hover fill */}
                         <div
-                            className="absolute inset-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300 bg-gradient-to-r from-[#FFD700]/15 via-[#A855F7]/15 to-[#FFD700]/15"
+                            className="absolute inset-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300 bg-[#FFD700]/15"
                         />
                         <span className="relative z-10 text-xs sm:text-sm tracking-[0.4em] uppercase font-bold">
                             [ INITIATE CONTACT ]
@@ -323,10 +321,18 @@ const Climax = () => {
                     </a>
                 </div>
 
-                {/* Spacer note */}
-                <p className="mt-8 font-mono text-[10px] text-white/15 tracking-wider">
-                    kurapatikushalnarasimha95@gmail.com
-                </p>
+                {/* Personal Closing Notes & Witty Footer */}
+                <div className="mt-12 pt-6 border-t border-white/10 space-y-2 max-w-lg mx-auto">
+                    <p className="font-mono text-xs text-[#C8C8D4]/80 leading-relaxed">
+                        Built with curiosity, questionable amounts of caffeine, and an unhealthy tendency to ask <span className="text-[#FFD700] font-semibold">“but why?”</span>.
+                    </p>
+                    <p className="font-mono text-[11px] text-white/40 italic">
+                        If you found a bug, congratulations. You found the intended feature of my curiosity.
+                    </p>
+                    <p className="font-mono text-[10px] text-white/20 tracking-wider pt-2">
+                        kurapatikushalnarasimha95@gmail.com
+                    </p>
+                </div>
             </div>
 
             {/* Bottom fade to page bg */}

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import Lenis from "lenis";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 export default function useLenis() {
   const [lenis, setLenis] = useState(null);
@@ -10,11 +11,12 @@ export default function useLenis() {
     if (isTouchDevice) return;
 
     const lenisInstance = new Lenis({
-      duration: 2,
-      lerp: 0.05,
+      duration: 1.6,
+      lerp: 0.08,
       smoothWheel: true,
     });
 
+    lenisInstance.on('scroll', ScrollTrigger.update);
     setLenis(lenisInstance);
 
     function raf(time) {
