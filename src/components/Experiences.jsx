@@ -427,8 +427,8 @@ const CertsExperience = () => {
                 </div>
 
                 <div className="relative z-20 w-full px-6">
-                    {/* Vertical Glowing Track */}
-                    <div className="absolute left-[41px] top-4 bottom-0 w-[2px] bg-gradient-to-b from-[#FFD700]/40 via-[#FFD700]/10 to-transparent z-10" />
+                    {/* Vertical Track */}
+                    <div className="absolute left-[41px] top-4 bottom-0 w-[2px] bg-[#FFD700]/25 z-10" />
 
                     <div className="flex flex-col gap-16">
                         {CAREER_FRAMES.map((frame, i) => (
@@ -529,15 +529,15 @@ const CertsExperience = () => {
                     >
                         SCROLL
                     </span>
-                    <div className="w-px h-12 bg-gradient-to-b from-[#FFD700]/30 to-transparent" />
+                    <div className="w-px h-12 bg-[#FFD700]/30" />
                 </div>
 
                 {/* Cinematic Horizontal Scrub Progress Bar (Desktop) */}
                 <div 
-                    className="absolute bottom-0 left-0 h-[2px] bg-gradient-to-r from-[#FFD700] via-[#F59E0B] to-[#A855F7] z-40 transition-all duration-300 pointer-events-none"
+                    className="absolute bottom-0 left-0 h-[2px] bg-[#FFD700] z-40 transition-all duration-300 pointer-events-none"
                     style={{ 
                         width: `${((activeIdx + 1) / CAREER_FRAMES.length) * 100}%`,
-                        boxShadow: '0 0 12px rgba(255,215,0,0.7)'
+                        boxShadow: '0 0 10px rgba(255,215,0,0.5)'
                     }} 
                 />
             </div>

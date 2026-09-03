@@ -62,7 +62,7 @@ export default function SpatialRift({
 
   if (isMobile) {
     return (
-      <div className="h-px w-full bg-gradient-to-r from-transparent via-[#A855F7]/30 to-transparent my-10" />
+      <div className="h-px w-full bg-white/10 my-10" />
     );
   }
 
