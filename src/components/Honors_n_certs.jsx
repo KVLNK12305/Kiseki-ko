@@ -11,54 +11,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 // ── Data ───────────────────────────────────────────────────────
 const CERTIFICATES = [
-    {
-        title: 'AWS Cloud Practitioner',
-        issuer: 'Amazon Web Services',
-        date: '2024', id: 'aws',
-        description: 'Validated overall understanding of the AWS Cloud platform, including basic security, architecture, pricing, and core services.',
-        skills: ['Cloud Computing', 'Security', 'AWS Core Services'],
-        link: 'https://aws.amazon.com/certification/certified-cloud-practitioner/',
-    },
-    {
-        title: 'Meta Front-End Dev',
-        issuer: 'Coursera / Meta',
-        date: '2023', id: 'meta',
-        description: 'Professional certification covering advanced React, version control, UX/UI principles, and web development fundamentals.',
-        skills: ['React', 'JavaScript', 'UX/UI', 'Figma'],
-        link: 'https://www.coursera.org/professional-certificates/meta-front-end-developer',
-    },
-    {
-        title: 'Postman API Fundamentals',
-        issuer: 'Postman',
-        date: '2024', id: 'postman',
-        description: 'Comprehensive training on API development lifecycle, testing, documentation, and automation using Postman.',
-        skills: ['API Testing', 'Documentation', 'Automation'],
-        link: 'https://www.postman.com/student-program/student-expert/',
-    },
-    {
-        title: 'Rust Programming',
-        issuer: 'Rust Foundation',
-        date: '2023', id: 'rust',
-        description: 'Deep dive into Rust ownership model, borrowing, lifetimes, and systems programming concepts.',
-        skills: ['Rust', 'Systems Programming', 'Memory Safety'],
-        link: 'https://www.rust-lang.org/learn',
-    },
-    {
-        title: 'Advanced React Patterns',
-        issuer: 'Frontend Masters',
-        date: '2023', id: 'react',
-        description: 'Mastery of compound components, render props, state reducers, and custom hooks for scalable applications.',
-        skills: ['React Hooks', 'Design Patterns', 'Performance'],
-        link: 'https://frontendmasters.com/courses/advanced-react-patterns/',
-    },
-    {
-        title: 'Docker Essentials',
-        issuer: 'Docker Inc.',
-        date: '2024', id: 'docker',
-        description: 'Practical knowledge of containerization, Dockerfiles, image management, and multi-container orchestration.',
-        skills: ['Docker', 'Containers', 'DevOps'],
-        link: 'https://www.docker.com/',
-    },
+
 ];
 
 const RESEARCH_ITEMS = [
