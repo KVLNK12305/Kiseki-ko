@@ -53,45 +53,19 @@ function App() {
     };
 
     const handleMouseOver = (e) => {
-      const isInteractive = e.target.closest('a, button, .cursor-interactive, input, textarea, [role="button"]');
-      const isSelectable = e.target.closest('.selectable-text');
-
-      if (isInteractive) {
-        cursor.style.opacity = '1';
-        cursor.classList.remove('opacity-0');
-        cursor.classList.add('cursor-locked');
-      } else if (isSelectable) {
-        // Hide hybrid cursor so native text selection cursor (I-beam) is fully visible
-        cursor.style.opacity = '0';
-        cursor.classList.add('opacity-0');
-        cursor.classList.remove('cursor-locked');
-      } else {
-        cursor.style.opacity = '1';
-        cursor.classList.remove('opacity-0');
-        cursor.classList.remove('cursor-locked');
-      }
+      const target = e.target.closest('a, button, .cursor-interactive, input, textarea, [role="button"]');
+      if (target) cursor.classList.add('cursor-locked');
     };
     const handleMouseOut = (e) => {
       const target = e.target.closest('a, button, .cursor-interactive, input, textarea, [role="button"]');
       if (target) cursor.classList.remove('cursor-locked');
-      const isSelectable = e.target.closest('.selectable-text');
-      if (isSelectable) {
-        cursor.style.opacity = '1';
-        cursor.classList.remove('opacity-0');
-      }
     };
 
-    const handleMouseDown = (e) => {
+    const handleMouseDown = () => {
       cursor.classList.add('cursor-clicking');
-      if (e.target.closest('.selectable-text') && !e.target.closest('a, button, .cursor-interactive, [role="button"]')) {
-        cursor.style.opacity = '0';
-      }
     };
-    const handleMouseUp = (e) => {
+    const handleMouseUp = () => {
       cursor.classList.remove('cursor-clicking');
-      if (!e.target.closest('.selectable-text') || e.target.closest('a, button, .cursor-interactive, [role="button"]')) {
-        cursor.style.opacity = '1';
-      }
     };
 
     const handleMouseLeave = () => {
