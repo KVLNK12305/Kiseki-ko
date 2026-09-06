@@ -81,6 +81,31 @@
     .cursor-pointer, .cursor-interactive, .cursor-default {
       cursor: none !important;
     }
+
+    /* Allow native text cursor on text-selectable areas */
+    .selectable-text,
+    .selectable-text p,
+    .selectable-text span,
+    .selectable-text strong,
+    .selectable-text em,
+    .selectable-text div {
+      cursor: text !important;
+      user-select: text !important;
+      -webkit-user-select: text !important;
+    }
+    .selectable-text a,
+    .selectable-text button,
+    .selectable-text [role="button"] {
+      cursor: pointer !important;
+      user-select: text !important;
+      -webkit-user-select: text !important;
+    }
+  }
+
+  .selectable-text,
+  .selectable-text * {
+    user-select: text !important;
+    -webkit-user-select: text !important;
   }
 
   body {
