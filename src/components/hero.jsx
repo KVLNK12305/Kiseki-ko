@@ -182,10 +182,10 @@ const Hero = () => {
                     .to(
                         portraitStageRef.current,
                         {
-                            x: -window.innerWidth * 0.24,
+                            x: -window.innerWidth * 0.35,
                             rotateY: 14,
                             rotateX: -3,
-                            scale: 0.92,
+                            scale: 0.88,
                             translateZ: 25,
                             duration: 0.24,
                             ease: 'power2.inOut',
