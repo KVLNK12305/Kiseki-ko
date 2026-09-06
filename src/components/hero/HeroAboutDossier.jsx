@@ -61,10 +61,7 @@ const HeroAboutDossier = ({ containerRef }) => {
     return (
         <div
             ref={containerRef}
-            onMouseMove={(e) => e.stopPropagation()}
-            onMouseDown={(e) => e.stopPropagation()}
-            onPointerDown={(e) => e.stopPropagation()}
-            className="selectable-text absolute right-3 sm:right-6 lg:right-8 xl:right-12 z-40 w-[94vw] sm:w-full max-w-2xl lg:max-w-[740px] xl:max-w-[780px] max-h-[84vh] lg:max-h-[88vh] p-6 sm:p-7 lg:p-8 rounded-3xl bg-[#08080F]/95 border border-white/10 shadow-[0_25px_80px_rgba(0,0,0,0.85)] backdrop-blur-2xl flex flex-col justify-between"
+            className="absolute right-3 sm:right-6 lg:right-8 xl:right-12 z-40 w-[94vw] sm:w-full max-w-2xl lg:max-w-[740px] xl:max-w-[780px] max-h-[84vh] lg:max-h-[88vh] p-6 sm:p-7 lg:p-8 rounded-3xl bg-[#08080F]/95 border border-white/10 shadow-[0_25px_80px_rgba(0,0,0,0.85)] backdrop-blur-2xl flex flex-col justify-between"
             style={{ transformStyle: 'preserve-3d' }}
         >
             {/* ── 1. HEADER BAR ─────────────────────────────────────── */}

@@ -4,7 +4,7 @@ import { IntroGreeting } from './HeroAboutDossier';
 
 const HeroMobileFlow = ({ obsessions }) => {
     return (
-        <div className="selectable-text relative w-full px-4 sm:px-6 py-12 space-y-12 border-t border-white/5">
+        <div className="relative w-full px-4 sm:px-6 py-12 space-y-12 border-t border-white/5">
             {/* Summary Bio */}
             <div className="space-y-4">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-sm bg-[#FFD700]/10 border border-[#FFD700]/30 text-[10px] font-mono text-[#FFD700] uppercase tracking-widest">
