@@ -57,7 +57,7 @@ const HeroFooter = ({
             {/* Domain Branding */}
             <div className="flex items-center gap-2 text-[#9090A8]">
                 <Globe size={13} className="text-[#FFD700]" />
-                <span className="font-mono text-[11px] sm:text-xs">kushal.kiseki.dev</span>
+                <a href="https://kiseki-ko.vercel.app" className="font-mono text-[11px] sm:text-xs hover:text-[#FFD700] transition-colors cursor-interactive">kiseki-ko.vercel.app</a>
             </div>
         </footer>
     );
