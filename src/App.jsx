@@ -7,7 +7,6 @@ import FloatingNav from './components/FloatingNav';
 import Hero from './components/hero';
 import Arsenal from './components/FoE';
 import CertsExperience from './components/Experiences';
-import Ed_Timeline from './components/Edtimeline';
 import Projects from './components/Projects';
 import Honors_n_certs from './components/Honors_n_certs';
 import Climax from './components/climax';
@@ -142,7 +141,6 @@ function App() {
             <div id="security">
               <Arsenal />
               <CertsExperience />
-              <Ed_Timeline />
             </div>
 
             <SpatialRift label="02 · SYSTEMS & DEPLOYMENTS" kanji="領域" />
