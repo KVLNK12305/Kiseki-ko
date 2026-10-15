@@ -1,0 +1,7 @@
+Contact: mailto:kurapatikushalnarasimha95@gmail.com
+Expires: 2027-10-14T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://kiseki-ko.vercel.app/.well-known/security.txt
+
+# Found a bug? Congratulations — you found the intended feature of my curiosity.
+# Responsible disclosure appreciated.
