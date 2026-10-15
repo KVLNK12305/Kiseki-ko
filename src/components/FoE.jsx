@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { Network, Radar, Bug, Waypoints, LineChart } from 'lucide-react';
 import useIsMobile from '../hooks/useIsMobile';
+import SectionHeader from './SectionHeader';
 
 import tableauImg from './images/tableau-software (1).png';
 import osintImg from './images/osint.png';
@@ -117,7 +118,7 @@ const Arsenal = () => {
   const isNodeActive = (node) => activeCategory === 'all' || node.category === activeCategory;
 
   return (
-    <section id="arsenal" className="relative w-full min-h-[120vh] bg-[#030305] text-white overflow-hidden font-mono selection:bg-[#FFD700]/30">
+    <section id="arsenal" className="relative w-full md:min-h-[120vh] md:pl-16 bg-[#030305] text-white overflow-hidden font-mono">
       
       {/* FIXED NOISE OVERLAY (Base64 avoid 403 Forbidden) */}
       <div className="absolute inset-0 pointer-events-none z-[60] opacity-[0.03] bg-[url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyBAMAAAD9tt+fAAAAElBMVEUAAAD8/Pz09PT4+PjMzMz////09TU9AAAAAXRSTlMAQObYZgAAADRJREFUeF5jYGRgYBBgYmBghGInBgYmBnYmRih2YmBgYmBnYmRiZwSJOzGwM7EzsTMyMDAAAGYQAwXpU9mXAAAAAElFTkSuQmCC')] bg-repeat" />
@@ -125,29 +126,25 @@ const Arsenal = () => {
       {/* BACKGROUND GRID */}
       <div className="absolute inset-0 bg-[linear-gradient(rgba(255,215,0,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,215,0,0.03)_1px,transparent_1px)] bg-[size:40px_40px] opacity-20" />
 
-      <div className="relative z-10 container mx-auto px-4 py-20 h-full flex flex-col">
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-5 sm:px-8 py-14 md:py-20 h-full flex flex-col">
         
         {/* HEADER */}
-        <div className="mb-12 space-y-4">
-          <div className="flex items-center gap-2 text-[#FFD700] text-xs tracking-[0.2em] opacity-80">
-            <span>SYSTEM INVENTORY</span>
-            <span className="w-12 h-[1px] bg-[#FFD700]/50" />
-            <span className={scanComplete ? "text-emerald-400 font-bold" : "text-[#FFD700]"}>
-              {scanComplete ? "STATUS: 18 ASSETS INDEXED" : "STATUS: RADAR SCANNING"}
-            </span>
-          </div>
-          <h2 className="text-5xl md:text-7xl font-bold tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-gray-500">
-            TECH ARSENAL
-          </h2>
+        <div className="mb-8 md:mb-12">
+          <SectionHeader
+            eyebrow="SYSTEM INVENTORY"
+            status={scanComplete || isMobile ? `${TECH_NODES.length} ASSETS INDEXED` : 'RADAR SCANNING'}
+            statusClassName={scanComplete || isMobile ? 'text-emerald-400 font-bold' : 'text-[#FFD700]'}
+            title="Tech Arsenal"
+          />
 
           {/* FILTERS */}
-          <div className="flex flex-wrap gap-2 mt-8">
+          <div className="snap-rail md:flex-wrap gap-2 mt-6 md:mt-8 -mx-5 px-5 sm:mx-0 sm:px-0">
             {CATEGORIES.map((cat) => (
               <button
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.id)}
                 className={`
-                  px-4 py-2 text-xs tracking-wider border transition-all duration-300 relative group overflow-hidden
+                  shrink-0 px-3.5 md:px-4 py-2 text-[11px] md:text-xs tracking-wider border transition-all duration-300 relative group overflow-hidden
                   ${activeCategory === cat.id 
                     ? 'border-[#FFD700] text-[#FFD700] bg-[#FFD700]/10 shadow-[0_0_15px_rgba(255,215,0,0.15)]' 
                     : 'border-white/10 text-gray-400 hover:border-white/30 hover:text-white'}
@@ -162,10 +159,28 @@ const Arsenal = () => {
           </div>
         </div>
 
+        {/* MOBILE: CATEGORY GRID */}
+        {isMobile && (
+          <div className="grid grid-cols-2 gap-2.5">
+            {TECH_NODES.filter(isNodeActive).map((node) => (
+              <div key={node.id} className="flex flex-col gap-2.5 p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.07]">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 shrink-0 rounded-lg bg-[#050505] border border-white/10 flex items-center justify-center text-gray-400 [&_img]:w-6 [&_img]:h-6 [&_svg]:w-6 [&_svg]:h-6">
+                    {node.icon}
+                  </div>
+                  <span className="text-[13px] font-bold text-white leading-tight">{node.label}</span>
+                </div>
+                <p className="text-[11px] leading-snug text-gray-400 font-body-ui">{node.description}</p>
+              </div>
+            ))}
+          </div>
+        )}
+
         {/* CONSTELLATION MAP */}
+        {!isMobile && (
         <div 
           ref={mapRef}
-          className={`flex-1 relative min-h-[800px] border border-white/5 rounded-3xl bg-black/40 overflow-hidden ${isMobile ? '' : 'backdrop-blur-md'}`}
+          className="flex-1 relative min-h-[800px] border border-white/5 rounded-3xl bg-black/40 overflow-hidden backdrop-blur-md"
         >
           {/* Lusion Radar Pulse Sweep Ring (Desktop) */}
           {!isMobile && (
@@ -292,7 +307,7 @@ const Arsenal = () => {
                   animate={{
                     scale: 1,
                     opacity: 1,
-                    y: isHovered ? [`${node.y}%`] : [`${node.y}%`, `${node.y - 1}%`, `${node.y}%`],
+                    y: isHovered ? 0 : [0, -6, 0],
                   }}
                   transition={{ 
                     scale: { delay: entranceDelay, type: "spring", damping: 16, stiffness: 120 },
@@ -330,6 +345,7 @@ const Arsenal = () => {
             <div>SYS_Y: <motion.span className="text-[#FFD700]">{displayY}</motion.span></div>
           </div>
         </div>
+        )}
       </div>
     </section>
   );

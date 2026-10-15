@@ -116,3 +116,10 @@ export const OBSESSIONS = [
         visualType: 'shield',
     },
 ];
+// Chapter tabs for the About dossier (desktop) and mobile flow
+export const ABOUT_TABS = [
+    { id: 'mindset', label: '01 · Mindset' },
+    { id: 'os', label: '02 · OS Lineage' },
+    { id: 'craft', label: '03 · Craft & Japan' },
+    { id: 'offline', label: '04 · Off-Terminal' },
+];

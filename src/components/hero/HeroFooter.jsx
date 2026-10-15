@@ -29,7 +29,7 @@ const HeroFooter = ({
                     <Linkedin size={16} />
                 </a>
                 <a
-                    href="mailto:kurapatikushal@gmail.com"
+                    href="mailto:kurapatikushalnarasimha95@gmail.com"
                     aria-label="Email"
                     className="text-[#6B7280] hover:text-white hover:scale-110 transition-all p-1 cursor-interactive"
                 >

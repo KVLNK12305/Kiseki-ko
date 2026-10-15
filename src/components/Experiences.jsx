@@ -3,6 +3,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { motion } from 'framer-motion';
 import useIsMobile from '../hooks/useIsMobile';
+import SectionHeader from './SectionHeader';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -187,7 +188,7 @@ const CareerFrame = ({ data }) => (
         />
 
         {/* ── Header strip ── */}
-        <div className="absolute top-8 left-0 right-0 px-10 flex items-center justify-between z-20">
+        <div className="absolute top-14 left-0 right-0 pl-24 pr-10 flex items-center justify-between z-20">
             <span
                 className="text-[10px] tracking-[0.5em] uppercase"
                 style={{ fontFamily: 'var(--font-mono)', color: 'rgba(255,215,0,0.25)' }}
@@ -415,59 +416,60 @@ const CertsExperience = () => {
 
     if (isMobile) {
         return (
-            <section id="experience" className="relative bg-[#030305] flex flex-col pt-24 pb-24 overflow-hidden">
-                <div className="absolute inset-0 bg-speed-lines opacity-60 pointer-events-none" />
+            <section id="experience" className="relative bg-[#030305] pt-14 pb-16 overflow-hidden">
                 <div className="absolute inset-0 bg-pattern-dots opacity-30 pointer-events-none" />
-                
-                <div className="w-full px-6 mb-16 relative z-20">
-                    <div className="flex items-center gap-2 text-[#FFD700] text-xs tracking-[0.2em] opacity-80 mb-2">
-                        <span>CAREER TRAJECTORY</span>
-                        <span className="w-12 h-[1px] bg-[#FFD700]/50" />
-                    </div>
-                </div>
 
-                <div className="relative z-20 w-full px-6">
-                    {/* Vertical Track */}
-                    <div className="absolute left-[41px] top-4 bottom-0 w-[2px] bg-[#FFD700]/25 z-10" />
+                <SectionHeader
+                    eyebrow="CAREER TRAJECTORY"
+                    status={`${CAREER_FRAMES.length} FRAMES`}
+                    title="Experience"
+                    className="relative z-20 px-5 mb-10"
+                />
 
-                    <div className="flex flex-col gap-16">
-                        {CAREER_FRAMES.map((frame, i) => (
-                            <motion.div
-                                key={frame.frame}
-                                initial={{ opacity: 0, y: 30 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true, margin: "-100px" }}
-                                transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
-                                className="relative flex flex-col pl-14"
-                            >
-                                {/* Timeline Node (Dot) */}
-                                <div 
-                                    className="absolute left-[17px] top-[12px] -translate-x-1/2 w-[10px] h-[10px] rounded-full bg-[#030305] border-[2px] z-20" 
-                                    style={{ borderColor: frame.statusColor, boxShadow: `0 0 12px ${frame.statusColor}60` }} 
-                                />
+                <ol className="relative z-20 mx-5 border-l border-[#FFD700]/20 space-y-10">
+                    {CAREER_FRAMES.map((frame) => (
+                        <motion.li
+                            key={frame.frame}
+                            initial={{ opacity: 0, y: 24 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true, margin: '-60px' }}
+                            transition={{ duration: 0.5, ease: 'easeOut' }}
+                            className="relative pl-6"
+                        >
+                            {/* Timeline node, centred on the rail */}
+                            <span
+                                className="absolute left-0 top-1.5 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-[#030305] border-2"
+                                style={{ borderColor: frame.statusColor, boxShadow: `0 0 10px ${frame.statusColor}60` }}
+                            />
 
-                                <div className="flex items-center gap-2.5 mb-2">
-                                    <span className="text-[10px] tracking-[0.35em] uppercase" style={{ fontFamily: 'var(--font-mono)', color: frame.statusColor }}>
-                                        {frame.status}
-                                    </span>
-                                </div>
-                                <div className="leading-none mb-3" style={{ fontFamily: 'var(--font-display)', fontSize: '3.8rem', color: '#FFFFFF', textShadow: `0 0 40px rgba(255,215,0,0.1)` }}>
-                                    {frame.year}
-                                </div>
-                                <h3 className="text-2xl font-bold text-white leading-tight mt-1 mb-2">{frame.role}</h3>
-                                <p className="text-sm font-semibold mb-6 tracking-wide" style={{ color: frame.accent }}>@ {frame.org}</p>
-                                <ul className="space-y-4">
-                                    {frame.bullets.map((bullet, idx) => (
-                                        <li key={idx} className="flex items-start gap-3 text-sm text-white/75 leading-relaxed">
-                                            <span className="mt-1 shrink-0 text-[10px]" style={{ color: frame.accent }}>▸</span>
-                                            <span>{bullet}</span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </motion.div>
-                        ))}
-                    </div>
-                </div>
+                            <div className="flex items-center gap-2 mb-2 font-mono text-[10px] tracking-[0.25em] uppercase">
+                                <span style={{ color: frame.statusColor }}>{frame.status}</span>
+                                <span className="text-white/20">·</span>
+                                <span className="text-white/40 tracking-[0.15em]">{frame.type}</span>
+                            </div>
+
+                            <div className="flex items-baseline gap-3 mb-2">
+                                <span className="font-display text-[2.5rem] leading-none text-white">{frame.year}</span>
+                                <span className="font-mono text-[10px] text-white/35 tracking-wider">{frame.period}</span>
+                            </div>
+
+                            <h3 className="text-lg font-bold text-white leading-snug">{frame.role}</h3>
+                            <p className="text-sm font-semibold mb-4" style={{ color: frame.accent }}>
+                                @ {frame.org}
+                                <span className="ml-1.5 font-normal text-white/35 text-xs">· {frame.location}</span>
+                            </p>
+
+                            <ul className="space-y-2.5 p-4 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+                                {frame.bullets.map((bullet, idx) => (
+                                    <li key={idx} className="flex items-start gap-2.5 text-[13px] text-white/70 leading-relaxed">
+                                        <span className="mt-[3px] shrink-0 text-[10px]" style={{ color: frame.accent }}>▸</span>
+                                        <span>{bullet}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </motion.li>
+                    ))}
+                </ol>
             </section>
         );
     }
@@ -480,6 +482,15 @@ const CertsExperience = () => {
             {/* Background speed lines (manga aesthetic) */}
             <div className="absolute inset-0 bg-speed-lines opacity-60 pointer-events-none" />
             <div className="absolute inset-0 bg-pattern-dots opacity-30 pointer-events-none" />
+
+            <div className="relative z-20 pl-16">
+                <SectionHeader
+                    eyebrow="CAREER TRAJECTORY"
+                    status={`${CAREER_FRAMES.length} FRAMES`}
+                    title="Experience"
+                    className="max-w-7xl mx-auto px-8 pt-20 pb-12"
+                />
+            </div>
 
             <div ref={triggerRef} className="relative overflow-hidden">
                 {/* The scrolling tape */}
@@ -502,7 +513,7 @@ const CertsExperience = () => {
                     style={{ background: 'linear-gradient(to bottom, rgba(3,3,5,0.98), rgba(3,3,5,0.5))' }}
                     aria-hidden="true"
                 >
-                    {Array.from({ length: 40 }).map((_, i) => <div key={i} className="sprocket-hole" />)}
+                    {Array.from({ length: 120 }).map((_, i) => <div key={i} className="sprocket-hole" />)}
                 </div>
 
                 {/* Film sprocket — bottom (above timeline) */}
@@ -511,7 +522,7 @@ const CertsExperience = () => {
                     style={{ background: 'linear-gradient(to top, rgba(3,3,5,0.98), rgba(3,3,5,0.5))' }}
                     aria-hidden="true"
                 >
-                    {Array.from({ length: 40 }).map((_, i) => <div key={i} className="sprocket-hole" />)}
+                    {Array.from({ length: 120 }).map((_, i) => <div key={i} className="sprocket-hole" />)}
                 </div>
 
                 {/* Cinematic timeline track */}

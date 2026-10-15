@@ -669,15 +669,40 @@
     will-change: auto !important;
   }
 
-  /* Cap animation durations — no long spring settling */
-  @media (prefers-reduced-motion: no-preference) {
-    *, *::before, *::after {
-      animation-duration: 0.4s !important;
-    }
-  }
-
-  /* Kill animate-pulse on mobile — saves repaint cycles */
-  .animate-pulse {
+  /* Kill decorative infinite loops on mobile — saves repaint cycles.
+     (Previously every animation was capped to 0.4s, which made 3–4s
+     loops like shine/ping/shimmer strobe ~10x faster.) */
+  .animate-pulse,
+  .animate-ping,
+  .project-tag-shimmer::after,
+  .holo-orbit-ring {
     animation: none !important;
   }
+  .animate-ping { opacity: 0 !important; }
 }
+
+/* Hover lifts only where hover exists — avoids "stuck" hover on tap */
+@media (hover: none) {
+  .project-card:hover { transform: none; }
+  .project-card:hover::after { opacity: 0; }
+}
+
+/* ============================================================
+   10. MOBILE LAYOUT HELPERS
+   ============================================================ */
+/* Clearance for the floating bottom nav pill + iOS home indicator */
+.mobile-nav-clearance {
+  padding-bottom: calc(6.5rem + env(safe-area-inset-bottom, 0px));
+}
+
+/* Horizontal snap rail with hidden scrollbar */
+.snap-rail {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+}
+.snap-rail::-webkit-scrollbar { display: none; }
+.snap-rail > * { scroll-snap-align: start; }

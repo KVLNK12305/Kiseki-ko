@@ -34,7 +34,6 @@ const Hero = () => {
     const portraitStageRef = useRef(null);
     const narrativeCardRef = useRef(null);
     const expertiseDeckRef = useRef(null);
-    const operatorHoloBadgeRef = useRef(null);
 
     const [currentTime, setCurrentTime] = useState('');
     const [domainOverdrive, setDomainOverdrive] = useState(false);
@@ -52,7 +51,13 @@ const Hero = () => {
         const update = () => {
             const now = new Date();
             setCurrentTime(
-                now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })
+                now.toLocaleTimeString('en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: true,
+                    timeZone: 'Asia/Kolkata',
+                })
             );
         };
         update();
@@ -150,12 +155,6 @@ const Hero = () => {
                     pointerEvents: 'none',
                 });
 
-                gsap.set(operatorHoloBadgeRef.current, {
-                    opacity: 0,
-                    scale: 0.8,
-                    y: -10,
-                });
-
                 // ── PHASE 1: TRANSITION FROM HERO INTO ABOUT ME (0.00 -> 0.35) ──
                 tl.to(
                     leftPaneRef.current,
@@ -232,16 +231,6 @@ const Hero = () => {
                         0.36
                     )
                     .to(
-                        operatorHoloBadgeRef.current,
-                        {
-                            autoAlpha: 0,
-                            opacity: 0,
-                            visibility: 'hidden',
-                            duration: 0.08,
-                        },
-                        0.36
-                    )
-                    .to(
                         expertiseDeckRef.current,
                         {
                             autoAlpha: 1,
@@ -296,7 +285,7 @@ const Hero = () => {
                 ref={pinContainerRef}
                 onMouseMove={handleMouseMove}
                 onMouseLeave={handleMouseLeave}
-                className="sticky top-0 min-h-[100dvh] lg:h-[100dvh] w-full overflow-hidden flex flex-col justify-between select-none py-2 lg:py-0 perspective-1400"
+                className={`${isMobile ? 'relative' : 'sticky top-0'} min-h-[100svh] lg:h-[100dvh] w-full overflow-hidden flex flex-col justify-between select-none py-2 lg:py-0 perspective-1400`}
             >
                 {/* Subtle Screen Reveal Flash */}
                 <div ref={flashRef} className="absolute inset-0 z-[60] bg-white pointer-events-none opacity-0" />
@@ -323,7 +312,7 @@ const Hero = () => {
                         } ${
                             domainOverdrive
                                 ? 'bg-gradient-to-r from-[#EF4444]/18 via-[#FFD700]/20 to-[#A855F7]/16 scale-110'
-                                : 'bg-gradient-to-r from-[#A855F7]/10 via-[#FFD700]/10 to-[#EAB308]/08'
+                                : 'bg-gradient-to-r from-[#A855F7]/10 via-[#FFD700]/10 to-[#EAB308]/8'
                         }`}
                     />
 
@@ -375,7 +364,7 @@ const Hero = () => {
                                     y: isMobile ? 0 : textTiltY,
                                 }}
                             >
-                                <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-sm bg-[#FFD700]/08 border border-[#FFD700]/25 text-[10px] font-mono text-[#FFD700] uppercase tracking-[0.25em] mb-3 sm:mb-4">
+                                <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-sm bg-[#FFD700]/8 border border-[#FFD700]/25 text-[9px] sm:text-[10px] font-mono text-[#FFD700] uppercase tracking-[0.14em] sm:tracking-[0.25em] mb-3 sm:mb-4">
                                     <span className="h-1.5 w-1.5 rounded-full bg-[#FFD700]" />
                                     <span>KUSHAL KURAPATI // SYSTEMS & SECURITY</span>
                                 </div>
@@ -566,26 +555,6 @@ const Hero = () => {
 
                         {/* ── EXTENSION LAYER 1: MODULAR ABOUT STORY DOSSIER ── */}
                         {!isMobile && <HeroAboutDossier containerRef={narrativeCardRef} />}
-
-                        {/* ── EXTENSION LAYER 2: TOP-LEFT OPERATOR MINI BADGE ─── */}
-                        {!isMobile && (
-                            <div
-                                ref={operatorHoloBadgeRef}
-                                className="absolute top-4 left-6 z-40 px-4 py-2 rounded-xl bg-[#08080E]/95 border border-[#FFD700]/40 backdrop-blur-md shadow-2xl flex items-center gap-3 pointer-events-none"
-                                style={{
-                                    visibility: activePhaseIndex === 2 ? 'hidden' : 'visible',
-                                    opacity: activePhaseIndex === 2 ? 0 : undefined,
-                                }}
-                            >
-                                <div className="relative w-7 h-7 rounded-full overflow-hidden border border-[#FFD700]/60">
-                                    <img src={profileImg} alt="Kushal" className="w-full h-full object-cover object-top" />
-                                </div>
-                                <div className="font-mono text-[10px] leading-tight">
-                                    <div className="text-white font-bold tracking-wider">KUSHAL KURAPATI</div>
-                                    <div className="text-[#FFD700] tracking-widest">THINGS I OBSESS OVER</div>
-                                </div>
-                            </div>
-                        )}
 
                         {/* ── EXTENSION LAYER 3: MODULAR 3D OBSESSIONS CONSOLE ── */}
                         {!isMobile && (

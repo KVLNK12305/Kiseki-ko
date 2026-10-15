@@ -10,7 +10,7 @@ gsap.registerPlugin(ScrollTrigger);
  * Domain Expansion / Spatial Rift Section Divider & Transition
  * Slices the space horizontally with chromatic RGB split, luminous fissure tear,
  * and high-energy particle sparks when scrolled into view.
- * PC (desktop) only; mobile renders a clean subtle divider.
+ * PC (desktop) only; mobile renders a lightweight labelled divider.
  */
 export default function SpatialRift({
   label = "DOMAIN · SPATIAL RIFT",
@@ -61,15 +61,25 @@ export default function SpatialRift({
   }, { scope: riftRef, dependencies: [isMobile] });
 
   if (isMobile) {
+    // Keep the section label on mobile — previously a bare 1px rule dropped it
     return (
-      <div className="h-px w-full bg-white/10 my-10" />
+      <div className="relative w-full px-5 py-6 flex items-center gap-3 select-none" aria-hidden="true">
+        <span className="font-serif font-black text-sm text-[#FFD700]">{kanji}</span>
+        <span className="font-mono text-[10px] font-semibold text-white/60 tracking-[0.2em] uppercase whitespace-nowrap">
+          {label}
+        </span>
+        <span
+          className="flex-1 h-px"
+          style={{ background: 'linear-gradient(90deg, rgba(255,215,0,0.45), rgba(168,85,247,0.2) 60%, transparent)' }}
+        />
+      </div>
     );
   }
 
   return (
     <div
       ref={riftRef}
-      className="relative w-full py-12 flex items-center justify-center overflow-hidden select-none pointer-events-none"
+      className="relative w-full py-12 pl-16 flex items-center justify-center overflow-hidden select-none pointer-events-none"
     >
       {/* Blade Flash Sweep */}
       <div

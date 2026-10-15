@@ -24,18 +24,18 @@ const HeroObsessionsConsole = ({
     return (
         <div
             ref={containerRef}
-            className="absolute inset-x-4 sm:inset-x-8 lg:inset-x-12 top-[48%] -translate-y-1/2 z-30 max-w-7xl mx-auto w-full flex flex-col justify-center will-change-transform select-none"
+            className="absolute left-24 right-8 xl:right-12 top-[48%] -translate-y-1/2 z-30 max-w-7xl mx-auto flex flex-col justify-center will-change-transform select-none"
             style={{ transformStyle: 'preserve-3d' }}
         >
             {/* ── Console Header ───────────────────────────────────── */}
-            <div className="mb-4 flex items-end justify-between border-b border-white/10 pb-3">
+            <div className="mb-3 flex items-end justify-between border-b border-white/10 pb-3">
                 <div>
                     <div className="inline-flex items-center gap-2.5 text-[#FFD700] font-mono text-xs sm:text-sm tracking-[0.3em] uppercase mb-1">
                         <Activity size={14} className="text-[#FFD700]" />
-                        <span>02 · SYSTEM COGNITION // UNDER THE ABSTRACTION</span>
+                        <span>SYSTEM COGNITION // UNDER THE ABSTRACTION</span>
                     </div>
                     <h3
-                        className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight leading-none"
+                        className="text-3xl xl:text-[2.75rem] font-bold text-white tracking-tight leading-none"
                         style={{ fontFamily: 'Playfair Display, Georgia, serif' }}
                     >
                         Things I obsess over.
@@ -45,9 +45,9 @@ const HeroObsessionsConsole = ({
                 {/* Scrubber & Arrow Controls */}
                 <div className="flex items-center gap-4">
                     <div className="font-mono text-sm sm:text-base text-white/50 tracking-widest">
-                        <span className="text-white font-bold">{`0${selectedIndex + 1}`}</span>
+                        <span className="text-white font-bold">{String(selectedIndex + 1).padStart(2, '0')}</span>
                         <span> / </span>
-                        <span>06</span>
+                        <span>{String(obsessions.length).padStart(2, '0')}</span>
                     </div>
 
                     <div className="flex items-center gap-1.5">
@@ -72,7 +72,7 @@ const HeroObsessionsConsole = ({
             </div>
 
             {/* ── Cybernetic Kinetic Blades Container ────────────────── */}
-            <div className="relative h-[420px] sm:h-[460px] lg:h-[490px] xl:h-[510px] w-full flex items-stretch gap-3">
+            <div className="relative h-[clamp(320px,calc(100dvh-340px),510px)] w-full flex items-stretch gap-3">
                 {obsessions.map((item, idx) => {
                     const isExpanded = selectedIndex === idx;
                     const IconComponent = item.icon;
@@ -111,7 +111,7 @@ const HeroObsessionsConsole = ({
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
                                     transition={{ duration: 0.22, delay: 0.04 }}
-                                    className="relative w-full h-full p-6 sm:p-8 flex flex-col justify-between overflow-hidden"
+                                    className="relative w-full h-full p-6 xl:p-7 flex flex-col justify-between gap-3 overflow-hidden"
                                 >
                                     {/* Ambient Glow */}
                                     <div
@@ -145,9 +145,9 @@ const HeroObsessionsConsole = ({
                                     </div>
 
                                     {/* Main Question & Thesis */}
-                                    <div className="my-auto py-2 z-10 space-y-3 max-w-4xl">
+                                    <div className="my-auto z-10 space-y-2.5 max-w-4xl">
                                         <h4
-                                            className="text-2xl sm:text-3xl lg:text-[2.15rem] xl:text-[2.4rem] font-normal text-white leading-snug tracking-tight"
+                                            className="text-[clamp(1.4rem,3.4vh,2.4rem)] font-normal text-white leading-snug tracking-tight"
                                             style={{ fontFamily: 'Playfair Display, Georgia, serif' }}
                                         >
                                             "{item.question}"
@@ -158,7 +158,7 @@ const HeroObsessionsConsole = ({
                                             <span>{item.thesis}</span>
                                         </div>
 
-                                        <p className="text-sm sm:text-base text-[#D4D4E0] leading-relaxed font-sans pt-1 max-w-3xl">
+                                        <p className="text-sm xl:text-[15px] text-[#D4D4E0] leading-relaxed font-body-ui max-w-3xl">
                                             {item.description}
                                         </p>
                                     </div>
@@ -184,7 +184,7 @@ const HeroObsessionsConsole = ({
                                         </div>
 
                                         {/* Embedded Mini Visualizer Canvas */}
-                                        <div className="hidden sm:block w-44 h-22 lg:w-52 lg:h-24 rounded-xl bg-black/60 border border-white/10 overflow-hidden relative p-1.5 flex-shrink-0">
+                                        <div className="hidden sm:block w-44 h-20 lg:w-48 rounded-xl bg-black/60 border border-white/10 overflow-hidden relative p-1.5 flex-shrink-0">
                                             <ObsessionVisualizer visualType={item.visualType} accent={item.accent} />
                                         </div>
                                     </div>
@@ -208,7 +208,7 @@ const HeroObsessionsConsole = ({
                                             transform: 'rotate(180deg)',
                                         }}
                                     >
-                                        <span className="font-bold mr-2" style={{ color: item.accent }}>
+                                        <span className="font-bold me-2" style={{ color: item.accent }}>
                                             {item.num}
                                         </span>
                                         <span>{item.title}</span>

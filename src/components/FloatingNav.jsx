@@ -191,31 +191,44 @@ const FloatingNav = ({ lenis }) => {
 
                     {/* ── MOBILE: Bottom Floating Pill ───────────────────────── */}
                     <motion.div
-                        className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] pointer-events-none"
+                        className="md:hidden fixed left-1/2 -translate-x-1/2 z-[100] pointer-events-none"
+                        style={{ bottom: 'calc(1rem + env(safe-area-inset-bottom, 0px))' }}
                         initial={{ y: 100, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
                         exit={{ y: 100, opacity: 0 }}
                         transition={{ type: 'spring', stiffness: 240, damping: 22 }}
                     >
-                        <div className="flex items-center gap-1 px-3 py-2.5 bg-[#0d0d12]/90 backdrop-blur-xl border border-white/10 rounded-full shadow-2xl pointer-events-auto"
-                             style={{ boxShadow: '0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,215,0,0.05)' }}>
-                            {NAV_CONFIG.map((item) => (
-                                <button
-                                    key={item.targetId}
-                                    onClick={() => scrollTo(item.targetId)}
-                                    aria-label={item.label}
-                                    className={`
-                                        w-9 h-9 flex items-center justify-center rounded-full transition-all duration-300
-                                        ${activeSection === item.targetId
-                                            ? 'bg-[#FFD700] text-black shadow-[0_0_15px_rgba(255,215,0,0.4)]'
-                                            : 'text-white/40 hover:text-white/80'
-                                        }
-                                    `}
-                                >
-                                    <item.Icon size={14} strokeWidth={activeSection === item.targetId ? 2.5 : 1.5} />
-                                </button>
-                            ))}
-                        </div>
+                        <nav
+                            aria-label="Sections"
+                            className="flex items-center gap-0.5 p-1.5 bg-[#0d0d12]/95 border border-white/10 rounded-full pointer-events-auto"
+                            style={{ boxShadow: '0 8px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,215,0,0.05)' }}
+                        >
+                            {NAV_CONFIG.map((item) => {
+                                const isActive = activeSection === item.targetId;
+                                return (
+                                    <motion.button
+                                        key={item.targetId}
+                                        layout
+                                        transition={{ type: 'spring', stiffness: 400, damping: 32 }}
+                                        onClick={() => scrollTo(item.targetId)}
+                                        aria-label={item.label}
+                                        aria-current={isActive ? 'true' : undefined}
+                                        className={`h-10 flex items-center justify-center gap-1.5 rounded-full ${
+                                            isActive
+                                                ? 'px-3.5 bg-[#FFD700] text-black shadow-[0_0_15px_rgba(255,215,0,0.35)]'
+                                                : 'w-10 text-white/45 active:text-white'
+                                        }`}
+                                    >
+                                        <item.Icon size={15} strokeWidth={isActive ? 2.5 : 1.75} className="shrink-0" />
+                                        {isActive && (
+                                            <span className="font-mono text-[10px] font-bold tracking-[0.12em] uppercase whitespace-nowrap">
+                                                {item.label.split('·')[1].trim()}
+                                            </span>
+                                        )}
+                                    </motion.button>
+                                );
+                            })}
+                        </nav>
                     </motion.div>
                 </>
             )}

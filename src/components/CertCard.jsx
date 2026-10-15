@@ -74,8 +74,7 @@ const CertCard = ({ cert, onClick }) => {
 
                 {/* Cert title — Playfair Display */}
                 <h4
-                    className="text-white text-lg font-bold mb-1 leading-tight group-hover:text-[#FFD700] transition-colors duration-300"
-                    style={{ fontFamily: 'Rajdhani, system-ui, sans-serif' }}
+                    className="font-body-ui text-white text-lg font-bold mb-1 leading-tight group-hover:text-[#FFD700] transition-colors duration-300"
                 >
                     {cert.title}
                 </h4>

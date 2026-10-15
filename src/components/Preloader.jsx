@@ -242,18 +242,17 @@ const Preloader = ({ onComplete }) => {
             />
 
             {/* Content */}
-            <div className="relative z-10 text-center px-6 w-full max-w-xl">
+            <div className="relative z-10 text-center px-6 w-full max-w-2xl">
                 {/* Name — each word on its own line */}
                 <div ref={nameRef} className="mb-4" style={{ opacity: 0 }}>
                     <h1
-                        className="font-display font-black tracking-[0.08em] text-white leading-[0.9]"
-                        style={{ fontFamily: 'Bebas Neue, sans-serif' }}
+                        className="font-display font-black tracking-[0.08em] text-white leading-[0.95]"
                     >
                         {words.map((word, wi) => {
                             const startOffset = charOffset;
                             charOffset += word.length + 1;
                             return (
-                                <span key={wi} className="block text-5xl sm:text-7xl md:text-8xl">
+                                <span key={wi} className="block text-[2.6rem] sm:text-6xl md:text-7xl">
                                     {word.split('').map((ch, ci) => (
                                         <span key={startOffset + ci} className="pl-letter inline-block">{ch}</span>
                                     ))}

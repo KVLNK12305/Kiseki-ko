@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { Award, BookOpen, ExternalLink, ScrollText, X, BadgeCheck } from 'lucide-react';
 import CertCard from './CertCard';
 import useIsMobile from '../hooks/useIsMobile';
+import SectionHeader from './SectionHeader';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -40,16 +41,17 @@ const RESEARCH_ITEMS = [
 // ── Research Card ─────────────────────────────────────────────
 const ResearchCard = ({ item }) => {
     const isPublished = item.status === 'Published';
+    const hasLink = Boolean(item.link) && item.link !== '#';
+    const linkProps = hasLink ? { href: item.link, target: '_blank', rel: 'noopener noreferrer' } : {};
+    const Tag = hasLink ? motion.a : motion.div;
 
     return (
-        <motion.a
+        <Tag
+            {...linkProps}
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 0.5, ease: "easeOut" }}
-            href={item.link}
-            target="_blank"
-            rel="noopener noreferrer"
             className="research-card block group relative rounded-2xl overflow-hidden transition-all duration-400 cursor-interactive"
             style={{
                 background: 'linear-gradient(135deg, #0D0D14 0%, #0A0A10 100%)',
@@ -76,14 +78,16 @@ const ResearchCard = ({ item }) => {
             <div className="absolute inset-0 bg-pattern-noise opacity-[0.03] pointer-events-none" />
 
             {/* External link icon */}
-            <div className="absolute top-5 right-5 text-white/30 group-hover:text-[#FFD700] transition-colors">
-                <ExternalLink size={18} />
-            </div>
+            {hasLink && (
+                <div className="absolute top-5 right-5 text-white/30 group-hover:text-[#FFD700] transition-colors">
+                    <ExternalLink size={18} />
+                </div>
+            )}
 
-            <div className="relative z-10 p-8">
+            <div className="relative z-10 p-6 md:p-8">
                 {/* Icon */}
                 <div
-                    className="inline-flex items-center justify-center w-12 h-12 rounded-xl mb-6 border"
+                    className="inline-flex items-center justify-center w-11 h-11 md:w-12 md:h-12 rounded-xl mb-5 md:mb-6 border"
                     style={{
                         background: `${item.iconColor}15`,
                         borderColor: `${item.iconColor}35`,
@@ -111,8 +115,7 @@ const ResearchCard = ({ item }) => {
 
                 {/* Title */}
                 <h3
-                    className="text-2xl font-bold mb-2 leading-tight text-white group-hover:text-[#FFD700] transition-colors"
-                    style={{ fontFamily: 'Rajdhani, system-ui, sans-serif' }}
+                    className="font-body-ui text-xl md:text-2xl font-bold mb-2 leading-tight text-white group-hover:text-[#FFD700] transition-colors"
                 >
                     {item.title}
                 </h3>
@@ -136,7 +139,7 @@ const ResearchCard = ({ item }) => {
                 className="h-[2px] w-full opacity-60 group-hover:opacity-100 transition-opacity"
                 style={{ background: `linear-gradient(to right, ${item.iconColor}, transparent)` }}
             />
-        </motion.a>
+        </Tag>
     );
 };
 
@@ -167,59 +170,37 @@ const Honors_n_certs = () => {
         <section
             id="publications"
             ref={containerRef}
-            className="py-28 relative bg-[#030305] overflow-hidden"
+            className="pt-14 pb-16 md:py-24 md:pl-16 relative bg-[#030305] overflow-hidden"
         >
             {/* Dot pattern */}
             <div className="absolute inset-0 bg-pattern-dots opacity-50 pointer-events-none" />
 
-            {/* Top separator */}
-            <div className="absolute top-0 left-0 w-full h-px bg-white/10" />
-
-            <div className="container mx-auto max-w-6xl px-6 relative z-10">
+            <div className="max-w-7xl mx-auto px-5 sm:px-8 relative z-10">
 
                 {/* ── Section Header ─── */}
-                <motion.div 
+                <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: "-50px" }}
                     transition={{ duration: 0.6, ease: "easeOut" }}
-                    className="hon-header flex items-end gap-6 mb-20"
+                    className="mb-8 md:mb-12"
                 >
-                    {/* Watermark number — Font_1.otf */}
-                    <div
-                        className="hidden md:block select-none pointer-events-none leading-none"
-                        style={{
-                            fontFamily: 'Font1, serif',
-                            fontSize: '7rem',
-                            color: 'transparent',
-                            WebkitTextStroke: '1px rgba(255,215,0,0.08)',
-                            lineHeight: 1,
-                        }}
-                        aria-hidden="true"
-                    >
-                        05
-                    </div>
-                    <div>
-                        <p className="font-mono text-[10px] tracking-[0.4em] text-[#A855F7]/70 uppercase mb-2">
-                            RECOGNITION &amp; RESEARCH
-                        </p>
-                        <h2
-                            className="text-4xl md:text-5xl font-bold text-white leading-tight"
-                            style={{ fontFamily: 'Rajdhani, system-ui, sans-serif' }}
-                        >
-                            Honors &amp; Research
-                        </h2>
-                    </div>
+                    <SectionHeader
+                        eyebrow="RECOGNITION & RESEARCH"
+                        status={`${RESEARCH_ITEMS.length} PAPERS`}
+                        title="Honors & Research"
+                    />
                 </motion.div>
 
                 {/* ── Research Grid ─── */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-28">
+                <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 ${CERTIFICATES.length ? 'mb-20 md:mb-28' : ''}`}>
                     {RESEARCH_ITEMS.map((item, i) => (
                         <ResearchCard key={i} item={item} />
                     ))}
                 </div>
 
-                {/* ── Certifications Marquee ─── */}
+                {/* ── Certifications Marquee (hidden until there are certificates to show) ─── */}
+                {CERTIFICATES.length > 0 && (
                 <div className="relative">
                     <motion.div 
                         initial={{ opacity: 0, y: 20 }}
@@ -251,6 +232,7 @@ const Honors_n_certs = () => {
                         </div>
                     </div>
                 </div>
+                )}
             </div>
 
             {/* ── Certificate Modal ─── */}
@@ -278,8 +260,7 @@ const Honors_n_certs = () => {
                             </div>
                             <div>
                                 <h3
-                                    className="text-xl font-bold text-white"
-                                    style={{ fontFamily: 'Rajdhani, system-ui, sans-serif' }}
+                                    className="font-body-ui text-xl font-bold text-white"
                                 >
                                     {selectedCert.title}
                                 </h3>

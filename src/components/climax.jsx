@@ -195,9 +195,16 @@ const Climax = () => {
     return (
         <section
             id="contact"
-            className="relative min-h-screen w-full flex items-center justify-center overflow-hidden"
+            className={`relative min-h-[100svh] w-full flex items-center justify-center overflow-hidden md:pl-16 ${isMobile ? 'pt-16 mobile-nav-clearance' : ''}`}
             style={{ background: '#000000' }}
         >
+            {/* Top fade from page bg so the black section doesn't start on a hard seam */}
+            <div
+                className="absolute top-0 left-0 right-0 h-24 pointer-events-none z-[3]"
+                style={{ background: 'linear-gradient(to bottom, #030305, transparent)' }}
+                aria-hidden="true"
+            />
+
             {/* ── Vortex layer ─── */}
             <div className="absolute inset-0 z-0">
                 {prefersReducedMotion || isMobile ? (
@@ -231,17 +238,17 @@ const Climax = () => {
             />
 
             {/* ── Content ─── */}
-            <div className="relative z-10 text-center px-6 max-w-2xl mx-auto">
+            <div className="relative z-10 text-center px-5 sm:px-6 max-w-2xl mx-auto">
                 {/* Terminal prompt badge */}
-                <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#FFD700]/10 border border-[#FFD700]/25 text-[10px] font-mono text-[#FFD700] uppercase tracking-[0.25em] mb-5">
+                <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#FFD700]/10 border border-[#FFD700]/25 text-[9px] sm:text-[10px] font-mono text-[#FFD700] uppercase tracking-[0.18em] sm:tracking-[0.25em] mb-5">
                     <span className="h-1.5 w-1.5 rounded-full bg-[#FFD700] animate-pulse" />
                     <span>exit 0; // UNLESS SOMETHING BREAKS FIRST</span>
                 </div>
 
                 {/* Main heading */}
                 <h2
-                    className="text-5xl sm:text-6xl md:text-7xl font-bold italic text-white mb-4 leading-[1.05]"
-                    style={{ fontFamily: 'Bebas Neue, sans-serif' }}
+                    className="text-[2.6rem] sm:text-6xl md:text-7xl font-normal text-white mb-5 leading-[1.05] tracking-tight"
+                    style={{ fontFamily: 'Playfair Display, Georgia, serif' }}
                 >
                     <DecryptedText
                         text="Let's build something"
@@ -253,7 +260,7 @@ const Climax = () => {
                     />
                     <br />
                     <span
-                        className="not-italic"
+                        className="italic inline-block pb-1"
                         style={{
                             background: 'linear-gradient(90deg, #FFD700 0%, #FFF6A0 50%, #FFD700 100%)',
                             backgroundClip: 'text',
@@ -275,7 +282,7 @@ const Climax = () => {
 
                 {/* Sub-text */}
                 <p
-                    className="font-mono text-[11px] text-white/40 tracking-[0.3em] uppercase mb-10"
+                    className="font-mono text-[10px] sm:text-[11px] text-white/40 tracking-[0.2em] sm:tracking-[0.3em] uppercase mb-10 leading-relaxed"
                     style={{ fontFamily: 'JetBrains Mono, monospace' }}
                 >
                     CURRENTLY EXPLORING CLOUD SECURITY, IDENTITY ARCHITECTURE & RESILIENT SYSTEMS
@@ -293,7 +300,7 @@ const Climax = () => {
 
                     <a
                         href="mailto:kurapatikushalnarasimha95@gmail.com"
-                        className="group relative inline-flex items-center gap-3 px-12 py-5 overflow-hidden cursor-interactive bg-black/60 backdrop-blur-md transition-all duration-300 hover:scale-105"
+                        className="group relative inline-flex items-center justify-center gap-3 px-7 sm:px-12 py-4 sm:py-5 overflow-hidden cursor-interactive bg-black/60 backdrop-blur-md transition-all duration-300 hover:scale-105"
                         style={{
                             border: '1px solid rgba(255,215,0,0.5)',
                             color: '#FFD700',
@@ -305,7 +312,7 @@ const Climax = () => {
                         <div
                             className="absolute inset-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300 bg-[#FFD700]/15"
                         />
-                        <span className="relative z-10 text-xs sm:text-sm tracking-[0.4em] uppercase font-bold">
+                        <span className="relative z-10 text-xs sm:text-sm tracking-[0.25em] sm:tracking-[0.4em] uppercase font-bold whitespace-nowrap">
                             [ INITIATE CONTACT ]
                         </span>
                         <svg

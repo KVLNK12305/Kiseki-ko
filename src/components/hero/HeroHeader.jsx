@@ -36,7 +36,7 @@ const HeroHeader = ({
             <div className="flex items-center gap-4 sm:gap-8">
                 <span className="hidden sm:inline-block text-[#6B7280]">軌跡 · AP-SOUTH-1</span>
                 <div className="flex items-center gap-1.5 text-[#FFD700]">
-                    <span className="text-[9px] sm:text-[10px] text-[#6B7280]">UTC</span>
+                    <span className="text-[9px] sm:text-[10px] text-[#6B7280]">IST</span>
                     <span className="font-mono font-medium text-[11px] sm:text-xs">
                         {currentTime || '08:00:00 PM'}
                     </span>

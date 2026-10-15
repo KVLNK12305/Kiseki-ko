@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { motion, AnimatePresence, useInView } from 'framer-motion';
-import { Radio, Terminal, Lock, Unlock, ExternalLink, Play, Film } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Radio, Terminal, Lock, Unlock, ExternalLink, Film, X } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import DecryptedText from './sokulu/DecryptedText';
 import ElectricBorder from './sokulu/ElectricBorder';
 import useIsMobile from '../hooks/useIsMobile';
+import SectionHeader from './SectionHeader';
 import akiraVideo from './images/Screencast_20260331_001952.webm';
 import f1Video from './images/F1.mp4';
 
@@ -79,6 +79,8 @@ const projects = [
         bentoType: 'wide',
     },
 ];
+
+const hasPublicLink = (project) => Boolean(project.link) && project.link !== '#';
 
 const CLEARANCE_COLORS = {
     'TOP SECRET': '#dc2626',
@@ -187,10 +189,6 @@ const DemoPanel = ({ project, revealed }) => {
                 }}
             >
                 <ClassifiedStamp clearance={project.clearance} revealed={revealed} />
-
-                {/* Mobile: simple flex column layout */}
-                <div className="flex lg:hidden flex-col gap-8 w-full relative z-20">
-                </div>
 
                 {/* Mock browser header */}
                 <div className="w-full h-8 border-b border-white/[0.06] flex items-center px-4 justify-between bg-[#0a0a0f] shrink-0 z-10 relative">
@@ -356,10 +354,7 @@ const ProjectSlide = ({ project }) => {
                                 </div>
                             </div>
 
-                            <h3
-                                className="text-3xl md:text-4xl font-bold italic text-white mb-4 leading-tight transition-colors duration-300 group-hover:text-[#FFD700]"
-                                style={{ fontFamily: 'Rajdhani, system-ui, sans-serif' }}
-                            >
+                            <h3 className="font-body-ui text-3xl md:text-4xl font-bold text-white mb-4 leading-tight tracking-tight transition-colors duration-300 group-hover:text-[#FFD700]">
                                 {project.title}
                             </h3>
 
@@ -402,15 +397,21 @@ const ProjectSlide = ({ project }) => {
                                 })}
                             </div>
 
-                            <a
-                                href={project.link}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="inline-flex items-center gap-2 font-mono text-xs tracking-[0.25em] uppercase text-white/60 hover:text-[#FFD700] transition-colors duration-300 cursor-interactive border border-white/10 hover:border-[#FFD700]/40 px-4 py-2"
-                            >
-                                [ ACCESS CODEBASE ]
-                                <span className="text-base">↗</span>
-                            </a>
+                            {hasPublicLink(project) ? (
+                                <a
+                                    href={project.link}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="inline-flex items-center gap-2 font-mono text-xs tracking-[0.25em] uppercase text-white/60 hover:text-[#FFD700] transition-colors duration-300 cursor-interactive border border-white/10 hover:border-[#FFD700]/40 px-4 py-2"
+                                >
+                                    [ ACCESS CODEBASE ]
+                                    <span className="text-base">↗</span>
+                                </a>
+                            ) : (
+                                <span className="inline-flex items-center gap-2 font-mono text-xs tracking-[0.25em] uppercase text-white/30 border border-white/[0.06] px-4 py-2">
+                                    <Lock size={12} /> [ PRIVATE REPO ]
+                                </span>
+                            )}
                         </div>
                     </ElectricBorder>
                 </motion.div>
@@ -440,7 +441,7 @@ const MobileBentoCard = ({ project, index, onOpenVideo }) => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-50px" }}
             transition={{ type: 'spring', damping: 20, stiffness: 80, delay: index * 0.08 }}
-            className="project-card bento-span-standard group relative flex flex-col justify-between p-6 cursor-pointer"
+            className="project-card bento-span-standard group relative flex flex-col justify-between p-5"
             onClick={() => project.video && onOpenVideo(project.video)}
         >
             <div className="relative z-20 flex items-center justify-between mb-4">
@@ -449,7 +450,7 @@ const MobileBentoCard = ({ project, index, onOpenVideo }) => {
                         FILE · {project.id}
                     </span>
                     {project.video && (
-                        <span className="inline-flex items-center gap-1 text-[8.5px] font-mono text-[#FFD700] bg-[#FFD700]/10 border border-[#FFD700]/30 px-2 py-0.5 rounded-full">
+                        <span className="inline-flex items-center gap-1 text-[9px] font-mono text-[#FFD700] bg-[#FFD700]/10 border border-[#FFD700]/30 px-2 py-0.5 rounded-full">
                             <Film size={9} /> TAP TO WATCH
                         </span>
                     )}
@@ -463,7 +464,7 @@ const MobileBentoCard = ({ project, index, onOpenVideo }) => {
             </div>
 
             <div className="relative z-20 flex-1 flex flex-col justify-end">
-                <h3 className="font-bold text-white text-xl mb-2 leading-tight tracking-wide" style={{ fontFamily: 'var(--font-display)' }}>
+                <h3 className="font-body-ui font-bold text-white text-xl mb-2 leading-tight tracking-tight">
                     {project.title}
                 </h3>
                 <p className="text-white/60 text-xs leading-relaxed font-body-ui mb-4 line-clamp-3">
@@ -498,16 +499,22 @@ const MobileBentoCard = ({ project, index, onOpenVideo }) => {
                     })}
                 </div>
 
-                <a
-                    href={project.link}
-                    target="_blank"
-                    rel="noreferrer"
-                    onClick={(e) => e.stopPropagation()}
-                    className="inline-flex items-center gap-1.5 font-mono text-[9.5px] tracking-[0.2em] uppercase text-white/40 hover:text-[#FFD700] transition-colors duration-300 ml-auto"
-                >
-                    <span>CODEBASE</span>
-                    <ExternalLink size={10} />
-                </a>
+                {hasPublicLink(project) ? (
+                    <a
+                        href={project.link}
+                        target="_blank"
+                        rel="noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="inline-flex items-center gap-1.5 min-h-[32px] font-mono text-[10px] tracking-[0.2em] uppercase text-white/50 hover:text-[#FFD700] transition-colors duration-300 ml-auto"
+                    >
+                        <span>CODEBASE</span>
+                        <ExternalLink size={11} />
+                    </a>
+                ) : (
+                    <span className="inline-flex items-center gap-1.5 min-h-[32px] font-mono text-[10px] tracking-[0.2em] uppercase text-white/25 ml-auto">
+                        <Lock size={10} /> PRIVATE
+                    </span>
+                )}
             </div>
 
             <span className="absolute bottom-2 right-4 select-none pointer-events-none opacity-[0.03] font-deco text-7xl" style={{ color: 'transparent', WebkitTextStroke: '1px #FFD700' }}>
@@ -556,22 +563,16 @@ const Projects = () => {
     // MOBILE VIEW: Render Bento Box Grid layout
     if (isMobile) {
         return (
-            <section id="projects" className="relative py-16 bg-[#08080E] min-h-screen flex flex-col px-6">
-                <div className="mb-10 space-y-3">
-                    <div className="flex items-center gap-2 text-[#FFD700] text-xs tracking-[0.2em] opacity-80">
-                        <span>CLASSIFIED ARCHIVES</span>
-                        <span className="w-12 h-[1px] bg-[#FFD700]/50" />
-                        <span>STATUS: ACTIVE</span>
-                    </div>
-                    <h2 className="text-4xl font-bold tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-gray-500" style={{ fontFamily: 'var(--font-display)' }}>
-                        CASE FILES
-                    </h2>
-                    <p className="text-white/40 text-xs font-mono max-w-2xl leading-relaxed">
-                        Operational network structures, systems programming architectures, and deployment pipelines — declassified for technical analysis. Tap any card to view transmission.
-                    </p>
-                </div>
+            <section id="projects" className="relative pt-14 pb-16 bg-[#030305] flex flex-col px-5">
+                <SectionHeader
+                    eyebrow="CLASSIFIED ARCHIVES"
+                    status={`${projects.length} FILES`}
+                    title="Case Files"
+                    description="Systems, security and tooling work — declassified. Tap a card marked “watch” to play its demo."
+                    className="mb-8"
+                />
 
-                <div className="bento-grid">
+                <div className="grid grid-cols-1 gap-4">
                     {projects.map((project, i) => (
                         <MobileBentoCard
                             key={project.id}
@@ -585,12 +586,19 @@ const Projects = () => {
                 {expandedVideo && (
                     createPortal(
                         <div
-                            className="fixed inset-0 z-[200] bg-black/95 flex items-center justify-center p-4 cursor-pointer"
+                            className="fixed inset-0 z-[200] bg-black/95 flex flex-col items-center justify-center gap-4 p-4"
                             onClick={() => setExpandedVideo(null)}
                         >
-                            <div className="relative w-full h-auto aspect-video rounded-xl overflow-hidden border border-[#FFD700]/40 bg-black">
-                                <video src={expandedVideo} autoPlay controls className="w-full h-full object-contain" />
+                            <div className="relative w-full h-auto aspect-video rounded-xl overflow-hidden border border-[#FFD700]/40 bg-black" onClick={(e) => e.stopPropagation()}>
+                                <video src={expandedVideo} autoPlay muted playsInline controls className="w-full h-full object-contain" />
                             </div>
+                            <button
+                                type="button"
+                                onClick={() => setExpandedVideo(null)}
+                                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-white/15 bg-white/5 font-mono text-[11px] tracking-[0.2em] uppercase text-white/80"
+                            >
+                                <X size={14} /> Close
+                            </button>
                         </div>,
                         document.body
                     )
@@ -603,24 +611,34 @@ const Projects = () => {
     return (
         <section
             id="projects"
-            className="relative overflow-hidden bg-[#08080E]"
+            className="relative overflow-hidden bg-[#030305]"
         >
             <div className="absolute inset-0 bg-pattern-circuit opacity-40 pointer-events-none" />
 
-            {/* Tactical Live HUD Index Counter (Desktop) */}
-            <div className="absolute bottom-8 right-12 z-30 pointer-events-none flex items-baseline gap-2 font-mono">
-                <span className="text-3xl font-black text-[#FFD700] tracking-wider">
-                    {projects[activeSlide]?.id || '01'}
-                </span>
-                <span className="text-xs text-white/30 tracking-widest">
-                    / {String(projects.length).padStart(2, '0')}
-                </span>
-                <span className="ml-4 text-[10px] tracking-[0.25em] text-[#FFD700]/60 uppercase border-l border-white/10 pl-3">
-                    {projects[activeSlide]?.title}
-                </span>
+            <div className="relative z-20 pl-16">
+                <SectionHeader
+                    eyebrow="CLASSIFIED ARCHIVES"
+                    status={`${projects.length} FILES`}
+                    title="Case Files"
+                    description="Systems, security and tooling work — hover a file to declassify it."
+                    className="max-w-7xl mx-auto px-8 pt-20 pb-4"
+                />
             </div>
 
-            <div ref={triggerRef}>
+            <div ref={triggerRef} className="relative">
+                {/* Tactical Live HUD Index Counter (Desktop) */}
+                <div className="absolute bottom-8 right-12 z-30 pointer-events-none flex items-baseline gap-2 font-mono">
+                    <span className="text-3xl font-black text-[#FFD700] tracking-wider">
+                        {projects[activeSlide]?.id || '01'}
+                    </span>
+                    <span className="text-xs text-white/30 tracking-widest">
+                        / {String(projects.length).padStart(2, '0')}
+                    </span>
+                    <span className="ml-4 text-[10px] tracking-[0.25em] text-[#FFD700]/60 uppercase border-l border-white/10 pl-3">
+                        {projects[activeSlide]?.title}
+                    </span>
+                </div>
+
                 <div
                     ref={sectionRef}
                     className="flex h-screen relative"
