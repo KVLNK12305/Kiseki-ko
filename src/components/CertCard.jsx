@@ -17,7 +17,7 @@ const CertCard = ({ cert, onClick }) => {
     return (
         <div
             onClick={() => onClick(cert)}
-            className="cert-card group flex-shrink-0 w-72 md:w-80 mx-4 cursor-pointer relative overflow-hidden rounded-lg transition-all duration-400 hover:-translate-y-2 cursor-interactive"
+            className="cert-card group flex-shrink-0 w-72 md:w-80 mx-4 cursor-pointer relative overflow-hidden rounded-lg transition-all duration-400 hover:-translate-y-2"
             style={{
                 background: 'linear-gradient(135deg, #0D0D14 0%, #0A0A10 100%)',
                 border: '1px solid rgba(255,215,0,0.1)',

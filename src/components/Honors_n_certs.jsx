@@ -52,7 +52,7 @@ const ResearchCard = ({ item }) => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 0.5, ease: "easeOut" }}
-            className="research-card block group relative rounded-2xl overflow-hidden transition-all duration-400 cursor-interactive"
+            className="research-card block group relative rounded-2xl overflow-hidden transition-all duration-400"
             style={{
                 background: 'linear-gradient(135deg, #0D0D14 0%, #0A0A10 100%)',
                 border: `1px solid rgba(255,255,255,0.08)`,
@@ -247,7 +247,7 @@ const Honors_n_certs = () => {
                         onClick={e => e.stopPropagation()}
                     >
                         <button
-                            className="absolute top-4 right-4 text-gray-600 hover:text-white transition-colors cursor-interactive"
+                            className="absolute top-4 right-4 text-gray-600 hover:text-white transition-colors"
                             onClick={() => setSelectedCert(null)}
                             aria-label="Close modal"
                         >
@@ -306,7 +306,7 @@ const Honors_n_certs = () => {
                                     href={selectedCert.link}
                                     target="_blank"
                                     rel="noreferrer"
-                                    className="flex items-center gap-1.5 font-mono text-xs font-bold text-[#FFD700] hover:underline cursor-interactive"
+                                    className="flex items-center gap-1.5 font-mono text-xs font-bold text-[#FFD700] hover:underline"
                                 >
                                     VERIFY CREDENTIAL <ExternalLink size={11} />
                                 </a>

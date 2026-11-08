@@ -1,656 +1,224 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
-import { motion } from 'framer-motion';
-import { Radio, Terminal, Lock, Unlock, ExternalLink, Film, X } from 'lucide-react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import ElectricBorder from './sokulu/ElectricBorder';
-import useIsMobile from '../hooks/useIsMobile';
+import React, { useState } from 'react';
+import { ArrowUpRight, Play } from 'lucide-react';
 import SectionHeader from './SectionHeader';
 import akiraVideo from './images/Screencast_20260331_001952.webm';
 import f1Video from './images/F1.mp4';
 
-gsap.registerPlugin(ScrollTrigger);
-
+// `contributors` are GitHub logins, ordered by commit count. Hard-coded
+// (from the repos' contributor lists) so the page makes no API calls.
+// `issue` is the one joke per card: a dry "known issue" line, styled like
+// a code comment. Static text, so it costs nothing to render.
 const projects = [
     {
         id: '01',
         title: 'ADG-Polymorph',
-        description: 'Security-Aware SDN Deception Framework with kernel-level eBPF/XDP networking. Reduces detection latency to sub-μs using entropy anomaly detection.',
-        tags: [{ name: 'Rust (Aya)', cat: 'lang' }, { name: 'eBPF/XDP', cat: 'sys' }, { name: 'Open vSwitch', cat: 'net' }, { name: 'Mininet', cat: 'net' }],
-        link: '#',
-        clearance: 'TOP SECRET',
-        bentoType: 'tall',
+        description: 'Security-aware SDN deception framework with kernel-level eBPF/XDP networking. Reduces detection latency to sub-μs using entropy anomaly detection.',
+        tags: ['Rust (Aya)', 'eBPF/XDP', 'Open vSwitch', 'Mininet'],
+        link: null,
+        issue: 'attackers keep falling for it.',
     },
     {
         id: '02',
         title: 'GhostShell',
-        description: 'Rust TUI combining decoy terminal with hidden real-time observability dashboard. Async telemetry pipeline streaming structured logs.',
-        tags: [{ name: 'Rust', cat: 'lang' }, { name: 'Tokio', cat: 'runtime' }, { name: 'LLM APIs', cat: 'ai' }, { name: 'TUI', cat: 'ui' }],
+        description: 'Rust TUI combining a decoy terminal with a hidden real-time observability dashboard. Async telemetry pipeline streaming structured logs.',
+        tags: ['Rust', 'Tokio', 'LLM APIs', 'TUI'],
         link: 'https://github.com/KVLNK12305/GhostShell',
-        clearance: 'SECRET',
-        bentoType: 'standard',
+        contributors: ['KVLNK12305'],
+        issue: 'the fake shell is friendlier than the real one.',
     },
     {
         id: '03',
         title: 'EeffoC',
-        description: 'Event-Driven Task Orchestration capturing real-time Discord events. Features intent extraction routing payloads through Microsoft Graph.',
-        tags: [{ name: 'Go', cat: 'lang' }, { name: 'n8n', cat: 'workflow' }, { name: 'MS Graph', cat: 'api' }, { name: 'Automation', cat: 'sys' }],
+        description: 'Event-driven task orchestration capturing real-time Discord events. Extracts intent and routes payloads through Microsoft Graph.',
+        tags: ['Go', 'n8n', 'MS Graph', 'Automation'],
         link: 'https://github.com/KVLNK12305/EeffoC',
-        clearance: 'CONFIDENTIAL',
-        bentoType: 'standard',
+        contributors: ['KVLNK12305'],
+        issue: 'coffee, backwards. so is my sleep schedule.',
     },
     {
         id: '04',
         title: 'Everust',
-        description: 'Modular platform experimenting with async execution and ownership. Benchmarks system behavior across concurrency models.',
-        tags: [{ name: 'Rust', cat: 'lang' }, { name: 'Axum', cat: 'web' }, { name: 'Tokio', cat: 'runtime' }, { name: 'Async', cat: 'sys' }],
+        description: 'Modular platform for experimenting with async execution and ownership. Benchmarks system behaviour across concurrency models.',
+        tags: ['Rust', 'Axum', 'Tokio', 'Async'],
         link: 'https://github.com/KVLNK12305/Everust',
-        clearance: 'CONFIDENTIAL',
-        bentoType: 'standard',
+        contributors: ['KVLNK12305'],
+        issue: 'the borrow checker won most arguments.',
     },
     {
         id: '05',
         title: 'AKIRA',
-        description: 'High-throughput API gateway & cryptographic Identity Provider. Employs a Rust-based zero-knowledge key vault via Bun FFI for secure tamper-evident auth logs.',
-        tags: [{ name: 'Bun', cat: 'runtime' }, { name: 'Express', cat: 'web' }, { name: 'React', cat: 'ui' }, { name: 'Rust Crypto', cat: 'sys' }],
+        description: 'High-throughput API gateway and cryptographic identity provider. A Rust key vault, called through Bun FFI, keeps auth logs tamper-evident.',
+        tags: ['Bun', 'Express', 'React', 'Rust Crypto'],
         link: 'https://github.com/KVLNK12305/Akira',
-        clearance: 'TOP SECRET',
+        contributors: ['KVLNK12305'],
         video: akiraVideo,
-        bentoType: 'large',
+        issue: 'none reported. that is what worries me.',
     },
     {
         id: '06',
         title: 'NovaSketch',
-        description: 'Real-time collaborative whiteboard using WebSockets. Fine-grained access control prevents concurrent conflicts.',
-        tags: [{ name: 'React', cat: 'ui' }, { name: 'WebSockets', cat: 'net' }, { name: 'MongoDB', cat: 'db' }, { name: 'OAuth', cat: 'auth' }],
+        description: 'Real-time collaborative whiteboard over WebSockets. Fine-grained access control prevents concurrent edit conflicts.',
+        tags: ['React', 'WebSockets', 'MongoDB', 'OAuth'],
         link: 'https://github.com/Ateliers-io/NovaSketch',
-        clearance: 'SECRET',
-        bentoType: 'wide',
+        contributors: ['KVLNK12305', 'ksskarthik18', 'NarainBK', 'gjyoshitha26', 'LavishkaDhamija'],
+        issue: 'two people still cannot agree on a line. by design.',
     },
     {
         id: '07',
         title: 'F1 Evolution',
-        description: 'Data analysis of Formula 1 regulatory impacts across eras. Explores performance dynamics, lap time deviations, and team dominance metrics.',
-        tags: [{ name: 'Pandas', cat: 'data' }, { name: 'Seaborn', cat: 'viz' }, { name: 'Plotly', cat: 'viz' }],
+        description: 'Data analysis of how Formula 1 regulations changed each era: performance dynamics, lap-time deviation and team dominance.',
+        tags: ['Pandas', 'Seaborn', 'Plotly'],
         link: 'https://github.com/KVLNK12305/F1_Case_Study',
-        clearance: 'UNCLASSIFIED',
+        contributors: ['KVLNK12305'],
         video: f1Video,
-        bentoType: 'wide',
+        issue: 'no dataset explains Ferrari strategy.',
     },
 ];
 
-const hasPublicLink = (project) => Boolean(project.link) && project.link !== '#';
-
-const CLEARANCE_COLORS = {
-    'TOP SECRET': '#dc2626',
-    'SECRET': '#ea580c',
-    'CONFIDENTIAL': '#FFD700',
-    'UNCLASSIFIED': '#4ade80',
-};
-
-const TAG_CAT_STYLES = {
-    lang: { bg: 'rgba(168,85,247,0.12)', border: 'rgba(168,85,247,0.3)', dot: '#c084fc', text: '#e9d5ff' },
-    sys: { bg: 'rgba(239,68,68,0.12)', border: 'rgba(239,68,68,0.3)', dot: '#f87171', text: '#fca5a5' },
-    net: { bg: 'rgba(59,130,246,0.12)', border: 'rgba(59,130,246,0.3)', dot: '#60a5fa', text: '#bfdbfe' },
-    web: { bg: 'rgba(34,197,94,0.12)', border: 'rgba(34,197,94,0.3)', dot: '#4ade80', text: '#bbf7d0' },
-    ui: { bg: 'rgba(251,146,60,0.12)', border: 'rgba(251,146,60,0.3)', dot: '#fb923c', text: '#fed7aa' },
-    data: { bg: 'rgba(99,102,241,0.12)', border: 'rgba(99,102,241,0.3)', dot: '#818cf8', text: '#c7d2fe' },
-    viz: { bg: 'rgba(20,184,166,0.12)', border: 'rgba(20,184,166,0.3)', dot: '#2dd4bf', text: '#99f6e4' },
-    ai: { bg: 'rgba(217,70,239,0.12)', border: 'rgba(217,70,239,0.3)', dot: '#e879f9', text: '#f5d0fe' },
-    runtime: { bg: 'rgba(234,179,8,0.12)', border: 'rgba(234,179,8,0.3)', dot: '#facc15', text: '#fef08a' },
-    workflow: { bg: 'rgba(16,185,129,0.12)', border: 'rgba(16,185,129,0.3)', dot: '#34d399', text: '#a7f3d0' },
-    api: { bg: 'rgba(14,165,233,0.12)', border: 'rgba(14,165,233,0.3)', dot: '#38bdf8', text: '#bae6fd' },
-    auth: { bg: 'rgba(244,114,182,0.12)', border: 'rgba(244,114,182,0.3)', dot: '#f472b6', text: '#fbcfe8' },
-    db: { bg: 'rgba(251,191,36,0.12)', border: 'rgba(251,191,36,0.3)', dot: '#fbbf24', text: '#fef3c7' },
-};
-
-// ── Classified Stamp (Desktop View) ───────────────────────────
-const ClassifiedStamp = ({ clearance, revealed }) => {
-    const letters = clearance.split('');
-    const color = CLEARANCE_COLORS[clearance] || '#dc2626';
+// The video element is only created after a click, so nothing is
+// downloaded or decoded until someone actually asks to watch.
+const DemoVideo = ({ src, title }) => {
+    const [playing, setPlaying] = useState(false);
 
     return (
-        <div
-            className="absolute inset-0 flex items-center justify-center pointer-events-none z-20"
-            aria-hidden="true"
-        >
-            <motion.div
-                initial={false}
-                animate={revealed ? { opacity: 0, scale: 1.25 } : { opacity: 0.9, scale: 1 }}
-                transition={{ duration: 0.45, ease: "easeOut" }}
-                className="rotate-[-10deg] flex items-center gap-1 px-4 py-2 border-2 rounded-md backdrop-blur-md shadow-2xl"
-                style={{
-                    borderColor: `${color}99`,
-                    backgroundColor: 'rgba(5,5,8,0.75)',
-                    boxShadow: `0 0 35px ${color}44, inset 0 0 20px ${color}22`,
-                }}
-            >
-                {letters.map((char, i) => (
-                    <motion.span
-                        key={i}
-                        animate={revealed ? {
-                            x: (i - letters.length / 2) * 32,
-                            y: (i % 2 === 0 ? -1 : 1) * 40,
-                            rotate: (i - letters.length / 2) * 22,
-                            opacity: 0,
-                        } : {
-                            x: 0,
-                            y: 0,
-                            rotate: 0,
-                            opacity: 1,
-                        }}
-                        transition={{ duration: 0.45, delay: i * 0.015 }}
-                        className="font-mono font-black text-xs md:text-sm tracking-[0.25em] inline-block"
-                        style={{
-                            color: color,
-                            textShadow: `0 0 16px ${color}`,
-                        }}
-                    >
-                        {char === ' ' ? '\u00A0' : char}
-                    </motion.span>
-                ))}
-            </motion.div>
-        </div>
-    );
-};
-
-// ── Demo Panel (Desktop View) ──────────────────────────────────
-const DemoPanel = ({ project, revealed }) => {
-    const [expandedVideo, setExpandedVideo] = useState(null);
-
-    useEffect(() => {
-        const handleKeyDown = (e) => {
-            if (e.key === 'Escape' && expandedVideo) {
-                setExpandedVideo(null);
-            }
-        };
-
-        if (expandedVideo) {
-            window.addEventListener('keydown', handleKeyDown);
-        }
-
-        return () => {
-            window.removeEventListener('keydown', handleKeyDown);
-        };
-    }, [expandedVideo]);
-
-    const hasVideo = project.title === 'AKIRA' || project.title === 'F1 Evolution';
-    const videoSrc = project.title === 'AKIRA' ? akiraVideo : f1Video;
-
-    return (
-        <>
-            <div
-                className="relative h-[380px] rounded-2xl border overflow-hidden transition-all duration-700"
-                style={{
-                    background: '#050508',
-                    borderColor: revealed ? 'rgba(255,215,0,0.25)' : 'rgba(255,255,255,0.05)',
-                    boxShadow: revealed ? '0 0 30px rgba(255,215,0,0.08)' : 'none',
-                }}
-            >
-                <ClassifiedStamp clearance={project.clearance} revealed={revealed} />
-
-                {/* Mock browser header */}
-                <div className="w-full h-8 border-b border-white/[0.06] flex items-center px-4 justify-between bg-[#0a0a0f] shrink-0 z-10 relative">
-                    <div className="flex gap-2">
-                        <div className="w-2.5 h-2.5 rounded-full bg-red-500/70" />
-                        <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/70" />
-                        <div className="w-2.5 h-2.5 rounded-full bg-green-500/70" />
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <Radio className="w-3 h-3 text-green-400 animate-pulse" />
-                        <span className="text-[9px] text-green-400 font-mono tracking-widest">
-                            {revealed ? 'LIVE FEED' : 'SIGNAL BLOCKED'}
-                        </span>
-                    </div>
-                    <Terminal className="w-3.5 h-3.5 text-white/20" />
-                </div>
-
-                <div className="flex-1 relative bg-[#050508] overflow-hidden" style={{ height: 'calc(100% - 32px)' }}>
-                    <div
-                        className="absolute inset-0 transition-all duration-700"
-                        style={{
-                            clipPath: revealed
-                                ? 'polygon(0 0, 100% 0, 100% 100%, 0 100%)'
-                                : 'polygon(0 0, 100% 0, 100% 0, 0 0)',
-                        }}
-                    >
-                        {hasVideo ? (
-                            <div
-                                className="absolute inset-0 cursor-pointer"
-                                onMouseEnter={() => revealed && setExpandedVideo(videoSrc)}
-                            >
-                                {revealed && (
-                                    <video
-                                        src={videoSrc}
-                                        autoPlay
-                                        muted
-                                        loop
-                                        playsInline
-                                        preload="metadata"
-                                        className="absolute inset-0 w-full h-full object-cover"
-                                    />
-                                )}
-                                <div className="absolute bottom-3 right-3 z-20 px-2.5 py-1 rounded border border-[#FFD700]/40 bg-black/60 text-[10px] font-mono text-[#FFD700] tracking-widest backdrop-blur-sm">
-                                    HOVER: EXPAND
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="absolute inset-0 flex items-center justify-center">
-                                <img
-                                    src={`https://api.dicebear.com/7.x/shapes/svg?seed=${project.title}&backgroundColor=050508&shape1Color=FFD700&shape2Color=4c1d95`}
-                                    alt=""
-                                    className="absolute inset-0 w-full h-full object-cover opacity-15 mix-blend-screen scale-110"
-                                />
-                                <div
-                                    className="font-mono text-lg tracking-[0.3em] font-bold border-2 p-5 rounded-lg rotate-[-4deg] backdrop-blur-sm"
-                                    style={{
-                                        color: 'rgba(255,215,0,0.4)',
-                                        borderColor: 'rgba(255,215,0,0.15)',
-                                    }}
-                                >
-                                    COMING SOON
-                                </div>
-                            </div>
-                        )}
-                    </div>
-
-                    {!revealed && (
-                        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 z-10">
-                            <Lock size={32} className="text-white/10" />
-                            <span className="font-mono text-[11px] text-white/20 tracking-[0.3em] uppercase">
-                                Hover to Declassify
-                            </span>
-                        </div>
-                    )}
-
-                    <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.025)_1px,transparent_1px)] bg-[size:100%_4px] pointer-events-none z-30" />
-                </div>
-            </div>
-
-            {/* Desktop Fullscreen Modal */}
-            {expandedVideo && createPortal(
-                <div
-                    className="fixed inset-0 z-[200] bg-black/90 backdrop-blur-md flex items-center justify-center p-4 cursor-pointer"
-                    style={{ background: 'radial-gradient(circle at center, rgba(255,215,0,0.08), rgba(0,0,0,0.95) 60%)' }}
-                    onClick={() => setExpandedVideo(null)}
+        <div className="relative aspect-video w-full overflow-hidden rounded-lg border border-white/[0.08] bg-[#07070B]">
+            {playing ? (
+                <video
+                    src={src}
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    controls
+                    className="absolute inset-0 h-full w-full object-cover"
+                />
+            ) : (
+                <button
+                    type="button"
+                    onClick={() => setPlaying(true)}
+                    className="group/play absolute inset-0 flex items-center justify-center gap-3 font-mono text-[13px] text-white/70 transition-colors hover:text-[#FFD700]"
+                    aria-label={`Play ${title} demo`}
                 >
-                    <div
-                        className="relative w-full h-full sm:h-auto sm:aspect-video max-w-7xl rounded-2xl overflow-hidden border border-[#FFD700]/40 shadow-[0_0_60px_rgba(255,215,0,0.3)] cursor-default flex items-center justify-center bg-black/50"
-                        onMouseLeave={() => setExpandedVideo(null)}
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <video src={expandedVideo} autoPlay muted loop playsInline className="w-full h-full object-contain sm:object-cover" />
-                        <div className="absolute top-4 left-1/2 -translate-x-1/2 px-3 py-1 rounded border border-[#FFD700]/40 bg-black/60 text-[11px] tracking-[0.2em] font-mono text-[#FFD700]">
-                            FOCUS MODE ACTIVE
-                        </div>
-                        <div className="absolute bottom-4 right-4 px-3 py-1 rounded border border-white/20 bg-black/60 text-[10px] tracking-widest font-mono text-white/70 hidden sm:block">
-                            MOVE CURSOR OUT OR PRESS ESC TO CLOSE
-                        </div>
-                    </div>
-                </div>,
-                document.body
+                    <span className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 transition-colors group-hover/play:border-[#FFD700]/60">
+                        <Play size={16} className="ml-0.5" />
+                    </span>
+                    play demo
+                </button>
             )}
-        </>
-    );
-};
-
-// ── Project Slide (Desktop View with ElectricBorder & 3D Perspective) ───────────
-const ProjectSlide = ({ project }) => {
-    const [revealed, setRevealed] = useState(false);
-    const clearanceColor = CLEARANCE_COLORS[project.clearance] || '#dc2626';
-
-    return (
-        <div
-            className="w-screen h-full flex-shrink-0 flex items-center justify-center p-8 border-r border-white/[0.04] relative"
-            style={{ minWidth: '100vw', perspective: '1400px' }}
-        >
-            <span
-                className="absolute top-8 left-10 select-none pointer-events-none"
-                aria-hidden="true"
-                style={{
-                    fontFamily: 'Font1, serif',
-                    fontSize: 'clamp(6rem, 18vw, 18rem)',
-                    color: 'transparent',
-                    WebkitTextStroke: '1px rgba(255,215,0,0.04)',
-                    lineHeight: 1,
-                }}
-            >
-                {project.id}
-            </span>
-
-            <div
-                className="max-w-5xl w-full grid grid-cols-1 lg:grid-cols-2 gap-10 items-center transition-all duration-500"
-                style={{ transformStyle: 'preserve-3d' }}
-                onMouseEnter={() => setRevealed(true)}
-                onMouseLeave={() => setRevealed(false)}
-            >
-                {/* Dossier Card with 3D Book-Open Angle */}
-                <motion.div
-                    className="order-2 lg:order-1"
-                    animate={{
-                        rotateY: revealed ? 3.5 : 0,
-                        z: revealed ? 20 : 0,
-                    }}
-                    transition={{ type: "spring", damping: 20, stiffness: 120 }}
-                >
-                    <ElectricBorder color="#FFD700">
-                        <div className="bg-[#0D0D14] p-8 rounded-xl border border-white/[0.06] relative overflow-hidden group">
-                            <div className="flex items-center justify-between mb-6">
-                                <span className="font-mono text-[10px] tracking-[0.4em] text-white/20 uppercase">
-                                    CASE FILE · {project.id}
-                                </span>
-                                <div className="flex items-center gap-2">
-                                    <span
-                                        className="font-mono text-[10px] tracking-[0.2em] uppercase"
-                                        style={{ color: clearanceColor + '99' }}
-                                    >
-                                        {project.clearance}
-                                    </span>
-                                    <span
-                                        className="w-1.5 h-1.5 rounded-full"
-                                        style={{ background: clearanceColor, opacity: 0.6 }}
-                                    />
-                                </div>
-                            </div>
-
-                            <h3 className="font-body-ui text-3xl md:text-4xl font-bold text-white mb-4 leading-tight tracking-tight transition-colors duration-300 group-hover:text-[#FFD700]">
-                                {project.title}
-                            </h3>
-
-                            <div className="flex items-center gap-2 mb-4">
-                                {revealed
-                                    ? <Unlock size={12} className="text-green-400" />
-                                    : <Lock size={12} className="text-white/20" />
-                                }
-                                <span className={`font-mono text-[10px] tracking-widest uppercase transition-colors duration-300 ${revealed ? 'text-green-400' : 'text-white/20'}`}>
-                                    {revealed ? 'DECLASSIFIED' : 'CLASSIFIED'}
-                                </span>
-                            </div>
-
-                            <p className="text-[#9090A8] mb-7 leading-relaxed text-sm md:text-base">
-                                {project.description}
-                            </p>
-
-                            <div className="flex flex-wrap gap-2 mb-7">
-                                {project.tags.map(tag => {
-                                    const style = TAG_CAT_STYLES[tag.cat] || {
-                                        bg: 'rgba(255,255,255,0.04)',
-                                        border: 'rgba(255,255,255,0.1)',
-                                        dot: '#FFD700',
-                                        text: 'rgba(255,215,0,0.8)',
-                                    };
-                                    return (
-                                        <span
-                                            key={tag.name}
-                                            className="inline-flex items-center gap-1.5 px-3 py-1 text-[11px] font-mono rounded-full border backdrop-blur-sm"
-                                            style={{
-                                                background: style.bg,
-                                                borderColor: style.border,
-                                                color: style.text,
-                                            }}
-                                        >
-                                            <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: style.dot }} />
-                                            {tag.name}
-                                        </span>
-                                    );
-                                })}
-                            </div>
-
-                            {hasPublicLink(project) ? (
-                                <a
-                                    href={project.link}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="inline-flex items-center gap-2 font-mono text-xs tracking-[0.25em] uppercase text-white/60 hover:text-[#FFD700] transition-colors duration-300 cursor-interactive border border-white/10 hover:border-[#FFD700]/40 px-4 py-2"
-                                >
-                                    [ ACCESS CODEBASE ]
-                                    <span className="text-base">↗</span>
-                                </a>
-                            ) : (
-                                <span className="inline-flex items-center gap-2 font-mono text-xs tracking-[0.25em] uppercase text-white/30 border border-white/[0.06] px-4 py-2">
-                                    <Lock size={12} /> [ PRIVATE REPO ]
-                                </span>
-                            )}
-                        </div>
-                    </ElectricBorder>
-                </motion.div>
-
-                <motion.div
-                    className="order-1 lg:order-2"
-                    animate={{
-                        rotateY: revealed ? -3.5 : 0,
-                        z: revealed ? 20 : 0,
-                    }}
-                    transition={{ type: "spring", damping: 20, stiffness: 120 }}
-                >
-                    <DemoPanel project={project} revealed={revealed} />
-                </motion.div>
-            </div>
         </div>
     );
 };
 
-// ── Mobile Bento Card Component ────────────────────────────────
-const MobileBentoCard = ({ project, index, onOpenVideo }) => {
-    const clearanceColor = CLEARANCE_COLORS[project.clearance] || '#dc2626';
-
-    return (
-        <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ type: 'spring', damping: 20, stiffness: 80, delay: index * 0.08 }}
-            className="project-card bento-span-standard group relative flex flex-col justify-between p-5"
-            onClick={() => project.video && onOpenVideo(project.video)}
-        >
-            <div className="relative z-20 flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                    <span className="font-mono text-[9px] tracking-[0.25em] text-white/30 uppercase">
-                        FILE · {project.id}
-                    </span>
-                    {project.video && (
-                        <span className="inline-flex items-center gap-1 text-[9px] font-mono text-[#FFD700] bg-[#FFD700]/10 border border-[#FFD700]/30 px-2 py-0.5 rounded-full">
-                            <Film size={9} /> TAP TO WATCH
-                        </span>
-                    )}
-                </div>
-                <div className="flex items-center gap-1.5">
-                    <span className="font-mono text-[9px] tracking-[0.15em] uppercase" style={{ color: clearanceColor }}>
-                        {project.clearance}
-                    </span>
-                    <span className="w-1.5 h-1.5 rounded-full" style={{ background: clearanceColor }} />
-                </div>
-            </div>
-
-            <div className="relative z-20 flex-1 flex flex-col justify-end">
-                <h3 className="font-body-ui font-bold text-white text-xl mb-2 leading-tight tracking-tight">
-                    {project.title}
-                </h3>
-                <p className="text-white/60 text-xs leading-relaxed font-body-ui mb-4 line-clamp-3">
-                    {project.description}
-                </p>
-            </div>
-
-            <div className="relative z-20 pt-3 border-t border-white/5 flex flex-wrap items-center justify-between gap-2 mt-auto">
-                <div className="flex flex-wrap gap-1.5">
-                    {project.tags.map((tag) => {
-                        const style = TAG_CAT_STYLES[tag.cat] || {
-                            bg: 'rgba(255,255,255,0.03)',
-                            border: 'rgba(255,255,255,0.1)',
-                            dot: '#FFD700',
-                            text: 'rgba(255,215,0,0.85)',
-                        };
-
-                        return (
-                            <span
-                                key={tag.name}
-                                className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-mono font-medium rounded-md border"
-                                style={{
-                                    background: style.bg,
-                                    borderColor: style.border,
-                                    color: style.text,
-                                }}
-                            >
-                                <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: style.dot }} />
-                                {tag.name}
-                            </span>
-                        );
-                    })}
-                </div>
-
-                {hasPublicLink(project) ? (
-                    <a
-                        href={project.link}
-                        target="_blank"
-                        rel="noreferrer"
-                        onClick={(e) => e.stopPropagation()}
-                        className="inline-flex items-center gap-1.5 min-h-[32px] font-mono text-[10px] tracking-[0.2em] uppercase text-white/50 hover:text-[#FFD700] transition-colors duration-300 ml-auto"
-                    >
-                        <span>CODEBASE</span>
-                        <ExternalLink size={11} />
-                    </a>
-                ) : (
-                    <span className="inline-flex items-center gap-1.5 min-h-[32px] font-mono text-[10px] tracking-[0.2em] uppercase text-white/25 ml-auto">
-                        <Lock size={10} /> PRIVATE
-                    </span>
-                )}
-            </div>
-
-            <span className="absolute bottom-2 right-4 select-none pointer-events-none opacity-[0.03] font-deco text-7xl" style={{ color: 'transparent', WebkitTextStroke: '1px #FFD700' }}>
-                {project.id}
-            </span>
-        </motion.div>
-    );
-};
-
-// ── Main Projects Component ────────────────────────────────────
-const Projects = () => {
-    const triggerRef = useRef(null);
-    const sectionRef = useRef(null);
-    const isMobile = useIsMobile();
-    const [expandedVideo, setExpandedVideo] = useState(null);
-    const [activeSlide, setActiveSlide] = useState(0);
-
-    useEffect(() => {
-        if (isMobile) return; // Skip GSAP horizontal scroll pinning on mobile
-
-        const ctx = gsap.context(() => {
-            gsap.fromTo(
-                sectionRef.current,
-                { translateX: 0 },
-                {
-                    translateX: `-${(projects.length - 1) * 100}vw`,
-                    ease: 'none',
-                    duration: 1,
-                    scrollTrigger: {
-                        trigger: triggerRef.current,
-                        start: 'top top',
-                        end: '+=3200',
-                        scrub: 2,
-                        pin: true,
-                        onUpdate: (self) => {
-                            const idx = Math.round(self.progress * (projects.length - 1));
-                            setActiveSlide(idx);
-                        },
-                    },
-                }
-            );
-        });
-        return () => ctx.revert();
-    }, [isMobile]);
-
-    // MOBILE VIEW: Render Bento Box Grid layout
-    if (isMobile) {
-        return (
-            <section id="projects" className="relative pt-14 pb-16 bg-[#030305] flex flex-col px-5">
-                <SectionHeader
-                    eyebrow="CLASSIFIED ARCHIVES"
-                    status={`${projects.length} FILES`}
-                    title="Case Files"
-                    description="Systems, security and tooling work — declassified. Tap a card marked “watch” to play its demo."
-                    className="mb-8"
-                />
-
-                <div className="grid grid-cols-1 gap-4">
-                    {projects.map((project, i) => (
-                        <MobileBentoCard
-                            key={project.id}
-                            project={project}
-                            index={i}
-                            onOpenVideo={(src) => setExpandedVideo(src)}
-                        />
-                    ))}
-                </div>
-
-                {expandedVideo && (
-                    createPortal(
-                        <div
-                            className="fixed inset-0 z-[200] bg-black/95 flex flex-col items-center justify-center gap-4 p-4"
-                            onClick={() => setExpandedVideo(null)}
-                        >
-                            <div className="relative w-full h-auto aspect-video rounded-xl overflow-hidden border border-[#FFD700]/40 bg-black" onClick={(e) => e.stopPropagation()}>
-                                <video src={expandedVideo} autoPlay muted playsInline controls className="w-full h-full object-contain" />
-                            </div>
-                            <button
-                                type="button"
-                                onClick={() => setExpandedVideo(null)}
-                                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-white/15 bg-white/5 font-mono text-[11px] tracking-[0.2em] uppercase text-white/80"
-                            >
-                                <X size={14} /> Close
-                            </button>
-                        </div>,
-                        document.body
-                    )
-                )}
-            </section>
-        );
-    }
-
-    // DESKTOP VIEW: Render Original ElectricBorder Horizontal Carousel
-    return (
-        <section
-            id="projects"
-            className="relative overflow-hidden bg-[#030305]"
-        >
-            <div className="absolute inset-0 bg-pattern-circuit opacity-40 pointer-events-none" />
-
-            <div className="relative z-20 pl-16">
-                <SectionHeader
-                    eyebrow="CLASSIFIED ARCHIVES"
-                    status={`${projects.length} FILES`}
-                    title="Case Files"
-                    description="Systems, security and tooling work — hover a file to declassify it."
-                    className="max-w-7xl mx-auto px-8 pt-20 pb-4"
-                />
-            </div>
-
-            <div ref={triggerRef} className="relative">
-                {/* Tactical Live HUD Index Counter (Desktop) */}
-                <div className="absolute bottom-8 right-12 z-30 pointer-events-none flex items-baseline gap-2 font-mono">
-                    <span className="text-3xl font-black text-[#FFD700] tracking-wider">
-                        {projects[activeSlide]?.id || '01'}
-                    </span>
-                    <span className="text-xs text-white/30 tracking-widest">
-                        / {String(projects.length).padStart(2, '0')}
-                    </span>
-                    <span className="ml-4 text-[10px] tracking-[0.25em] text-[#FFD700]/60 uppercase border-l border-white/10 pl-3">
-                        {projects[activeSlide]?.title}
-                    </span>
-                </div>
-
-                <div
-                    ref={sectionRef}
-                    className="flex h-screen relative"
-                    style={{ width: `${projects.length * 100}vw` }}
+// Overlapping avatar stack. Plain lazy <img>s at a fixed 28px, so
+// they never shift layout and only load when the card is near view.
+const Contributors = ({ logins }) => (
+    <div className="flex items-center gap-2.5">
+        <div className="flex -space-x-2">
+            {logins.map((login) => (
+                <a
+                    key={login}
+                    href={`https://github.com/${login}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    title={login}
+                    className="relative rounded-full ring-2 ring-[#0B0B10] transition-transform duration-150 hover:z-10 hover:-translate-y-0.5"
                 >
-                    {projects.map((project) => (
-                        <ProjectSlide key={project.id} project={project} />
-                    ))}
-                </div>
+                    <img
+                        src={`https://github.com/${login}.png?size=56`}
+                        alt={login}
+                        width={28}
+                        height={28}
+                        loading="lazy"
+                        decoding="async"
+                        className="h-7 w-7 rounded-full bg-white/10"
+                    />
+                </a>
+            ))}
+        </div>
+        <span className="font-mono text-[12px] text-white/40">
+            {logins.length === 1 ? 'solo' : `${logins.length} contributors`}
+        </span>
+    </div>
+);
+
+const ProjectCard = ({ project }) => (
+    <article
+        className={`group flex flex-col rounded-xl border border-white/[0.07] bg-[#0B0B10] p-6 transition-colors duration-200 hover:border-[#FFD700]/30 ${
+            project.video ? 'lg:col-span-2' : ''
+        }`}
+    >
+        <div className="mb-4 flex items-baseline justify-between gap-4">
+            <h3 className="font-body-ui text-2xl font-bold tracking-tight text-[#F0EDE8]">
+                {project.title}
+            </h3>
+            <span className="font-mono text-[13px] text-white/30">{project.id}</span>
+        </div>
+
+        {project.video && (
+            <div className="mb-5">
+                <DemoVideo src={project.video} title={project.title} />
             </div>
-        </section>
-    );
-};
+        )}
+
+        <p className="mb-5 text-[15px] leading-relaxed text-[#B4B4C6]">{project.description}</p>
+
+        <ul className="mb-6 flex flex-wrap gap-2">
+            {project.tags.map((tag) => (
+                <li
+                    key={tag}
+                    className="rounded-md border border-white/10 px-2.5 py-1 font-mono text-[12px] text-white/70"
+                >
+                    {tag}
+                </li>
+            ))}
+        </ul>
+
+        {project.contributors && (
+            <div className="mb-5">
+                <Contributors logins={project.contributors} />
+            </div>
+        )}
+
+        <div className="mt-auto flex flex-wrap items-end justify-between gap-x-6 gap-y-3 border-t border-white/[0.06] pt-4">
+            <p className="font-mono text-[13px] text-white/45">
+                <span className="text-[#FFD700]/70">// known issue:</span> {project.issue}
+                <span className="project-caret" aria-hidden="true" />
+            </p>
+
+            {project.link ? (
+                <a
+                    href={project.link}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1 font-mono text-[13px] text-white/75 transition-colors hover:text-[#FFD700]"
+                >
+                    source <ArrowUpRight size={14} />
+                </a>
+            ) : (
+                <span className="font-mono text-[13px] text-white/35">private repo</span>
+            )}
+        </div>
+    </article>
+);
+
+const Projects = () => (
+    <section id="projects" className="relative bg-[#030305] px-5 py-16 sm:px-10 md:py-24 lg:px-16">
+        <div className="mx-auto max-w-7xl">
+            <SectionHeader
+                eyebrow="PROJECTS"
+                status={`${projects.length} BUILDS`}
+                title="Things I built"
+                description="…and then tried to break. Each one ships with its known issues listed."
+                className="mb-10 md:mb-14"
+            />
+
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+                {projects.map((project) => (
+                    <ProjectCard key={project.id} project={project} />
+                ))}
+            </div>
+        </div>
+    </section>
+);
 
 export default Projects;

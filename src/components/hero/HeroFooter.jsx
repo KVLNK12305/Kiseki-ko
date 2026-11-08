@@ -15,7 +15,7 @@ const HeroFooter = ({
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="GitHub"
-                    className="text-[#6B7280] hover:text-[#FFD700] hover:scale-110 transition-all p-1 cursor-interactive"
+                    className="text-[#6B7280] hover:text-[#FFD700] hover:scale-110 transition-all p-1"
                 >
                     <Github size={16} />
                 </a>
@@ -24,14 +24,14 @@ const HeroFooter = ({
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="LinkedIn"
-                    className="text-[#6B7280] hover:text-[#A855F7] hover:scale-110 transition-all p-1 cursor-interactive"
+                    className="text-[#6B7280] hover:text-[#A855F7] hover:scale-110 transition-all p-1"
                 >
                     <Linkedin size={16} />
                 </a>
                 <a
                     href="mailto:kurapatikushalnarasimha95@gmail.com"
                     aria-label="Email"
-                    className="text-[#6B7280] hover:text-white hover:scale-110 transition-all p-1 cursor-interactive"
+                    className="text-[#6B7280] hover:text-white hover:scale-110 transition-all p-1"
                 >
                     <Mail size={16} />
                 </a>
@@ -57,7 +57,7 @@ const HeroFooter = ({
             {/* Domain Branding */}
             <div className="flex items-center gap-2 text-[#9090A8]">
                 <Globe size={13} className="text-[#FFD700]" />
-                <a href="https://kiseki-ko.vercel.app" className="font-mono text-[11px] sm:text-xs hover:text-[#FFD700] transition-colors cursor-interactive">kiseki-ko.vercel.app</a>
+                <a href="https://kiseki-ko.vercel.app" className="font-mono text-[11px] sm:text-xs hover:text-[#FFD700] transition-colors">kiseki-ko.vercel.app</a>
             </div>
         </footer>
     );

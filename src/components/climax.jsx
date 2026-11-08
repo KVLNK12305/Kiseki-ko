@@ -300,7 +300,7 @@ const Climax = () => {
 
                     <a
                         href="mailto:kurapatikushalnarasimha95@gmail.com"
-                        className="group relative inline-flex items-center justify-center gap-3 px-7 sm:px-12 py-4 sm:py-5 overflow-hidden cursor-interactive bg-black/60 backdrop-blur-md transition-all duration-300 hover:scale-105"
+                        className="group relative inline-flex items-center justify-center gap-3 px-7 sm:px-12 py-4 sm:py-5 overflow-hidden bg-black/60 backdrop-blur-md transition-all duration-300 hover:scale-105"
                         style={{
                             border: '1px solid rgba(255,215,0,0.5)',
                             color: '#FFD700',

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import useLenis from './hooks/useLenis';
 import FloatingNav from './components/FloatingNav';
 
@@ -13,106 +13,9 @@ import SpatialRift from './components/sokulu/SpatialRift';
 
 function App() {
   const lenis = useLenis();
-  const cursorRef = useRef(null);
-
-  // ── Hybrid Cursor Logic ────────────────────────────────────
-  useEffect(() => {
-    // Strictly disable on touch devices or fine pointer absent
-    const isTouchDevice =
-      'ontouchstart' in window ||
-      navigator.maxTouchPoints > 0 ||
-      window.matchMedia('(pointer: coarse)').matches;
-    if (isTouchDevice) return;
-
-    const cursor = cursorRef.current;
-    if (!cursor) return;
-
-    let hasMoved = false;
-    let rafId;
-
-    const moveCursor = (e) => {
-      if (!hasMoved) {
-        hasMoved = true;
-        cursor.style.opacity = '1';
-        cursor.classList.remove('opacity-0');
-      }
-      rafId = requestAnimationFrame(() => {
-        cursor.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
-      });
-    };
-
-    const handleMouseOver = (e) => {
-      const target = e.target.closest('a, button, .cursor-interactive, input, textarea, [role="button"]');
-      if (target) cursor.classList.add('cursor-locked');
-    };
-    const handleMouseOut = (e) => {
-      const target = e.target.closest('a, button, .cursor-interactive, input, textarea, [role="button"]');
-      if (target) cursor.classList.remove('cursor-locked');
-    };
-
-    const handleMouseDown = () => {
-      cursor.classList.add('cursor-clicking');
-    };
-    const handleMouseUp = () => {
-      cursor.classList.remove('cursor-clicking');
-    };
-
-    const handleMouseLeave = () => {
-      cursor.style.opacity = '0';
-      cursor.classList.add('opacity-0');
-    };
-    const handleMouseEnter = () => {
-      if (hasMoved) {
-        cursor.style.opacity = '1';
-        cursor.classList.remove('opacity-0');
-      }
-    };
-
-    window.addEventListener('mousemove',    moveCursor,       { passive: true });
-    window.addEventListener('mouseover',    handleMouseOver);
-    window.addEventListener('mouseout',     handleMouseOut);
-    window.addEventListener('mousedown',    handleMouseDown);
-    window.addEventListener('mouseup',      handleMouseUp);
-    document.addEventListener('mouseleave', handleMouseLeave);
-    document.addEventListener('mouseenter', handleMouseEnter);
-
-    return () => {
-      cancelAnimationFrame(rafId);
-      window.removeEventListener('mousemove',    moveCursor);
-      window.removeEventListener('mouseover',    handleMouseOver);
-      window.removeEventListener('mouseout',     handleMouseOut);
-      window.removeEventListener('mousedown',    handleMouseDown);
-      window.removeEventListener('mouseup',      handleMouseUp);
-      document.removeEventListener('mouseleave', handleMouseLeave);
-      document.removeEventListener('mouseenter', handleMouseEnter);
-    };
-  }, []);
 
   return (
     <div className="bg-[#030305] min-h-screen">
-
-      {/* ── Tux Penguin & DuckChain Hybrid Cursor ─────────────── */}
-      <div
-        ref={cursorRef}
-        style={{ opacity: 0 }}
-        className="cursor-hybrid opacity-0 hidden md:flex transition-opacity duration-200 pointer-events-none"
-        aria-hidden="true"
-      >
-        {/* Normal state: Linux Tux Penguin */}
-        <img
-          src="/cursors/tux-cursor.png"
-          alt="Tux Cursor"
-          className="cursor-tux"
-          draggable="false"
-        />
-        {/* Interactive Hover state: DuckChain Duck Pointer */}
-        <img
-          src="/cursors/duck-pointer.png"
-          alt="Duck Pointer"
-          className="cursor-duck"
-          draggable="false"
-        />
-      </div>
 
       {/* ── Main Content ── */}
       <div>

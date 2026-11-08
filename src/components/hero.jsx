@@ -412,7 +412,7 @@ const Hero = () => {
                                 <div className="flex flex-wrap items-center gap-3 sm:gap-4">
                                     <button
                                         onClick={handleEnterDomain}
-                                        className="group inline-flex items-center gap-3 px-5 sm:px-6 py-3 sm:py-3.5 bg-[#FFD700]/10 border border-[#FFD700]/50 hover:bg-[#FFD700] hover:text-black text-[11px] sm:text-xs font-mono uppercase tracking-widest text-[#FFD700] transition-all duration-300 rounded-none cursor-interactive"
+                                        className="group inline-flex items-center gap-3 px-5 sm:px-6 py-3 sm:py-3.5 bg-[#FFD700]/10 border border-[#FFD700]/50 hover:bg-[#FFD700] hover:text-black text-[11px] sm:text-xs font-mono uppercase tracking-widest text-[#FFD700] transition-all duration-300 rounded-none"
                                     >
                                         <span className="font-bold">ENTER DOMAIN</span>
                                         <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
@@ -421,7 +421,7 @@ const Hero = () => {
                                     {!isMobile && (
                                         <button
                                             onClick={triggerDomainBurst}
-                                            className={`group inline-flex items-center gap-2 px-4 sm:px-5 py-3 sm:py-3.5 text-[11px] sm:text-xs font-mono uppercase tracking-widest transition-all duration-300 rounded-none cursor-interactive ${
+                                            className={`group inline-flex items-center gap-2 px-4 sm:px-5 py-3 sm:py-3.5 text-[11px] sm:text-xs font-mono uppercase tracking-widest transition-all duration-300 rounded-none ${
                                                 domainOverdrive
                                                     ? 'bg-[#A855F7]/20 border border-[#A855F7] text-white shadow-[0_0_20px_rgba(168,85,247,0.4)]'
                                                     : 'bg-transparent border border-[#A855F7]/35 hover:border-[#A855F7] text-[#A855F7]'
@@ -479,7 +479,7 @@ const Hero = () => {
                                     initial={{ opacity: 0, scale: 0.8 }}
                                     animate={{ opacity: 1, scale: 1 }}
                                     transition={{ duration: 0.5 }}
-                                    className={`absolute top-2 sm:top-4 right-1 sm:right-4 z-40 p-2 sm:p-2.5 rounded-full cursor-interactive border transition-all duration-300 ${
+                                    className={`absolute top-2 sm:top-4 right-1 sm:right-4 z-40 p-2 sm:p-2.5 rounded-full border transition-all duration-300 ${
                                         domainOverdrive
                                             ? 'bg-[#EF4444]/20 border-[#EF4444] shadow-[0_0_25px_rgba(239,68,68,0.7)]'
                                             : 'bg-black/50 hover:bg-[#FFD700]/15 border-white/15 hover:border-[#FFD700]/60 shadow-[0_0_15px_rgba(0,0,0,0.5)]'
