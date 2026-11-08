@@ -59,9 +59,7 @@ const Contributors = ({ logins }) => (
                         loading="lazy"
                         decoding="async"
                         className="h-7 w-7 rounded-full bg-white/10"
-                        onError={(e) => {
-                            e.currentTarget.style.visibility = 'hidden';
-                        }}
+                        
                     />
                 </a>
             ))}
