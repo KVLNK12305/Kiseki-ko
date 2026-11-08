@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import useLenis from './hooks/useLenis';
-import Preloader from './components/Preloader';
+import Preloader from './components/preloader/Preloader';
+import { shouldPlayIntro } from './components/preloader/introSession';
 import FloatingNav from './components/FloatingNav';
 
 // Components
@@ -13,7 +14,7 @@ import Climax from './components/climax';
 import SpatialRift from './components/sokulu/SpatialRift';
 
 function App() {
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(shouldPlayIntro);
   const lenis = useLenis();
   const cursorRef = useRef(null);
 
@@ -35,7 +36,7 @@ function App() {
     if (isTouchDevice) return;
 
     const cursor = cursorRef.current;
-    if (!cursor || isLoading) return;
+    if (!cursor) return;
 
     let hasMoved = false;
     let rafId;
@@ -96,7 +97,7 @@ function App() {
       document.removeEventListener('mouseleave', handleMouseLeave);
       document.removeEventListener('mouseenter', handleMouseEnter);
     };
-  }, [isLoading]);
+  }, []);
 
   return (
     <div className="bg-[#030305] min-h-screen">
@@ -124,11 +125,11 @@ function App() {
         />
       </div>
 
-      {/* ── Boot Sequence ─────────────────────────────────────── */}
-      {isLoading && <Preloader onComplete={handlePreloaderComplete} />}
+      {/* ── Intro: the slash burns away to reveal the live page ── */}
+      {isLoading && <Preloader onComplete={handlePreloaderComplete} lenis={lenis} />}
 
-      {/* ── Main Content ──────────────────────────────────────── */}
-      <div className={`transition-opacity duration-1000 ${isLoading ? 'opacity-0' : 'opacity-100'}`}>
+      {/* ── Main Content (rendered beneath the intro, inert until it ends) ── */}
+      <div inert={isLoading}>
 
         <FloatingNav lenis={lenis} />
 
