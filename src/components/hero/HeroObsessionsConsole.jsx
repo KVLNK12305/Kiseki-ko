@@ -54,7 +54,7 @@ const HeroObsessionsConsole = ({
                         <button
                             type="button"
                             onClick={handlePrev}
-                            className="w-9 h-9 rounded-lg bg-white/5 hover:bg-white/15 border border-white/10 hover:border-white/30 flex items-center justify-center text-white/70 hover:text-white transition-all cursor-interactive"
+                            className="w-9 h-9 rounded-lg bg-white/5 hover:bg-white/15 border border-white/10 hover:border-white/30 flex items-center justify-center text-white/70 hover:text-white transition-all"
                             aria-label="Previous obsession"
                         >
                             <ChevronLeft size={16} />
@@ -62,7 +62,7 @@ const HeroObsessionsConsole = ({
                         <button
                             type="button"
                             onClick={handleNext}
-                            className="w-9 h-9 rounded-lg bg-white/5 hover:bg-white/15 border border-white/10 hover:border-white/30 flex items-center justify-center text-white/70 hover:text-white transition-all cursor-interactive"
+                            className="w-9 h-9 rounded-lg bg-white/5 hover:bg-white/15 border border-white/10 hover:border-white/30 flex items-center justify-center text-white/70 hover:text-white transition-all"
                             aria-label="Next obsession"
                         >
                             <ChevronRight size={16} />

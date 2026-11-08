@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+// eslint-disable-next-line no-unused-vars -- used as <motion.*> JSX
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Home, Shield, Cpu, Award, Mail, Github, Linkedin
@@ -17,128 +18,84 @@ const SOCIALS = [
     { label: 'LinkedIn', Icon: Linkedin, href: 'https://www.linkedin.com/in/venkata-lakshmi-narasimha-kushal-kurapati-729ab4289/' },
 ];
 
+// Tooltips are pure CSS (group-hover), so hovering never re-renders React.
+const tooltipBase =
+    'pointer-events-none absolute z-50 whitespace-nowrap rounded-md border bg-[#0F0F16] opacity-0 -translate-x-1 transition duration-150 group-hover:opacity-100 group-hover:translate-x-0 group-focus-within:opacity-100 group-focus-within:translate-x-0';
+
 // ── Sidebar Nav Item ──────────────────────────────────────────
-const NavItem = ({ item, isActive, onClick }) => {
-    const [hovered, setHovered] = useState(false);
+const NavItem = ({ item, isActive, onClick }) => (
+    <div className="group relative flex items-center">
+        <button
+            onClick={onClick}
+            aria-label={item.label}
+            aria-current={isActive ? 'true' : undefined}
+            className={`relative flex h-10 w-10 items-center justify-center rounded-lg transition-colors duration-200 ${
+                isActive ? 'bg-[#FFD700]/10 text-[#FFD700]' : 'text-white/40 hover:bg-white/5 hover:text-white/75'
+            }`}
+        >
+            {isActive && (
+                <motion.div
+                    layoutId="active-indicator"
+                    className="absolute -left-3 top-1/2 h-6 w-[2px] -translate-y-1/2 rounded-r-full bg-[#FFD700]"
+                />
+            )}
+            <item.Icon size={16} strokeWidth={isActive ? 2.5 : 1.5} />
+        </button>
 
-    return (
-        <div className="relative flex items-center" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
-            <button
-                onClick={onClick}
-                aria-label={item.label}
-                className={`
-                    relative w-10 h-10 flex items-center justify-center rounded-lg
-                    transition-all duration-300 group cursor-interactive
-                    ${isActive
-                        ? 'text-[#FFD700] bg-[#FFD700]/10'
-                        : 'text-white/30 hover:text-white/70 hover:bg-white/5'
-                    }
-                `}
-            >
-                {/* Active left-border indicator */}
-                {isActive && (
-                    <motion.div
-                        layoutId="active-indicator"
-                        className="absolute -left-3 top-1/2 -translate-y-1/2 w-[2px] h-6 bg-[#FFD700] rounded-r-full"
-                        style={{ boxShadow: '0 0 8px rgba(255,215,0,0.8)' }}
-                    />
-                )}
-                <item.Icon size={16} strokeWidth={isActive ? 2.5 : 1.5} />
-            </button>
-
-            {/* Tooltip — slides right */}
-            <AnimatePresence>
-                {hovered && (
-                    <motion.div
-                        initial={{ opacity: 0, x: -4 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -4 }}
-                        transition={{ duration: 0.15 }}
-                        className="absolute left-14 z-50 whitespace-nowrap px-3 py-1.5 bg-[#0F0F16] border border-[#FFD700]/20 rounded-md pointer-events-none"
-                    >
-                        <span className="font-mono text-[11px] text-[#FFD700] tracking-widest uppercase">
-                            {item.label}
-                        </span>
-                        {/* Arrow */}
-                        <div className="absolute left-0 top-1/2 -translate-x-[5px] -translate-y-1/2 w-0 h-0
-                            border-t-[5px] border-t-transparent
-                            border-r-[5px] border-r-[#FFD700]/20
-                            border-b-[5px] border-b-transparent"
-                        />
-                    </motion.div>
-                )}
-            </AnimatePresence>
+        <div className={`${tooltipBase} left-14 border-[#FFD700]/20 px-3 py-1.5`}>
+            <span className="font-mono text-[12px] uppercase tracking-widest text-[#FFD700]">{item.label}</span>
         </div>
-    );
-};
+    </div>
+);
 
 // ── Social Icon ───────────────────────────────────────────────
-const SocialItem = ({ item }) => {
-    const [hovered, setHovered] = useState(false);
-    return (
-        <div className="relative flex items-center" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
-            <a
-                href={item.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={item.label}
-                className="w-8 h-8 flex items-center justify-center text-white/20 hover:text-[#FFD700] transition-colors duration-300 cursor-interactive"
-            >
-                <item.Icon size={14} strokeWidth={1.5} />
-            </a>
-            <AnimatePresence>
-                {hovered && (
-                    <motion.div
-                        initial={{ opacity: 0, x: -4 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -4 }}
-                        transition={{ duration: 0.15 }}
-                        className="absolute left-12 z-50 whitespace-nowrap px-2.5 py-1 bg-[#0F0F16] border border-white/10 rounded pointer-events-none"
-                    >
-                        <span className="font-mono text-[10px] text-white/50 tracking-widest uppercase">
-                            {item.label}
-                        </span>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+const SocialItem = ({ item }) => (
+    <div className="group relative flex items-center">
+        <a
+            href={item.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={item.label}
+            className="flex h-8 w-8 items-center justify-center text-white/35 transition-colors duration-200 hover:text-[#FFD700]"
+        >
+            <item.Icon size={14} strokeWidth={1.5} />
+        </a>
+        <div className={`${tooltipBase} left-12 border-white/10 px-2.5 py-1`}>
+            <span className="font-mono text-[12px] uppercase tracking-widest text-white/60">{item.label}</span>
         </div>
-    );
-};
+    </div>
+);
 
 // ── Main FloatingNav ──────────────────────────────────────────
 const FloatingNav = ({ lenis }) => {
     const [activeSection, setActiveSection] = useState('home');
-    const [scrollProgress, setScrollProgress] = useState(0);
     const [isNavVisible, setIsNavVisible] = useState(false);
 
+    // Active section: the one crossing the middle of the viewport. The
+    // browser reports crossings itself, so nothing is measured per frame.
     useEffect(() => {
-        const handleScroll = () => {
-            let current = 'home';
-            for (const item of NAV_CONFIG) {
-                const el = document.getElementById(item.targetId);
-                if (el) {
-                    const rect = el.getBoundingClientRect();
-                    if (rect.top < window.innerHeight * 0.5) current = item.targetId;
+        const observer = new IntersectionObserver(
+            (entries) => {
+                for (const entry of entries) {
+                    if (entry.isIntersecting) setActiveSection(entry.target.id);
                 }
-            }
-            setActiveSection(current);
+            },
+            { rootMargin: '-50% 0px -50% 0px' }
+        );
+        NAV_CONFIG.forEach(({ targetId }) => {
+            const el = document.getElementById(targetId);
+            if (el) observer.observe(el);
+        });
+        return () => observer.disconnect();
+    }, []);
 
-            // Show nav only when scrolled past a portion of the hero (e.g. 50vh)
-            if (window.scrollY > window.innerHeight * 0.5) {
-                setIsNavVisible(true);
-            } else {
-                setIsNavVisible(false);
-            }
-
-            // Compute global page scroll percentage
-            const totalScroll = document.documentElement.scrollHeight - window.innerHeight;
-            if (totalScroll > 0) {
-                setScrollProgress((window.scrollY / totalScroll) * 100);
-            }
-        };
-        handleScroll();
-        window.addEventListener('scroll', handleScroll, { passive: true });
-        return () => window.removeEventListener('scroll', handleScroll);
+    // Visibility: reads only window.scrollY (no layout). React skips the
+    // re-render when the boolean hasn't changed.
+    useEffect(() => {
+        const update = () => setIsNavVisible(window.scrollY > window.innerHeight * 0.5);
+        update();
+        window.addEventListener('scroll', update, { passive: true });
+        return () => window.removeEventListener('scroll', update);
     }, []);
 
     const scrollTo = (targetId) => {
@@ -161,7 +118,7 @@ const FloatingNav = ({ lenis }) => {
                     {/* ── DESKTOP: Vertical Sidebar ──────────────────────── */}
                     <motion.aside
                         className="hidden md:flex fixed left-0 top-0 h-screen z-[100] flex-col items-center justify-between py-8 w-16
-                                   border-r border-white/[0.04] bg-[#030305]/85 backdrop-blur-xl"
+                                   border-r border-white/[0.06] bg-[#030305]/95"
                         initial={{ x: -80, opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
                         exit={{ x: -80, opacity: 0 }}
