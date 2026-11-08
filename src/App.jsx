@@ -1,7 +1,5 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useEffect, useRef } from 'react';
 import useLenis from './hooks/useLenis';
-import Preloader from './components/preloader/Preloader';
-import { shouldPlayIntro } from './components/preloader/introSession';
 import FloatingNav from './components/FloatingNav';
 
 // Components
@@ -14,17 +12,8 @@ import Climax from './components/climax';
 import SpatialRift from './components/sokulu/SpatialRift';
 
 function App() {
-  const [isLoading, setIsLoading] = useState(shouldPlayIntro);
   const lenis = useLenis();
   const cursorRef = useRef(null);
-
-  // Memoized preloader completion
-  const handlePreloaderComplete = useCallback(() => {
-    setIsLoading(false);
-    setTimeout(() => {
-      window.dispatchEvent(new Event('resize'));
-    }, 100);
-  }, []);
 
   // ── Hybrid Cursor Logic ────────────────────────────────────
   useEffect(() => {
@@ -125,11 +114,8 @@ function App() {
         />
       </div>
 
-      {/* ── Intro: the slash burns away to reveal the live page ── */}
-      {isLoading && <Preloader onComplete={handlePreloaderComplete} lenis={lenis} />}
-
-      {/* ── Main Content (rendered beneath the intro, inert until it ends) ── */}
-      <div inert={isLoading}>
+      {/* ── Main Content ── */}
+      <div>
 
         <FloatingNav lenis={lenis} />
 
