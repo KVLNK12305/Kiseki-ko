@@ -1,79 +1,7 @@
 import React, { useState } from 'react';
 import { ArrowUpRight, Play } from 'lucide-react';
 import SectionHeader from './SectionHeader';
-import akiraVideo from './images/Screencast_20260331_001952.webm';
-import f1Video from './images/F1.mp4';
-
-// `contributors` are GitHub logins, ordered by commit count. Hard-coded
-// (from the repos' contributor lists) so the page makes no API calls.
-// `issue` is the one joke per card: a dry "known issue" line, styled like
-// a code comment. Static text, so it costs nothing to render.
-const projects = [
-    {
-        id: '01',
-        title: 'ADG-Polymorph',
-        description: 'Security-aware SDN deception framework with kernel-level eBPF/XDP networking. Reduces detection latency to sub-μs using entropy anomaly detection.',
-        tags: ['Rust (Aya)', 'eBPF/XDP', 'Open vSwitch', 'Mininet'],
-        link: null,
-        issue: 'attackers keep falling for it.',
-    },
-    {
-        id: '02',
-        title: 'GhostShell',
-        description: 'Rust TUI combining a decoy terminal with a hidden real-time observability dashboard. Async telemetry pipeline streaming structured logs.',
-        tags: ['Rust', 'Tokio', 'LLM APIs', 'TUI'],
-        link: 'https://github.com/KVLNK12305/GhostShell',
-        contributors: ['KVLNK12305'],
-        issue: 'the fake shell is friendlier than the real one.',
-    },
-    {
-        id: '03',
-        title: 'EeffoC',
-        description: 'Event-driven task orchestration capturing real-time Discord events. Extracts intent and routes payloads through Microsoft Graph.',
-        tags: ['Go', 'n8n', 'MS Graph', 'Automation'],
-        link: 'https://github.com/KVLNK12305/EeffoC',
-        contributors: ['KVLNK12305'],
-        issue: 'coffee, backwards. so is my sleep schedule.',
-    },
-    {
-        id: '04',
-        title: 'Everust',
-        description: 'Modular platform for experimenting with async execution and ownership. Benchmarks system behaviour across concurrency models.',
-        tags: ['Rust', 'Axum', 'Tokio', 'Async'],
-        link: 'https://github.com/KVLNK12305/Everust',
-        contributors: ['KVLNK12305'],
-        issue: 'the borrow checker won most arguments.',
-    },
-    {
-        id: '05',
-        title: 'AKIRA',
-        description: 'High-throughput API gateway and cryptographic identity provider. A Rust key vault, called through Bun FFI, keeps auth logs tamper-evident.',
-        tags: ['Bun', 'Express', 'React', 'Rust Crypto'],
-        link: 'https://github.com/KVLNK12305/Akira',
-        contributors: ['KVLNK12305'],
-        video: akiraVideo,
-        issue: 'none reported. that is what worries me.',
-    },
-    {
-        id: '06',
-        title: 'NovaSketch',
-        description: 'Real-time collaborative whiteboard over WebSockets. Fine-grained access control prevents concurrent edit conflicts.',
-        tags: ['React', 'WebSockets', 'MongoDB', 'OAuth'],
-        link: 'https://github.com/Ateliers-io/NovaSketch',
-        contributors: ['KVLNK12305', 'ksskarthik18', 'NarainBK', 'gjyoshitha26', 'LavishkaDhamija'],
-        issue: 'two people still cannot agree on a line. by design.',
-    },
-    {
-        id: '07',
-        title: 'F1 Evolution',
-        description: 'Data analysis of how Formula 1 regulations changed each era: performance dynamics, lap-time deviation and team dominance.',
-        tags: ['Pandas', 'Seaborn', 'Plotly'],
-        link: 'https://github.com/KVLNK12305/F1_Case_Study',
-        contributors: ['KVLNK12305'],
-        video: f1Video,
-        issue: 'no dataset explains Ferrari strategy.',
-    },
-];
+import { PROJECTS } from '../data/projects';
 
 // The video element is only created after a click, so nothing is
 // downloaded or decoded until someone actually asks to watch.
@@ -141,17 +69,18 @@ const Contributors = ({ logins }) => (
     </div>
 );
 
-const ProjectCard = ({ project }) => (
+const ProjectCard = ({ project, number }) => (
     <article
-        className={`group flex flex-col rounded-xl border border-white/[0.07] bg-[#0B0B10] p-6 transition-colors duration-200 hover:border-[#FFD700]/30 ${
-            project.video ? 'lg:col-span-2' : ''
+        id={`project-${project.slug}`}
+        className={`project-card-target group flex scroll-mt-24 flex-col rounded-xl border border-white/[0.07] bg-[#0B0B10] p-6 transition-colors duration-200 hover:border-[#FFD700]/30 ${
+            project.video || project.featured ? 'lg:col-span-2' : ''
         }`}
     >
         <div className="mb-4 flex items-baseline justify-between gap-4">
             <h3 className="font-body-ui text-2xl font-bold tracking-tight text-[#F0EDE8]">
                 {project.title}
             </h3>
-            <span className="font-mono text-[13px] text-white/30">{project.id}</span>
+            <span className="font-mono text-[13px] text-white/30">{number}</span>
         </div>
 
         {project.video && (
@@ -185,9 +114,9 @@ const ProjectCard = ({ project }) => (
                 <span className="project-caret" aria-hidden="true" />
             </p>
 
-            {project.link ? (
+            {project.repo ? (
                 <a
-                    href={project.link}
+                    href={project.repo}
                     target="_blank"
                     rel="noreferrer"
                     className="inline-flex items-center gap-1 font-mono text-[13px] text-white/75 transition-colors hover:text-[#FFD700]"
@@ -206,15 +135,15 @@ const Projects = () => (
         <div className="mx-auto max-w-7xl">
             <SectionHeader
                 eyebrow="PROJECTS"
-                status={`${projects.length} BUILDS`}
+                status={`${PROJECTS.length} BUILDS`}
                 title="Things I built"
                 description="…and then tried to break. Each one ships with its known issues listed."
                 className="mb-10 md:mb-14"
             />
 
             <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
-                {projects.map((project) => (
-                    <ProjectCard key={project.id} project={project} />
+                {PROJECTS.map((project, i) => (
+                    <ProjectCard key={project.slug} project={project} number={String(i + 1).padStart(2, '0')} />
                 ))}
             </div>
         </div>

@@ -1,12 +1,26 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
-const HeroHeader = ({
-    domainOverdrive,
-    isMobile,
-    scrollProgress,
-    phaseLabel,
-    currentTime,
-}) => {
+const formatIST = () =>
+    new Date().toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true,
+        timeZone: 'Asia/Kolkata',
+    });
+
+// Owns its own tick, so the once-a-second update re-renders this
+// <span> only, not the whole hero.
+const LiveClock = () => {
+    const [time, setTime] = useState(formatIST);
+    useEffect(() => {
+        const id = setInterval(() => setTime(formatIST()), 1000);
+        return () => clearInterval(id);
+    }, []);
+    return <span className="font-mono font-medium text-[11px] sm:text-xs tabular-nums">{time}</span>;
+};
+
+const HeroHeader = ({ domainOverdrive, isMobile, hasScrolled, phaseLabel }) => {
     return (
         <header className="hero-header-bar relative z-30 w-full px-5 sm:px-10 lg:px-16 pt-5 lg:pt-8 flex items-center justify-between text-xs font-mono tracking-widest text-[#9090A8] uppercase border-b border-white/5 pb-3.5">
             <div className="flex items-center gap-2.5 sm:gap-3">
@@ -22,10 +36,15 @@ const HeroHeader = ({
                         }`}
                     />
                 </span>
-                <span className="text-[#F0EDE8] font-medium tracking-widest text-[11px] sm:text-xs">
-                    {domainOverdrive ? 'KISEKI · OVERCLOCK ACTIVE' : 'KISEKI · ARCHITECT'}
+                <span className="flex items-baseline gap-2 text-[#F0EDE8] font-medium tracking-widest text-[11px] sm:text-xs">
+                    {/* The intro wordmark flies into this exact element, so it
+                        shares the wordmark's face and letter-spacing. */}
+                    <span data-intro-target className="font-display font-black text-[13px] sm:text-sm tracking-[0.12em]">
+                        KISEKI
+                    </span>
+                    <span>· {domainOverdrive ? 'OVERCLOCK ACTIVE' : 'ARCHITECT'}</span>
                 </span>
-                {!isMobile && scrollProgress > 5 && (
+                {!isMobile && hasScrolled && (
                     <>
                         <span className="text-white/25">|</span>
                         <span className="text-[#FFD700] font-semibold">{phaseLabel}</span>
@@ -37,9 +56,7 @@ const HeroHeader = ({
                 <span className="hidden sm:inline-block text-[#6B7280]">軌跡 · AP-SOUTH-1</span>
                 <div className="flex items-center gap-1.5 text-[#FFD700]">
                     <span className="text-[9px] sm:text-[10px] text-[#6B7280]">IST</span>
-                    <span className="font-mono font-medium text-[11px] sm:text-xs">
-                        {currentTime || '08:00:00 PM'}
-                    </span>
+                    <LiveClock />
                 </div>
             </div>
         </header>

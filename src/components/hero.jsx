@@ -10,6 +10,7 @@ import profileImg from './images/me.png';
 
 // Modular Sub-Components
 import CelestialField from './hero/CelestialField';
+import TrajectoryField from './hero/TrajectoryField';
 import { OBSESSIONS } from './hero/obsessionsData';
 import HeroObsessionsConsole from './hero/HeroObsessionsConsole';
 import HeroAboutDossier from './hero/HeroAboutDossier';
@@ -20,13 +21,19 @@ import HeroMobileFlow from './hero/HeroMobileFlow';
 gsap.registerPlugin(ScrollTrigger);
 
 // ── KISEKI // KUSHAL KURAPATI HERO & 3D SCROLL EXTENSION ───────
-const Hero = () => {
+const Hero = ({ introDone = true }) => {
     const isMobile = useIsMobile();
     const sectionRef = useRef(null);
     const pinContainerRef = useRef(null);
-    const slashRef = useRef(null);
-    const flashRef = useRef(null);
     const contourSvgRef = useRef(null);
+    // Background layers that dissolve at the end of the pin, so the hero
+    // hands off to the page's base colour instead of ending on a seam.
+    const atmosphereRef = useRef(null);
+    const grainRef = useRef(null);
+    const footerRef = useRef(null);
+    // Progress % is written straight to the DOM: it changes every frame
+    // and nothing else depends on it, so it shouldn't re-render React.
+    const progressRef = useRef(null);
 
     // Scroll-driven interactive element refs
     const leftPaneRef = useRef(null);
@@ -35,9 +42,8 @@ const Hero = () => {
     const narrativeCardRef = useRef(null);
     const expertiseDeckRef = useRef(null);
 
-    const [currentTime, setCurrentTime] = useState('');
     const [domainOverdrive, setDomainOverdrive] = useState(false);
-    const [scrollProgress, setScrollProgress] = useState(0);
+    const [hasScrolled, setHasScrolled] = useState(false);
     const [activePhaseIndex, setActivePhaseIndex] = useState(0);
     const [selectedObsessionIndex, setSelectedObsessionIndex] = useState(0);
 
@@ -46,32 +52,12 @@ const Hero = () => {
         setDomainOverdrive((prev) => !prev);
     }, []);
 
-    // Dynamic Live Clock
-    useEffect(() => {
-        const update = () => {
-            const now = new Date();
-            setCurrentTime(
-                now.toLocaleTimeString('en-US', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit',
-                    hour12: true,
-                    timeZone: 'Asia/Kolkata',
-                })
-            );
-        };
-        update();
-        const t = setInterval(update, 1000);
-        return () => clearInterval(t);
-    }, []);
-
     // ── Mouse Physics for Subtle Restrained Parallax ───────────
     const mouseX = useMotionValue(0);
     const mouseY = useMotionValue(0);
     const springConfig = { damping: 28, stiffness: 140, mass: 0.7 };
     const portraitX = useSpring(useTransform(mouseX, [-0.5, 0.5], [-16, 16]), springConfig);
     const portraitY = useSpring(useTransform(mouseY, [-0.5, 0.5], [-10, 10]), springConfig);
-    const linesX = useSpring(useTransform(mouseX, [-0.5, 0.5], [22, -22]), springConfig);
     const textTiltX = useSpring(useTransform(mouseX, [-0.5, 0.5], [-8, 8]), springConfig);
     const textTiltY = useSpring(useTransform(mouseY, [-0.5, 0.5], [-6, 6]), springConfig);
 
@@ -92,30 +78,18 @@ const Hero = () => {
     // ── Smooth Entrance & Living Topology ──────────────────────────
     useGSAP(
         () => {
-            if (contourSvgRef.current) {
-                gsap.fromTo(
-                    '.editorial-line',
-                    { strokeDashoffset: 500 },
-                    {
-                        strokeDashoffset: 0,
-                        duration: 1.4,
-                        stagger: 0.05,
-                        ease: 'power2.out',
-                        onComplete: () => {
-                            if (!isMobile) {
-                                gsap.to('.editorial-line', {
-                                    strokeDashoffset: -500,
-                                    duration: 28,
-                                    ease: 'none',
-                                    repeat: -1,
-                                });
-                            }
-                        },
-                    }
-                );
-            }
-
             // ── 3D Scroll Extension Timeline (Desktop) ─────────────
+            // Timeline length is exactly 1, so positions below read as
+            // fractions of the pinned scroll distance.
+            //
+            //   0.00–0.34  hero  → about       (panes out, dossier in)
+            //   0.34–0.48  hold: read about
+            //   0.48–0.74  about → obsessions (sequenced, not cross-faded:
+            //              about clears by 0.58, then the deck comes in)
+            //   0.74–0.84  hold: read obsessions
+            //   0.84–1.00  handoff: background dissolves to the page's
+            //              base colour; content stays put, then scrolls
+            //              away with the page once the pin releases.
             if (!isMobile && sectionRef.current && pinContainerRef.current) {
                 const tl = gsap.timeline({
                     scrollTrigger: {
@@ -125,21 +99,19 @@ const Hero = () => {
                         scrub: 1.1,
                         pin: pinContainerRef.current,
                         anticipatePin: 1,
-                        onUpdate: (self) => {
-                            const prog = self.progress;
-                            setScrollProgress(Math.round(prog * 100));
-                            if (prog < 0.28) {
-                                setActivePhaseIndex(0);
-                            } else if (prog < 0.64) {
-                                setActivePhaseIndex(1);
-                            } else {
-                                setActivePhaseIndex(2);
+                        invalidateOnRefresh: true, // re-measure function values on resize
+                        onUpdate: ({ progress }) => {
+                            if (progressRef.current) {
+                                progressRef.current.textContent = `${Math.round(progress * 100)}%`;
                             }
+                            // Both setters bail out when the value is unchanged,
+                            // so React only renders on actual phase changes.
+                            setHasScrolled(progress > 0.03);
+                            setActivePhaseIndex(progress < 0.3 ? 0 : progress < 0.58 ? 1 : 2);
                         },
                     },
                 });
 
-                // Initial hidden state for extension elements
                 gsap.set(narrativeCardRef.current, {
                     opacity: 0,
                     x: 160,
@@ -147,7 +119,6 @@ const Hero = () => {
                     transformPerspective: 1200,
                     pointerEvents: 'none',
                 });
-
                 gsap.set(expertiseDeckRef.current, {
                     opacity: 0,
                     scale: 0.96,
@@ -155,33 +126,13 @@ const Hero = () => {
                     pointerEvents: 'none',
                 });
 
-                // ── PHASE 1: TRANSITION FROM HERO INTO ABOUT ME (0.00 -> 0.35) ──
-                tl.to(
-                    leftPaneRef.current,
-                    {
-                        x: -140,
-                        opacity: 0,
-                        rotateY: -10,
-                        duration: 0.22,
-                        ease: 'power2.inOut',
-                    },
-                    0
-                )
-                    .to(
-                        rightPaneRef.current,
-                        {
-                            x: 140,
-                            opacity: 0,
-                            rotateY: 10,
-                            duration: 0.22,
-                            ease: 'power2.inOut',
-                        },
-                        0
-                    )
+                // ── Hero → About ──
+                tl.to(leftPaneRef.current, { x: -140, opacity: 0, rotateY: -10, duration: 0.22, ease: 'power2.inOut' }, 0)
+                    .to(rightPaneRef.current, { x: 140, opacity: 0, rotateY: 10, duration: 0.22, ease: 'power2.inOut' }, 0)
                     .to(
                         portraitStageRef.current,
                         {
-                            x: -window.innerWidth * 0.35,
+                            x: () => -window.innerWidth * 0.35,
                             rotateY: 14,
                             rotateX: -3,
                             scale: 0.88,
@@ -193,74 +144,56 @@ const Hero = () => {
                     )
                     .to(
                         narrativeCardRef.current,
-                        {
-                            opacity: 1,
-                            x: 0,
-                            rotateY: 0,
-                            pointerEvents: 'auto',
-                            duration: 0.22,
-                            ease: 'power3.out',
-                        },
+                        { opacity: 1, x: 0, rotateY: 0, pointerEvents: 'auto', duration: 0.22, ease: 'power3.out' },
                         0.12
                     )
 
-                    // ── PHASE 2: ABOUT ME TRANSITIONS INTO THINGS I OBSESS OVER (0.35 -> 0.75) ──
+                    // ── About → Obsessions ──
                     .to(
                         narrativeCardRef.current,
-                        {
-                            autoAlpha: 0,
-                            opacity: 0,
-                            y: -60,
-                            scale: 0.92,
-                            pointerEvents: 'none',
-                            duration: 0.12,
-                            ease: 'power2.in',
-                        },
-                        0.36
+                        { autoAlpha: 0, y: -60, scale: 0.92, pointerEvents: 'none', duration: 0.1, ease: 'power2.in' },
+                        0.48
                     )
                     .to(
                         portraitStageRef.current,
-                        {
-                            autoAlpha: 0,
-                            opacity: 0,
-                            visibility: 'hidden',
-                            pointerEvents: 'none',
-                            duration: 0.12,
-                            ease: 'power2.in',
-                        },
-                        0.36
+                        { autoAlpha: 0, pointerEvents: 'none', duration: 0.1, ease: 'power2.in' },
+                        0.48
                     )
                     .to(
                         expertiseDeckRef.current,
-                        {
-                            autoAlpha: 1,
-                            opacity: 1,
-                            scale: 1,
-                            z: 0,
-                            pointerEvents: 'auto',
-                            duration: 0.18,
-                            ease: 'power3.out',
-                        },
-                        0.40
-                    );
+                        { autoAlpha: 1, scale: 1, z: 0, pointerEvents: 'auto', duration: 0.16, ease: 'power3.out' },
+                        0.58
+                    )
 
-                // ── PHASE 3: CONVERGENCE & TRANSITION OUT (0.75 -> 1.00) ──
-                tl.to(
-                    expertiseDeckRef.current,
-                    {
-                        autoAlpha: 0,
-                        opacity: 0,
-                        y: -40,
-                        scale: 0.94,
-                        duration: 0.14,
-                        ease: 'power2.inOut',
-                    },
-                    0.86
-                );
+                    // ── Handoff ──
+                    // Only the atmosphere goes; the deck stays readable.
+                    .to(
+                        [atmosphereRef.current, grainRef.current, footerRef.current],
+                        { autoAlpha: 0, duration: 0.16, ease: 'power1.inOut' },
+                        0.84
+                    );
             }
         },
         { scope: sectionRef, dependencies: [isMobile] }
     );
+
+    // Draw the trajectory orbits once the intro has handed off (or right
+    // away when there is no intro). Static afterwards.
+    useEffect(() => {
+        const svg = contourSvgRef.current;
+        if (!introDone || !svg) return;
+        const orbits = svg.querySelectorAll('.trajectory-orbit');
+        const bodies = svg.querySelectorAll('.trajectory-body');
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            gsap.set(orbits, { strokeDashoffset: 0 });
+            gsap.set(bodies, { opacity: 0.9 });
+            return;
+        }
+        const tl = gsap.timeline();
+        tl.fromTo(orbits, { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 2.4, stagger: 0.14, ease: 'power3.inOut' })
+            .fromTo(bodies, { opacity: 0, scale: 0, transformOrigin: 'center' }, { opacity: 0.9, scale: 1, duration: 0.5, stagger: 0.2, ease: 'back.out(2)' }, '-=0.9');
+        return () => tl.kill();
+    }, [introDone, isMobile]);
 
     const handleEnterDomain = useCallback(() => {
         const target = document.getElementById('security');
@@ -285,74 +218,64 @@ const Hero = () => {
                 ref={pinContainerRef}
                 onMouseMove={handleMouseMove}
                 onMouseLeave={handleMouseLeave}
-                className={`${isMobile ? 'relative' : 'sticky top-0'} min-h-[100svh] lg:h-[100dvh] w-full overflow-hidden flex flex-col justify-between select-none py-2 lg:py-0 perspective-1400`}
+                className={`relative min-h-[100svh] lg:h-[100dvh] w-full overflow-hidden flex flex-col justify-between select-none py-2 lg:py-0 perspective-1400`}
             >
-                {/* Subtle Screen Reveal Flash */}
-                <div ref={flashRef} className="absolute inset-0 z-[60] bg-white pointer-events-none opacity-0" />
+                <div className="relative w-full h-full flex flex-col justify-between flex-1">
+                    {/* Atmosphere: sparkles, glow, trajectory orbits. Dissolved as one layer at handoff. */}
+                    <div ref={atmosphereRef} className="absolute inset-0 z-0 pointer-events-none">
+                        {!isMobile ? (
+                            <CelestialField overdrive={domainOverdrive} paused={!introDone} />
+                        ) : (
+                            <div
+                                className={`absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] transition-all duration-1000 pointer-events-none ${
+                                    domainOverdrive
+                                        ? 'from-[#EF4444]/20 via-[#A855F7]/10 to-transparent scale-110'
+                                        : 'from-[#FFD700]/5 via-transparent to-transparent scale-100'
+                                }`}
+                            />
+                        )}
 
-                <div ref={slashRef} className="relative w-full h-full flex flex-col justify-between flex-1">
-                    {!isMobile ? (
-                        <CelestialField overdrive={domainOverdrive} />
-                    ) : (
+                        {/* Restrained atmospheric lighting. Layered radial gradients
+                            instead of blur(160px): same soft falloff, but nothing for the
+                            GPU to filter (the blur was the most expensive paint on the page). */}
                         <div
-                            className={`absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] transition-all duration-1000 pointer-events-none ${
-                                domainOverdrive
-                                    ? 'from-[#EF4444]/20 via-[#A855F7]/10 to-transparent scale-110'
-                                    : 'from-[#FFD700]/5 via-transparent to-transparent scale-100'
+                            className={`absolute inset-0 pointer-events-none z-0 transition-opacity duration-700 ${
+                                domainOverdrive ? 'opacity-0' : 'opacity-100'
                             }`}
+                            style={{
+                                background: isMobile
+                                    ? 'radial-gradient(45% 30% at 50% 45%, rgba(255,215,0,0.08), transparent 75%)'
+                                    : 'radial-gradient(32% 42% at 34% 50%, rgba(168,85,247,0.09), transparent 72%),' +
+                                      'radial-gradient(34% 44% at 56% 52%, rgba(255,215,0,0.085), transparent 72%),' +
+                                      'radial-gradient(28% 40% at 76% 48%, rgba(234,179,8,0.06), transparent 72%)',
+                            }}
                         />
-                    )}
+                        <div
+                            className={`absolute inset-0 pointer-events-none z-0 transition-opacity duration-700 ${
+                                domainOverdrive ? 'opacity-100' : 'opacity-0'
+                            }`}
+                            style={{
+                                background: isMobile
+                                    ? 'radial-gradient(50% 34% at 50% 45%, rgba(239,68,68,0.16), transparent 75%)'
+                                    : 'radial-gradient(34% 46% at 34% 50%, rgba(239,68,68,0.15), transparent 72%),' +
+                                      'radial-gradient(36% 48% at 56% 52%, rgba(255,215,0,0.16), transparent 72%),' +
+                                      'radial-gradient(30% 44% at 76% 48%, rgba(168,85,247,0.13), transparent 72%)',
+                            }}
+                        />
 
-                    {/* Restrained Atmospheric Lighting */}
-                    <div
-                        className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full pointer-events-none z-0 transition-all duration-700 ${
-                            isMobile
-                                ? 'w-[400px] h-[400px] blur-[100px]'
-                                : 'w-[600px] sm:w-[900px] lg:w-[1200px] h-[500px] lg:h-[700px] blur-[160px]'
-                        } ${
-                            domainOverdrive
-                                ? 'bg-gradient-to-r from-[#EF4444]/18 via-[#FFD700]/20 to-[#A855F7]/16 scale-110'
-                                : 'bg-gradient-to-r from-[#A855F7]/10 via-[#FFD700]/10 to-[#EAB308]/8'
-                        }`}
-                    />
+                        {!isMobile && <TrajectoryField ref={contourSvgRef} overdrive={domainOverdrive} />}
+                    </div>
 
                     {/* ── 1. MODULAR HEADER BAR ─────────────────────────── */}
                     <HeroHeader
                         domainOverdrive={domainOverdrive}
                         isMobile={isMobile}
-                        scrollProgress={scrollProgress}
+                        hasScrolled={hasScrolled}
                         phaseLabel={phaseLabel}
-                        currentTime={currentTime}
                     />
 
                     {/* ── 2. CENTER IMMERSIVE STAGE ──────────────────────── */}
                     <div className="relative z-20 flex-1 w-full max-w-[1700px] mx-auto px-5 sm:px-10 lg:px-16 flex flex-col lg:flex-row items-center justify-between gap-6 lg:gap-8 py-4 lg:py-2">
-                        {/* Generative Vector Topological Contour Waves */}
-                        {!isMobile && (
-                            <motion.svg
-                                ref={contourSvgRef}
-                                style={{ x: isMobile ? 0 : linesX }}
-                                className="absolute inset-0 w-full h-full pointer-events-none opacity-20 lg:opacity-30 z-0 overflow-visible"
-                                viewBox="0 0 1200 800"
-                                fill="none"
-                            >
-                                {[0, 35, 70, 105, 140, 175, 210].map((offset, i) => (
-                                    <path
-                                        key={i}
-                                        className="editorial-line"
-                                        d={`M ${220 + offset * 1.3} 0 C ${380 + offset} 220, ${480 + offset} 480, ${
-                                            720 + offset * 1.1
-                                        } 800`}
-                                        stroke={domainOverdrive ? '#EF4444' : '#FFD700'}
-                                        strokeWidth={domainOverdrive ? '1.5' : '1'}
-                                        strokeOpacity={domainOverdrive ? 0.8 - i * 0.08 : 0.6 - i * 0.07}
-                                        strokeDasharray="500"
-                                        strokeDashoffset="0"
-                                    />
-                                ))}
-                            </motion.svg>
-                        )}
-
                         {/* ── LEFT COLUMN: AUTHENTIC HOOK & MANIFESTO ───── */}
                         <div
                             ref={leftPaneRef}
@@ -569,14 +492,16 @@ const Hero = () => {
 
                     {/* ── 3. MODULAR BOTTOM FOOTER BAR ────────────────────── */}
                     <HeroFooter
+                        containerRef={footerRef}
+                        progressRef={progressRef}
                         domainOverdrive={domainOverdrive}
                         isMobile={isMobile}
-                        scrollProgress={scrollProgress}
+                        hasScrolled={hasScrolled}
                     />
                 </div>
 
                 {/* Global Grain */}
-                <div className="absolute inset-0 pointer-events-none z-[60] opacity-[0.02] bg-pattern-noise" />
+                <div ref={grainRef} className="absolute inset-0 pointer-events-none z-[60] opacity-[0.02] bg-pattern-noise" />
             </div>
 
             {/* ── 4. MODULAR MOBILE FLOW ──────────────────────────── */}

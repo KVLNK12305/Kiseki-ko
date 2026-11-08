@@ -1,77 +1,110 @@
 import React, { useRef, useEffect } from 'react';
 
 // ── Subtle Celestial Sparkle Engine ───────────────────────────
-const CelestialField = React.memo(({ overdrive }) => {
+// A few dozen drifting sparks on a 2D canvas. It only animates while it
+// is actually on screen, renders at device pixel ratio (capped at 2) so
+// sparks stay crisp on HiDPI displays, and draws a single still frame
+// for users who prefer reduced motion. `paused` holds it on a still
+// frame (e.g. while the intro curtain covers it).
+const CelestialField = React.memo(({ overdrive, paused = false }) => {
     const canvasRef = useRef(null);
 
     useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
-        let w, h, animationFrame;
-        const particles = [];
-        const MAX_P = overdrive ? 45 : 24;
+        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        const count = overdrive ? 45 : 24;
+        const speed = overdrive ? 0.35 : 0.18;
+        const maxSize = overdrive ? 1.6 : 1.1;
+        let w = 0;
+        let h = 0;
+        let frame = 0;
+        let running = false;
+
+        const spawn = (p) => {
+            p.x = Math.random() * w;
+            p.y = Math.random() * h;
+            p.vx = (Math.random() - 0.5) * speed;
+            p.vy = (Math.random() - 0.5) * speed;
+            p.size = Math.random() * maxSize + 0.3;
+            p.life = 0;
+            p.maxLife = Math.random() * 140 + 70;
+            p.gold = Math.random() > 0.4;
+            return p;
+        };
 
         const resize = () => {
-            w = canvas.width = window.innerWidth;
-            h = canvas.height = window.innerHeight;
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            w = canvas.clientWidth;
+            h = canvas.clientHeight;
+            canvas.width = Math.round(w * dpr);
+            canvas.height = Math.round(h * dpr);
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         };
 
-        class Spark {
-            constructor() { this.reset(); }
-            reset() {
-                this.x = Math.random() * (w || window.innerWidth);
-                this.y = Math.random() * (h || window.innerHeight);
-                this.vx = (Math.random() - 0.5) * (overdrive ? 0.35 : 0.18);
-                this.vy = (Math.random() - 0.5) * (overdrive ? 0.35 : 0.18);
-                this.size = Math.random() * (overdrive ? 1.6 : 1.1) + 0.3;
-                this.life = 0;
-                this.maxLife = Math.random() * 140 + 70;
-                this.isGold = Math.random() > 0.4;
-            }
-            update() {
-                this.x += this.vx;
-                this.y += this.vy;
-                this.life++;
-                if (this.life > this.maxLife) this.reset();
-            }
-            draw() {
-                const prog = this.life / this.maxLife;
-                const alpha = prog < 0.5 ? (prog / 0.5) * 0.55 : ((1 - prog) / 0.5) * 0.55;
+        resize();
+        const particles = Array.from({ length: count }, () => {
+            const p = spawn({});
+            p.life = Math.floor(Math.random() * p.maxLife); // stagger so they don't pulse in sync
+            return p;
+        });
+
+        const draw = () => {
+            ctx.clearRect(0, 0, w, h);
+            for (const p of particles) {
+                const t = p.life / p.maxLife;
+                const alpha = (t < 0.5 ? t : 1 - t) * 1.1; // fade in, fade out; peaks at 0.55
                 ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fillStyle = this.isGold ? `rgba(255, 215, 0, ${alpha})` : `rgba(168, 85, 247, ${alpha * 0.8})`;
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fillStyle = p.gold ? `rgba(255, 215, 0, ${alpha})` : `rgba(168, 85, 247, ${alpha * 0.8})`;
                 ctx.fill();
             }
-        }
+        };
 
-        const init = () => {
-            particles.length = 0;
-            for (let i = 0; i < MAX_P; i++) {
-                const p = new Spark();
-                p.life = Math.floor(Math.random() * p.maxLife);
-                particles.push(p);
+        const tick = () => {
+            for (const p of particles) {
+                p.x += p.vx;
+                p.y += p.vy;
+                if (++p.life > p.maxLife) spawn(p);
             }
+            draw();
+            frame = requestAnimationFrame(tick);
         };
 
-        const animate = () => {
-            ctx.clearRect(0, 0, w, h);
-            particles.forEach(p => { p.update(); p.draw(); });
-            animationFrame = requestAnimationFrame(animate);
+        const start = () => {
+            if (running || reducedMotion || paused) return;
+            running = true;
+            frame = requestAnimationFrame(tick);
+        };
+        const stop = () => {
+            running = false;
+            cancelAnimationFrame(frame);
         };
 
-        window.addEventListener('resize', resize);
-        resize();
-        init();
-        animate();
+        const resizeObserver = new ResizeObserver(() => {
+            resize();
+            if (!running) draw();
+        });
+        resizeObserver.observe(canvas);
+
+        const visibilityObserver = new IntersectionObserver(([entry]) => {
+            if (entry.isIntersecting) start();
+            else stop();
+        });
+        visibilityObserver.observe(canvas);
+
+        draw();
 
         return () => {
-            window.removeEventListener('resize', resize);
-            cancelAnimationFrame(animationFrame);
+            stop();
+            resizeObserver.disconnect();
+            visibilityObserver.disconnect();
         };
-    }, [overdrive]);
+    }, [overdrive, paused]);
 
-    return <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none z-0" />;
+    return <canvas ref={canvasRef} className="absolute inset-0 h-full w-full pointer-events-none z-0" aria-hidden="true" />;
 });
 
 export default CelestialField;
